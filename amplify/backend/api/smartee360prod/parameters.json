@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "smartee360prod",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authsmartee360prod0d01e8ec",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

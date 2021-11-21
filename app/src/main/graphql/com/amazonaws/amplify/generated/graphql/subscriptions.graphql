@@ -1,0 +1,433 @@
+# this is an auto generated file. This will be overwritten
+subscription OnCreateUsers {
+  onCreateUsers {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateUsers {
+  onUpdateUsers {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteUsers {
+  onDeleteUsers {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateAssets {
+  onCreateAssets {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateAssets {
+  onUpdateAssets {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteAssets {
+  onDeleteAssets {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateLocations {
+  onCreateLocations {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateLocations {
+  onUpdateLocations {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteLocations {
+  onDeleteLocations {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateAuditLog {
+  onCreateAuditLog {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateAuditLog {
+  onUpdateAuditLog {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteAuditLog {
+  onDeleteAuditLog {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateScannedAssetsAuditLog {
+  onCreateScannedAssetsAuditLog {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateScannedAssetsAuditLog {
+  onUpdateScannedAssetsAuditLog {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteScannedAssetsAuditLog {
+  onDeleteScannedAssetsAuditLog {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}

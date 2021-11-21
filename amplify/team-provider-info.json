@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-smartee360prod-dev-92549-authRole",
+      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-92549-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-92549-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-smartee360prod-dev-92549-deployment",
+      "UnauthRoleName": "amplify-smartee360prod-dev-92549-unauthRole",
+      "StackName": "amplify-smartee360prod-dev-92549",
+      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-dev-92549/6f6b0060-46ae-11ec-bab9-128c6aa54d31",
+      "AmplifyAppId": "dgdyu6qym2v7e"
+    },
+    "categories": {
+      "auth": {
+        "smartee360prod0d01e8ec": {}
+      }
+    }
+  }
+}

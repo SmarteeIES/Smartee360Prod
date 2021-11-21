@@ -1,0 +1,98 @@
+type Users @model {
+  id: ID!
+  name: String!
+  description: String
+  baseUserType: String!
+  company: String!
+  email: String!
+  status: String
+  scanTime: Float
+  phoneNumber: String
+}
+
+type Assets @model
+@key (name: "locationIDIndex", fields: ["locationID"])
+@key(name: "assetByMacIndex", fields: ["baseAssetType","macAddress"], queryField: "assetByMac")
+@key(name: "assetBylocationIDIndex", fields: ["baseAssetType","locationID"], queryField: "assetBylocationID")
+@key(name: "assetByOwnerIndex", fields: ["baseAssetType","owner"], queryField: "assetByOwner")
+{
+  id: ID!
+  baseAssetType: String!
+  assetName: String!
+  assetID: String!
+  macAddress: String!
+  serviceID: String
+  locationID: ID!
+  uuidNumber: String
+  major: String
+  minor: String
+  rssiMax: Float
+  rssiMin: Float
+  rssiAvg: Float
+  latitude: Float!
+  longitude: Float!
+  classification: String
+  owner: String
+  locationName: String
+}
+
+
+type Locations @model
+{
+  id: ID!
+  baseLocationType: String!
+  locationName: String!
+  address: String!
+  latitude: Float!
+  longitude: Float!
+  classification: String
+  assets: [Assets] @connection(keyName: "locationIDIndex", fields: ["id"])
+  owner: String
+  category1: String
+  category2: String
+  category3: String
+}
+
+type AuditLog @model
+@key(name: "auditByDeviceIndex", fields: ["baseActionType","device"], queryField: "auditByDevice")
+@key(name: "auditByStoreIndex", fields: ["baseActionType","storeName"], queryField: "auditByStore")
+
+{
+  id: ID!
+  baseActionType: String!
+  user: String
+  device: String
+  deviceLatitude: Float
+  deviceLongitude: Float
+  storeName: String
+  scanTime: String
+  confirmTime: String
+  scannedAssets: [ScannedAssetsAuditLog] @connection(keyName: "auditLogIDIndex", fields: ["id"])
+  selectedStoreName:  String
+  owner: String
+  rssiMax: Float
+  rssiMin: Float
+  rssiAvg: Float
+}
+
+type ScannedAssetsAuditLog @model
+@key (name: "auditLogIDIndex", fields: ["auditLogID"])
+
+
+{
+  id: ID!
+  baseAssetType: String!
+  assetName: String!
+  assetID: String!
+  macAddress: String!
+  serviceID: String
+  auditLogID: ID!
+  uuidNumber: String
+  major: String
+  minor: String
+  rssi1: Float
+  rssi2: Float
+  rssi3: Float
+  classification: String
+  owner: String
+}

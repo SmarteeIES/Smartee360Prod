@@ -1,0 +1,478 @@
+# this is an auto generated file. This will be overwritten
+mutation CreateUsers(
+  $input: CreateUsersInput!
+  $condition: ModelUsersConditionInput
+) {
+  createUsers(input: $input, condition: $condition) {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateUsers(
+  $input: UpdateUsersInput!
+  $condition: ModelUsersConditionInput
+) {
+  updateUsers(input: $input, condition: $condition) {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteUsers(
+  $input: DeleteUsersInput!
+  $condition: ModelUsersConditionInput
+) {
+  deleteUsers(input: $input, condition: $condition) {
+    id
+    name
+    description
+    baseUserType
+    company
+    email
+    status
+    scanTime
+    phoneNumber
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateAssets(
+  $input: CreateAssetsInput!
+  $condition: ModelAssetsConditionInput
+) {
+  createAssets(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateAssets(
+  $input: UpdateAssetsInput!
+  $condition: ModelAssetsConditionInput
+) {
+  updateAssets(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteAssets(
+  $input: DeleteAssetsInput!
+  $condition: ModelAssetsConditionInput
+) {
+  deleteAssets(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateLocations(
+  $input: CreateLocationsInput!
+  $condition: ModelLocationsConditionInput
+) {
+  createLocations(input: $input, condition: $condition) {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateLocations(
+  $input: UpdateLocationsInput!
+  $condition: ModelLocationsConditionInput
+) {
+  updateLocations(input: $input, condition: $condition) {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteLocations(
+  $input: DeleteLocationsInput!
+  $condition: ModelLocationsConditionInput
+) {
+  deleteLocations(input: $input, condition: $condition) {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    owner
+    category1
+    category2
+    category3
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateAuditLog(
+  $input: CreateAuditLogInput!
+  $condition: ModelAuditLogConditionInput
+) {
+  createAuditLog(input: $input, condition: $condition) {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateAuditLog(
+  $input: UpdateAuditLogInput!
+  $condition: ModelAuditLogConditionInput
+) {
+  updateAuditLog(input: $input, condition: $condition) {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteAuditLog(
+  $input: DeleteAuditLogInput!
+  $condition: ModelAuditLogConditionInput
+) {
+  deleteAuditLog(input: $input, condition: $condition) {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateScannedAssetsAuditLog(
+  $input: CreateScannedAssetsAuditLogInput!
+  $condition: ModelScannedAssetsAuditLogConditionInput
+) {
+  createScannedAssetsAuditLog(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateScannedAssetsAuditLog(
+  $input: UpdateScannedAssetsAuditLogInput!
+  $condition: ModelScannedAssetsAuditLogConditionInput
+) {
+  updateScannedAssetsAuditLog(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteScannedAssetsAuditLog(
+  $input: DeleteScannedAssetsAuditLogInput!
+  $condition: ModelScannedAssetsAuditLogConditionInput
+) {
+  deleteScannedAssetsAuditLog(input: $input, condition: $condition) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    createdAt
+    updatedAt
+  }
+}
