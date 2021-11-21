@@ -5,11 +5,12 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.moko.beaconxpro"
-        minSdkVersion 18
+        applicationId "za.smartee.threeSixty"
+        minSdkVersion 23
         targetSdkVersion 29
-        versionCode 12
-        versionName "1.1.2"
+        multiDexEnabled true
+        versionCode 1
+        versionName "1.0"
     }
 
     buildTypes {
@@ -19,6 +20,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -28,9 +30,9 @@ android {
             def outputFile = output.outputFile
             if (outputFile != null && outputFile.name.endsWith('.apk')) {
                 def formatedDate = new Date().format("yyyyMMddHHmm")
-                def apkFileName = "BeaconXPro_${defaultConfig.versionName}_${formatedDate}.apk"
+                def apkFileName = "SmarteeThreeSixty_${defaultConfig.versionName}_${formatedDate}.apk"
                 if (outputFile.name.contains('debug')) {
-                    apkFileName = "BeaconXPro_${defaultConfig.versionName}_${formatedDate}_debug.apk"
+                    apkFileName = "SmarteeThreeSixty_${defaultConfig.versionName}_${formatedDate}_debug.apk"
                 }
                 outputFileName = apkFileName
             }
@@ -41,6 +43,7 @@ android {
 dependencies {
     // Butter Knife
     implementation 'com.jakewharton:butterknife:10.2.1'
+    implementation 'com.google.android.material:material:1.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
@@ -50,4 +53,21 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.4.1'
     implementation 'cn.carbswang.android:NumberPickerView:1.1.1'
     implementation project(path: ':mokosupport')
+
+    // Support for Java 8 features
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    implementation 'com.amplifyframework:aws-api:1.28.1'
+    implementation 'com.amplifyframework:aws-datastore:1.28.1'
+    implementation 'com.amplifyframework:core:1.6.5'
+    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.13.7'
+    implementation 'com.amplifyframework:aws-auth-cognito:1.17.7'
+
+
+// Cognito UserPools for SignIn
+    implementation 'com.amazonaws:aws-android-sdk-auth-userpools:2.13.5'
+
+//For the drop-in UI also:
+    implementation 'com.amazonaws:aws-android-sdk-auth-ui:2.13.5'
+
+
 }
