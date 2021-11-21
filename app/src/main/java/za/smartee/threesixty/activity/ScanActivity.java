@@ -1,12 +1,18 @@
 package za.smartee.threesixty.activity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +24,8 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignOutOptions;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +47,13 @@ public class ScanActivity extends BaseActivity {
     private boolean DSSuccess = true;
     public boolean networkConnectStatus;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
@@ -50,6 +61,7 @@ public class ScanActivity extends BaseActivity {
         TextView answer3 = (TextView) findViewById(R.id.scanInfo3);
         TextView answer4 = (TextView) findViewById(R.id.TextViewSelectedStore);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
+        loadingSwitch.setVisibility(View.INVISIBLE);
         loadingSwitch.setChecked(false);
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
         dlgAlert.setMessage("No Network Available, please connect and retry");
@@ -103,6 +115,15 @@ public class ScanActivity extends BaseActivity {
             }
         });
 
+        Button doneButton = (Button) findViewById(R.id.DONE);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+               onDonePressed();
+            }
+        });
+
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,8 +147,35 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        Intent i = new Intent(ScanActivity.this, MainActivity.class);
+        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
         startActivity(i);
+    }
+
+
+    public void onDonePressed() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Is the Smartee Scan Complete?");
+        alertDialogBuilder
+                .setMessage("Click Yes to Confirm and Exit!")
+                .setCancelable(false)
+                .setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                moveTaskToBack(true);
+                                android.os.Process.killProcess(android.os.Process.myPid());
+                                System.exit(1);
+                            }
+                        })
+
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private boolean isNetworkAvailable() {

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -192,7 +193,7 @@ public class ScanConfirmActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_confirm);
-        //ButterKnife.bind(this);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         btnScan = (Button) findViewById(R.id.btnScan);
         btnConfirm = (Button) findViewById(R.id.btnConfirm);
         btnScanCancel = (Button) findViewById(R.id.btnCancelScan);
@@ -604,8 +605,8 @@ public class ScanConfirmActivity extends BaseActivity{
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void onFinish() {
                 mokoBleScanner.stopScanDevice();
-//                spinner=(ProgressBar)findViewById(R.id.progressBar);
-//                spinner.setVisibility(View.GONE);
+                spinner=(ProgressBar)findViewById(R.id.progressBar);
+                spinner.setVisibility(View.GONE);
                 TextView answer = (TextView) findViewById(R.id.scanInfo);
                 selectedLocation.setVisibility(View.VISIBLE);
 

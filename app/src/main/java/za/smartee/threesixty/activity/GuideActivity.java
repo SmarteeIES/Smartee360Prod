@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -32,6 +33,7 @@ public class GuideActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             finish();
@@ -53,7 +55,6 @@ public class GuideActivity extends BaseActivity {
             case AppConstants.PERMISSION_REQUEST_CODE: {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        // 判断用户是否 点击了不再提醒。(检测该权限是否还可以申请)
                         boolean shouldShowRequest = shouldShowRequestPermissionRationale(permissions[0]);
                         if (shouldShowRequest) {
                             if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)) {

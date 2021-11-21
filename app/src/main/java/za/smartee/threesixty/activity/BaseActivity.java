@@ -9,11 +9,12 @@ import android.os.SystemClock;
 
 import com.elvishew.xlog.XLog;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 
-public class BaseActivity extends FragmentActivity {
+public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public class BaseActivity extends FragmentActivity {
     }
 
 
-    // 记录上次页面控件点击时间,屏蔽无效点击事件
+
     protected long mLastOnClickTime = 0;
 
     public boolean isWindowLocked() {
