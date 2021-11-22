@@ -401,8 +401,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
                                         // Mutation Update Start
                                         Amplify.API.mutate(ModelMutation.update(AssetItem),
-                                                response -> Log.i("MyAmplifyApp", "Asset with id: " + response.getData().getId()),
-                                                error -> Log.e("MyAmplifyApp", "Create failed", error)
+                                                response -> Log.i("Smartee", "Asset with id: " + response.getData().getId()),
+                                                error -> Log.e("Smartee", "Create failed", error)
                                         );
                                         //Mutation Update end
                                     }
@@ -422,8 +422,8 @@ public class ScanConfirmActivity extends BaseActivity{
                                             .owner(company)
                                             .build();
                                     Amplify.API.mutate(ModelMutation.create(auditItems),
-                                            response -> Log.i("MyAmplifyApp", "Audit with id: " + response.getData().getId()),
-                                            error -> Log.e("MyAmplifyApp", "Create failed", error)
+                                            response -> Log.i("Smartee", "Audit with id: " + response.getData().getId()),
+                                            error -> Log.e("Smartee", "Create failed", error)
                                     );
                                     //Mutation Update end
                                 }
@@ -522,7 +522,7 @@ public class ScanConfirmActivity extends BaseActivity{
 
         //Start of query to find the Locations, assets and company details.
         Amplify.API.query(
-                ModelQuery.list(Users.class, Users.COMPANY.contains("Spar")),
+                ModelQuery.list(Users.class, Users.COMPANY.contains(getResources().getString(R.string.customer))),
                 response -> {
                     for (Users users : response.getData()) {
                         if (user.equals(users.getEmail()) ) {
@@ -531,7 +531,7 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
 
                     Amplify.API.query(
-                            ModelQuery.list(Locations.class, Locations.OWNER.contains("Spar")),
+                            ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
                             locResponse -> {
                                 locationDetailInfo = new ArrayList<Map<String, String>>();
                                 for (Locations locationDetail : locResponse.getData()) {
@@ -557,7 +557,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                 }
                             },
                             error -> {
-                                Log.e("MyAmplifyApp", "Query failure", error);
+                                Log.e("Smartee", "Query failure", error);
                                 dlgAlert.create().show();
                             }
                     );
@@ -580,7 +580,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                 }
                             },
                             error -> {
-                                Log.e("MyAmplifyApp", "Query failure", error);
+                                Log.e("Smartee", "Query failure", error);
                                 dlgAlert.create().show();
                             }
                     );

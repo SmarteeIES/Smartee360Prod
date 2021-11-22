@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Smartee 360</string>
-
+    <string name="customer">Spar</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="ok">OK</string>

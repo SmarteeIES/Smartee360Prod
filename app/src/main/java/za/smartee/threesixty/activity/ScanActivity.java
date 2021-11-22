@@ -131,7 +131,7 @@ public class ScanActivity extends BaseActivity {
                     @Override
                     public void onResult(final Void result) {
                         Log.d("Signout Msg", "signed-out");
-                        Intent i = new Intent(ScanActivity.this, ScanConfirmActivity.class);
+                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
                         startActivity(i);
                     }
 
@@ -140,6 +140,7 @@ public class ScanActivity extends BaseActivity {
                         Log.e("Signout Msg", "sign-out error", e);
                     }
                 });
+
             }
         });
     }
