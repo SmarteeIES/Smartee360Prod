@@ -11,6 +11,8 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignInUIOptions;
 import com.amazonaws.mobile.client.UserStateDetails;
+import com.amplifyframework.auth.AuthUser;
+import com.amplifyframework.core.Amplify;
 
 import za.smartee.threesixty.R;
 
@@ -27,20 +29,22 @@ public class AuthActivity extends BaseActivity {
             @Override
             public void onResult(UserStateDetails userStateDetails) {
                 Log.i("TAG", userStateDetails.getUserState().toString());
-
-
-                switch (userStateDetails.getUserState()) {
-                    case SIGNED_IN:
-                        Intent i = new Intent(AuthActivity.this, GuideActivity.class);
-                        startActivity(i);
-                        break;
-                    case SIGNED_OUT:
-                        showSignIn();
-                        break;
-                    default:
-                        AWSMobileClient.getInstance().signOut();
-                        showSignIn();
-                        break;
+                if (Amplify.Auth.getCurrentUser() == null){
+                    showSignIn();
+                } else {
+                    switch (userStateDetails.getUserState()) {
+                        case SIGNED_IN:
+                            Intent i = new Intent(AuthActivity.this, GuideActivity.class);
+                            startActivity(i);
+                            break;
+                        case SIGNED_OUT:
+                            showSignIn();
+                            break;
+                        default:
+                            AWSMobileClient.getInstance().signOut();
+                            showSignIn();
+                            break;
+                    }
                 }
             }
 

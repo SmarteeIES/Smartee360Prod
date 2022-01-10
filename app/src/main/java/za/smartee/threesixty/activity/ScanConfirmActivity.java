@@ -149,6 +149,7 @@ public class ScanConfirmActivity extends BaseActivity{
     Long scannerSetTime;
     Date scanTime;
     Date confirmTime;
+    String user;
     String scanDurationType;
     private boolean missingLocFlag = false;
 
@@ -518,162 +519,169 @@ public class ScanConfirmActivity extends BaseActivity{
 
         Boolean finalLoadingChecked1 = loadingChecked;
         AuthUser currentUser = Amplify.Auth.getCurrentUser();
-        String user = currentUser.getUsername().toString();
 
-        //Start of query to find the Locations, assets and company details.
-        Amplify.API.query(
-                ModelQuery.list(Users.class, Users.COMPANY.contains(getResources().getString(R.string.customer))),
-                response -> {
-                    for (Users users : response.getData()) {
-                        if (user.equals(users.getEmail()) ) {
-                            company = users.getCompany();
-                        }
-                    }
 
+                if (Amplify.Auth.getCurrentUser() == null){
+                    Intent i = new Intent(ScanConfirmActivity.this, AuthActivity.class);
+                    startActivity(i);
+                }
+                else {
+                    String user = currentUser.getUsername().toString();
+                    //Start of query to find the Locations, assets and company details.
                     Amplify.API.query(
-                            ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
-                            locResponse -> {
-                                locationDetailInfo = new ArrayList<Map<String, String>>();
-                                for (Locations locationDetail : locResponse.getData()) {
-                                    if (locationDetail.getAddress() != null) {
-                                        Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
-                                        locationDetailInfo1.put("Address", locationDetail.getAddress());
-                                        locationDetailInfo1.put("LocationID", locationDetail.getId());
-                                        locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
-                                        locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
-                                        locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
-                                        locationDetailInfo.add(locationDetailInfo1);
+                            ModelQuery.list(Users.class, Users.COMPANY.contains(getResources().getString(R.string.customer))),
+                            response -> {
+                                for (Users users : response.getData()) {
+                                    if (user.equals(users.getEmail())) {
+                                        company = users.getCompany();
                                     }
                                 }
-                                for (int r = 0; r < locationDetailInfo.size(); r++){
-                                    String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                    if (finalLoadingChecked1){
-                                        if (tempLoc.equals("Transit") ){
-                                            locDdData.add(locationDetailInfo.get(r).get("Address"));
+
+                                Amplify.API.query(
+                                        ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
+                                        locResponse -> {
+                                            locationDetailInfo = new ArrayList<Map<String, String>>();
+                                            for (Locations locationDetail : locResponse.getData()) {
+                                                if (locationDetail.getAddress() != null) {
+                                                    Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
+                                                    locationDetailInfo1.put("Address", locationDetail.getAddress());
+                                                    locationDetailInfo1.put("LocationID", locationDetail.getId());
+                                                    locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
+                                                    locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
+                                                    locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
+                                                    locationDetailInfo.add(locationDetailInfo1);
+                                                }
+                                            }
+                                            for (int r = 0; r < locationDetailInfo.size(); r++) {
+                                                String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                                                if (finalLoadingChecked1) {
+                                                    if (tempLoc.equals("Transit")) {
+                                                        locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                                    }
+                                                } else {
+                                                    locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                                }
+                                            }
+                                        },
+                                        error -> {
+                                            Log.e("Smartee", "Query failure", error);
+                                            dlgAlert.create().show();
                                         }
-                                    } else {
-                                        locDdData.add(locationDetailInfo.get(r).get("Address"));
-                                    }
-                                }
+                                );
+
+                                Amplify.API.query(
+                                        ModelQuery.list(Assets.class, Assets.OWNER.contains(company)),
+                                        assetResponse -> {
+                                            assetDetailInfo = new ArrayList<Map<String, String>>();
+                                            for (Assets assetDetail : assetResponse.getData()) {
+                                                if (assetDetail.getAssetId() != null) {
+                                                    assetItems.add(assetDetail.getAssetId().toString());
+                                                    Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
+                                                    assetDetailInfo1.put("systemID", assetDetail.getId());
+                                                    assetDetailInfo1.put("assetID", assetDetail.getAssetId());
+                                                    assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
+                                                    assetDetailInfo1.put("assetName", assetDetail.getAssetName());
+                                                    assetDetailInfo1.put("locationID", assetDetail.getLocationId());
+                                                    assetDetailInfo.add(assetDetailInfo1);
+                                                }
+                                            }
+                                        },
+                                        error -> {
+                                            Log.e("Smartee", "Query failure", error);
+                                            dlgAlert.create().show();
+                                        }
+                                );
                             },
-                            error -> {
-                                Log.e("Smartee", "Query failure", error);
-                                dlgAlert.create().show();
-                            }
+                            error -> Log.e("Smartee 360 Message", "Query failure", error)
                     );
 
-                    Amplify.API.query(
-                            ModelQuery.list(Assets.class, Assets.OWNER.contains(company)),
-                            assetResponse -> {
-                                assetDetailInfo = new ArrayList<Map<String, String>>();
-                                for (Assets assetDetail : assetResponse.getData()) {
-                                    if (assetDetail.getAssetId() != null) {
-                                        assetItems.add(assetDetail.getAssetId().toString());
-                                        Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-                                        assetDetailInfo1.put("systemID", assetDetail.getId());
-                                        assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-                                        assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-                                        assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-                                        assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-                                        assetDetailInfo.add(assetDetailInfo1);
+                    Boolean finalLoadingChecked = loadingChecked;
+                    scannerSetTime = (new Double(25000)).longValue();
+
+                    new CountDownTimer(scannerSetTime, 1000) {
+                        @RequiresApi(api = Build.VERSION_CODES.N)
+                        public void onTick(long millisUntilFinished) {
+                            btnScan.setVisibility(View.INVISIBLE);
+                            TextView infoView = (TextView) findViewById(R.id.infoView);
+                            TextView timeText = (TextView) findViewById(R.id.timerText);
+
+                            infoView.setText("Scanning In Progress");
+                            Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
+                        }
+
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        public void onFinish() {
+                            mokoBleScanner.stopScanDevice();
+                            spinner = (ProgressBar) findViewById(R.id.progressBar);
+                            spinner.setVisibility(View.GONE);
+                            TextView answer = (TextView) findViewById(R.id.scanInfo);
+                            selectedLocation.setVisibility(View.VISIBLE);
+
+                            if (locationDetailInfo.equals(null)) {
+                                dlgAlert.show();
+                            }
+                            Integer locationDetailInfoSize = locationDetailInfo.size();
+                            if (locationDetailInfoSize == null) {
+                                locationDetailInfoSize = 0;
+                            }
+
+                            for (int r = 0; r < locationDetailInfoSize; r++) {
+                                locationInfoFlag = true;
+                                String tempLoc;
+                                tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                                if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
+                                    double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
+                                    if (distResult < 501) {
+                                        calculatedLoc = locationDetailInfo.get(r).get("Address");
                                     }
                                 }
-                            },
-                            error -> {
-                                Log.e("Smartee", "Query failure", error);
-                                dlgAlert.create().show();
                             }
-                    );
-                },
-                error -> Log.e("Smartee 360 Message", "Query failure", error)
-        );
+                            TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
 
-        Boolean finalLoadingChecked = loadingChecked;
-        scannerSetTime = (new Double(25000)).longValue();
+                            if (finalLoadingChecked) {
+                                selectedLocation.setVisibility(View.VISIBLE);
+                                selectedLocation.setText("Select Vehicle");
+                                locDD.setVisibility(View.VISIBLE);
+                                ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
+                                LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                LocationDDAdapter.notifyDataSetChanged();
+                                locDD.setAdapter(LocationDDAdapter);
+                                calculatedLoc = "Loading Checked";
+                            } else {
+                                missingLocation.setVisibility(View.VISIBLE);
+                                if (missingLocFlag == false) {
+                                    selectedLocation.setVisibility(View.VISIBLE);
+                                    if (calculatedLoc == null || calculatedLoc.equals("")) {
+                                        calculatedLoc = "No Location Available";
+                                    }
+                                    selectedLocation.setText("Current Location - " + calculatedLoc);
+                                }
+                            }
 
-        new CountDownTimer(scannerSetTime, 1000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            public void onTick(long millisUntilFinished) {
-                btnScan.setVisibility(View.INVISIBLE);
-                TextView infoView = (TextView) findViewById(R.id.infoView);
-                TextView timeText = (TextView) findViewById(R.id.timerText);
+                            if (!locationInfoFlag) {
+                                selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
+                            }
 
-                infoView.setText("Scanning In Progress");
-                Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
-            }
+                            locationInfoFlag = false;
 
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            public void onFinish() {
-                mokoBleScanner.stopScanDevice();
-                spinner=(ProgressBar)findViewById(R.id.progressBar);
-                spinner.setVisibility(View.GONE);
-                TextView answer = (TextView) findViewById(R.id.scanInfo);
-                selectedLocation.setVisibility(View.VISIBLE);
+                            if (calculatedLoc.equals("No Location Available")) {
+                                if (missingLocFlag != false) {
+                                    btnConfirm.setVisibility(View.VISIBLE);
+                                }
+                            } else {
+                                btnConfirm.setVisibility(View.VISIBLE);
+                            }
+                            btnScanCancel.setVisibility(View.VISIBLE);
 
-                if (locationDetailInfo.equals(null)){
-                    dlgAlert.show();
-                }
-                Integer locationDetailInfoSize = locationDetailInfo.size();
-                if (locationDetailInfoSize == null){
-                    locationDetailInfoSize = 0;
-                }
 
-                for (int r = 0; r < locationDetailInfoSize; r++){
-                    locationInfoFlag = true;
-                    String tempLoc;
-                    tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                    if (tempLoc.equals("DC") || tempLoc.equals("Store") ){
-                        double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")),Double.parseDouble(locationDetailInfo.get(r).get("Longitude")),devLat[0],devLng[0],0,0);
-                        if (distResult < 501){
-                            calculatedLoc = locationDetailInfo.get(r).get("Address");
+                            TextView infoView = (TextView) findViewById(R.id.infoView);
+                            TextView timeText = (TextView) findViewById(R.id.timerText);
+                            timeText.setText("");
+                            infoView.setText("");
+                            ArrayList<String> devData = new ArrayList<String>();
                         }
-                    }
+                    }.start();
                 }
-                TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
-
-                if (finalLoadingChecked){
-                    selectedLocation.setVisibility(View.VISIBLE);
-                    selectedLocation.setText("Select Vehicle");
-                    locDD.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
-                    LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    LocationDDAdapter.notifyDataSetChanged();
-                    locDD.setAdapter(LocationDDAdapter);
-                    calculatedLoc = "Loading Checked";
-                } else {
-                    missingLocation.setVisibility(View.VISIBLE);
-                    if (missingLocFlag == false) {
-                        selectedLocation.setVisibility(View.VISIBLE);
-                        if (calculatedLoc == null || calculatedLoc.equals("")) {
-                            calculatedLoc = "No Location Available";
-                        }
-                        selectedLocation.setText("Current Location - " + calculatedLoc);
-                    }
-                }
-
-                if (!locationInfoFlag){
-                    selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
-                }
-
-                locationInfoFlag = false;
-
-                if (calculatedLoc.equals("No Location Available")){
-                    if (missingLocFlag != false) {
-                        btnConfirm.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    btnConfirm.setVisibility(View.VISIBLE);
-                }
-                btnScanCancel.setVisibility(View.VISIBLE);
-
-
-                TextView infoView = (TextView) findViewById(R.id.infoView);
-                TextView timeText = (TextView) findViewById(R.id.timerText);
-                timeText.setText("");
-                infoView.setText("");
-                ArrayList<String> devData = new ArrayList<String>();
-            }
-        }.start();
     }
 
     //Check Permissions
