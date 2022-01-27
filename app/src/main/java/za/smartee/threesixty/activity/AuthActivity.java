@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -29,7 +30,7 @@ public class AuthActivity extends BaseActivity {
             @Override
             public void onResult(UserStateDetails userStateDetails) {
                 Log.i("TAG", userStateDetails.getUserState().toString());
-                if (Amplify.Auth.getCurrentUser() == null){
+                if (Amplify.Auth.getCurrentUser() == null) {
                     showSignIn();
                 } else {
                     switch (userStateDetails.getUserState()) {
@@ -86,6 +87,10 @@ public class AuthActivity extends BaseActivity {
                 });
             }
         });
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
     }
 
     private void showSignIn() {
