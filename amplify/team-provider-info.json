@@ -1,33 +1,43 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-smartee360prod-dev-92549-authRole",
-      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-92549-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-92549-authRole",
+      "AuthRoleName": "amplify-smartee360prod-dev-144557-authRole",
+      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-144557-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-dev-144557-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-smartee360prod-dev-92549-deployment",
-      "UnauthRoleName": "amplify-smartee360prod-dev-92549-unauthRole",
-      "StackName": "amplify-smartee360prod-dev-92549",
-      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-dev-92549/6f6b0060-46ae-11ec-bab9-128c6aa54d31",
-      "AmplifyAppId": "dgdyu6qym2v7e"
+      "DeploymentBucketName": "amplify-smartee360prod-dev-144557-deployment",
+      "UnauthRoleName": "amplify-smartee360prod-dev-144557-unauthRole",
+      "StackName": "amplify-smartee360prod-dev-144557",
+      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-dev-144557/644ee3f0-93dd-11ec-8dee-0a62b6e92247",
+      "AmplifyAppId": "d1tt2u4wz350rm"
     },
     "categories": {
       "auth": {
-        "smartee360prod0d01e8ec": {}
+        "smartee360prod1d4a730b": {
+          "userPoolId": "us-east-1_HlrKQMyiw",
+          "userPoolName": "smartee3602846c3a6_userpool_2846c3a6-amplify",
+          "webClientId": "2ng0s856tn3lbu1701rv7882r3",
+          "nativeClientId": "2ng0s856tn3lbu1701rv7882r3"
+        }
       }
     }
   },
   "prod": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-smartee360prod-prod-150939-authRole",
-      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-150939-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-150939-authRole",
+      "AuthRoleName": "amplify-smartee360prod-prod-161225-authRole",
+      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-161225-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-161225-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-smartee360prod-prod-150939-deployment",
-      "UnauthRoleName": "amplify-smartee360prod-prod-150939-unauthRole",
-      "StackName": "amplify-smartee360prod-prod-150939",
-      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-prod-150939/8939a4f0-9317-11ec-b834-0adec8a6997d",
-      "AmplifyAppId": "dgdyu6qym2v7e"
+      "DeploymentBucketName": "amplify-smartee360prod-prod-161225-deployment",
+      "UnauthRoleName": "amplify-smartee360prod-prod-161225-unauthRole",
+      "StackName": "amplify-smartee360prod-prod-161225",
+      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-prod-161225/79583650-93e9-11ec-9532-0a8554cb7fa7",
+      "AmplifyAppId": "d1tt2u4wz350rm"
+    },
+    "categories": {
+      "auth": {
+        "smartee360prodbb2322e0": {}
+      }
     }
   }
 }

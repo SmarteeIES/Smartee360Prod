@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.ColorSpace;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,6 +48,7 @@ import com.amplifyframework.core.Amplify;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.AuditLog;
 import com.amplifyframework.datastore.generated.model.Locations;
+import com.amplifyframework.datastore.generated.model.Todo;
 import com.amplifyframework.datastore.generated.model.Users;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
@@ -531,15 +533,32 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
                 else {
                     String user = currentUser.getUsername().toString();
+                    Log.i("Ashveer",user);
                     //Start of query to find the Locations, assets and company details.
+
+//                    Amplify.API.query(
+//                            ModelQuery.list(Assets.class, Assets.OWNER.beginsWith("Spar")),
+//                            response -> {
+//                                for (Assets users : response.getData()) {
+//
+//                                        company = users.getAssetId();
+//                                        Log.i("Ash",company);
+//
+//                                }
+//                            },
+//                            error -> Log.e("Smartee 360 Message", "Query failure", error)
+//                    );
+
+
                     Amplify.API.query(
-                            ModelQuery.list(Users.class, Users.COMPANY.contains(getResources().getString(R.string.customer))),
+                            ModelQuery.list(Users.class, Users.COMPANY.contains("Spar")),
                             response -> {
                                 for (Users users : response.getData()) {
-                                    if (user.equals(users.getEmail())) {
+                                    if (user.equals(users.getPhoneNumber())) {
                                         company = users.getCompany();
                                     }
                                 }
+
 
                                 Amplify.API.query(
                                         ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),

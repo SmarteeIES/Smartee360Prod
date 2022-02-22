@@ -29,9 +29,6 @@ public final class Locations implements Model {
   public static final QueryField LONGITUDE = field("Locations", "longitude");
   public static final QueryField CLASSIFICATION = field("Locations", "classification");
   public static final QueryField OWNER = field("Locations", "owner");
-  public static final QueryField CATEGORY1 = field("Locations", "category1");
-  public static final QueryField CATEGORY2 = field("Locations", "category2");
-  public static final QueryField CATEGORY3 = field("Locations", "category3");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="String", isRequired = true) String baseLocationType;
   private final @ModelField(targetType="String", isRequired = true) String locationName;
@@ -41,9 +38,6 @@ public final class Locations implements Model {
   private final @ModelField(targetType="String") String classification;
   private final @ModelField(targetType="Assets") @HasMany(associatedWith = "locationID", type = Assets.class) List<Assets> assets = null;
   private final @ModelField(targetType="String") String owner;
-  private final @ModelField(targetType="String") String category1;
-  private final @ModelField(targetType="String") String category2;
-  private final @ModelField(targetType="String") String category3;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
@@ -82,18 +76,6 @@ public final class Locations implements Model {
       return owner;
   }
   
-  public String getCategory1() {
-      return category1;
-  }
-  
-  public String getCategory2() {
-      return category2;
-  }
-  
-  public String getCategory3() {
-      return category3;
-  }
-  
   public Temporal.DateTime getCreatedAt() {
       return createdAt;
   }
@@ -102,7 +84,7 @@ public final class Locations implements Model {
       return updatedAt;
   }
   
-  private Locations(String id, String baseLocationType, String locationName, String address, Double latitude, Double longitude, String classification, String owner, String category1, String category2, String category3) {
+  private Locations(String id, String baseLocationType, String locationName, String address, Double latitude, Double longitude, String classification, String owner) {
     this.id = id;
     this.baseLocationType = baseLocationType;
     this.locationName = locationName;
@@ -111,9 +93,6 @@ public final class Locations implements Model {
     this.longitude = longitude;
     this.classification = classification;
     this.owner = owner;
-    this.category1 = category1;
-    this.category2 = category2;
-    this.category3 = category3;
   }
   
   @Override
@@ -132,9 +111,6 @@ public final class Locations implements Model {
               ObjectsCompat.equals(getLongitude(), locations.getLongitude()) &&
               ObjectsCompat.equals(getClassification(), locations.getClassification()) &&
               ObjectsCompat.equals(getOwner(), locations.getOwner()) &&
-              ObjectsCompat.equals(getCategory1(), locations.getCategory1()) &&
-              ObjectsCompat.equals(getCategory2(), locations.getCategory2()) &&
-              ObjectsCompat.equals(getCategory3(), locations.getCategory3()) &&
               ObjectsCompat.equals(getCreatedAt(), locations.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), locations.getUpdatedAt());
       }
@@ -151,9 +127,6 @@ public final class Locations implements Model {
       .append(getLongitude())
       .append(getClassification())
       .append(getOwner())
-      .append(getCategory1())
-      .append(getCategory2())
-      .append(getCategory3())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -172,9 +145,6 @@ public final class Locations implements Model {
       .append("longitude=" + String.valueOf(getLongitude()) + ", ")
       .append("classification=" + String.valueOf(getClassification()) + ", ")
       .append("owner=" + String.valueOf(getOwner()) + ", ")
-      .append("category1=" + String.valueOf(getCategory1()) + ", ")
-      .append("category2=" + String.valueOf(getCategory2()) + ", ")
-      .append("category3=" + String.valueOf(getCategory3()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -202,9 +172,6 @@ public final class Locations implements Model {
       null,
       null,
       null,
-      null,
-      null,
-      null,
       null
     );
   }
@@ -217,10 +184,7 @@ public final class Locations implements Model {
       latitude,
       longitude,
       classification,
-      owner,
-      category1,
-      category2,
-      category3);
+      owner);
   }
   public interface BaseLocationTypeStep {
     LocationNameStep baseLocationType(String baseLocationType);
@@ -252,9 +216,6 @@ public final class Locations implements Model {
     BuildStep id(String id);
     BuildStep classification(String classification);
     BuildStep owner(String owner);
-    BuildStep category1(String category1);
-    BuildStep category2(String category2);
-    BuildStep category3(String category3);
   }
   
 
@@ -267,9 +228,6 @@ public final class Locations implements Model {
     private Double longitude;
     private String classification;
     private String owner;
-    private String category1;
-    private String category2;
-    private String category3;
     @Override
      public Locations build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
@@ -282,10 +240,7 @@ public final class Locations implements Model {
           latitude,
           longitude,
           classification,
-          owner,
-          category1,
-          category2,
-          category3);
+          owner);
     }
     
     @Override
@@ -335,24 +290,6 @@ public final class Locations implements Model {
         return this;
     }
     
-    @Override
-     public BuildStep category1(String category1) {
-        this.category1 = category1;
-        return this;
-    }
-    
-    @Override
-     public BuildStep category2(String category2) {
-        this.category2 = category2;
-        return this;
-    }
-    
-    @Override
-     public BuildStep category3(String category3) {
-        this.category3 = category3;
-        return this;
-    }
-    
     /** 
      * @param id id
      * @return Current Builder instance, for fluent method chaining
@@ -365,7 +302,7 @@ public final class Locations implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, String baseLocationType, String locationName, String address, Double latitude, Double longitude, String classification, String owner, String category1, String category2, String category3) {
+    private CopyOfBuilder(String id, String baseLocationType, String locationName, String address, Double latitude, Double longitude, String classification, String owner) {
       super.id(id);
       super.baseLocationType(baseLocationType)
         .locationName(locationName)
@@ -373,10 +310,7 @@ public final class Locations implements Model {
         .latitude(latitude)
         .longitude(longitude)
         .classification(classification)
-        .owner(owner)
-        .category1(category1)
-        .category2(category2)
-        .category3(category3);
+        .owner(owner);
     }
     
     @Override
@@ -412,21 +346,6 @@ public final class Locations implements Model {
     @Override
      public CopyOfBuilder owner(String owner) {
       return (CopyOfBuilder) super.owner(owner);
-    }
-    
-    @Override
-     public CopyOfBuilder category1(String category1) {
-      return (CopyOfBuilder) super.category1(category1);
-    }
-    
-    @Override
-     public CopyOfBuilder category2(String category2) {
-      return (CopyOfBuilder) super.category2(category2);
-    }
-    
-    @Override
-     public CopyOfBuilder category3(String category3) {
-      return (CopyOfBuilder) super.category3(category3);
     }
   }
   

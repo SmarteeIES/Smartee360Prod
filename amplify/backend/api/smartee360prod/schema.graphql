@@ -36,7 +36,6 @@ type Assets @model
   locationName: String
 }
 
-
 type Locations @model
 {
   id: ID!
