@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="za.smartee.threesixty">
+    <queries>
+        <package android:name="za.smartee.threeSixty" />
+    </queries>
 
     <application
         android:name=".BaseApplication"
@@ -12,7 +15,9 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.AppCompat.Light"
         android:screenOrientation="portrait"
-        android:exported="true">
+        android:exported="true"
+        >
+
         <activity
             android:name=".activity.ScanConfirmActivity"
             android:screenOrientation="portrait"
@@ -26,32 +31,22 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light">
             tools:ignore="LockedOrientationActivity"
+            android: launchMode="singleTask"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter android:autoVerify="true">
+            <intent-filter android:label="s360vsc">
+                <data android:scheme="integration" />
+                <data android:host="s360vsc" />
+                <data android:pathPattern=".*" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:scheme="http"
-                    android:host="www.smartee.co.za" />
             </intent-filter>
 
-            <intent-filter android:autoVerify="true" >
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="vision.smartee.link"
-                    android:scheme="https" />
-            </intent-filter>
 
         </activity>
         <activity

@@ -13,6 +13,9 @@ mutation CreateUsers(
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -31,6 +34,9 @@ mutation UpdateUsers(
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -49,6 +55,9 @@ mutation DeleteUsers(
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -76,6 +85,9 @@ mutation CreateAssets(
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -103,6 +115,9 @@ mutation UpdateAssets(
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -130,6 +145,9 @@ mutation DeleteAssets(
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -166,15 +184,22 @@ mutation CreateLocations(
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -211,15 +236,22 @@ mutation UpdateLocations(
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -256,15 +288,22 @@ mutation DeleteLocations(
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -300,16 +339,23 @@ mutation CreateAuditLog(
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -345,16 +391,23 @@ mutation UpdateAuditLog(
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -390,16 +443,23 @@ mutation DeleteAuditLog(
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -424,6 +484,9 @@ mutation CreateScannedAssetsAuditLog(
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -448,6 +511,9 @@ mutation UpdateScannedAssetsAuditLog(
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -472,6 +538,9 @@ mutation DeleteScannedAssetsAuditLog(
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }

@@ -162,9 +162,13 @@ public class ScanActivity extends BaseActivity {
                 .setPositiveButton("Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                moveTaskToBack(true);
-                                android.os.Process.killProcess(android.os.Process.myPid());
-                                System.exit(1);
+//                                moveTaskToBack(true);
+//                                android.os.Process.killProcess(android.os.Process.myPid());
+//                                ScanActivity.this.finish();
+//                                System.exit(0);
+                                finishAffinity();
+                                ScanActivity.this.finish();
+                                System.exit(0);
                             }
                         })
 

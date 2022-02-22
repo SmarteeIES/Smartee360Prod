@@ -10,6 +10,9 @@ subscription OnCreateUsers {
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -25,6 +28,9 @@ subscription OnUpdateUsers {
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -40,6 +46,9 @@ subscription OnDeleteUsers {
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -64,6 +73,9 @@ subscription OnCreateAssets {
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -88,6 +100,9 @@ subscription OnUpdateAssets {
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -112,6 +127,9 @@ subscription OnDeleteAssets {
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -145,15 +163,22 @@ subscription OnCreateLocations {
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -187,15 +212,22 @@ subscription OnUpdateLocations {
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -229,15 +261,22 @@ subscription OnDeleteLocations {
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -270,16 +309,23 @@ subscription OnCreateAuditLog {
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -312,16 +358,23 @@ subscription OnUpdateAuditLog {
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -354,16 +407,23 @@ subscription OnDeleteAuditLog {
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -385,6 +445,9 @@ subscription OnCreateScannedAssetsAuditLog {
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -406,6 +469,9 @@ subscription OnUpdateScannedAssetsAuditLog {
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -427,6 +493,9 @@ subscription OnDeleteScannedAssetsAuditLog {
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }

@@ -37,6 +37,7 @@ public class AuthActivity extends BaseActivity {
                         case SIGNED_IN:
                             Intent i = new Intent(AuthActivity.this, GuideActivity.class);
                             startActivity(i);
+                            AuthActivity.this.finish();
                             break;
                         case SIGNED_OUT:
                             showSignIn();

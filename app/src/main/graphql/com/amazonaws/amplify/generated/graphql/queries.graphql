@@ -1,4 +1,36 @@
 # this is an auto generated file. This will be overwritten
+query SyncUsers(
+  $filter: ModelUsersFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUsers(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      name
+      description
+      baseUserType
+      company
+      email
+      status
+      scanTime
+      phoneNumber
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
 query GetUsers($id: ID!) {
   getUsers(id: $id) {
     id
@@ -10,6 +42,9 @@ query GetUsers($id: ID!) {
     status
     scanTime
     phoneNumber
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -30,10 +65,55 @@ query ListUserss(
       status
       scanTime
       phoneNumber
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncAssets(
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAssets(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetAssets($id: ID!) {
@@ -56,6 +136,9 @@ query GetAssets($id: ID!) {
     classification
     owner
     locationName
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -85,10 +168,52 @@ query ListAssetss(
       classification
       owner
       locationName
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncLocations(
+  $filter: ModelLocationsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncLocations(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseLocationType
+      locationName
+      address
+      latitude
+      longitude
+      classification
+      assets {
+        nextToken
+        startedAt
+      }
+      owner
+      category1
+      category2
+      category3
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetLocations($id: ID!) {
@@ -120,15 +245,22 @@ query GetLocations($id: ID!) {
         classification
         owner
         locationName
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     owner
     category1
     category2
     category3
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -149,15 +281,61 @@ query ListLocationss(
       classification
       assets {
         nextToken
+        startedAt
       }
       owner
       category1
       category2
       category3
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncAuditLogs(
+  $filter: ModelAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAuditLogs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseActionType
+      user
+      device
+      deviceLatitude
+      deviceLongitude
+      storeName
+      scanTime
+      confirmTime
+      scannedAssets {
+        nextToken
+        startedAt
+      }
+      selectedStoreName
+      owner
+      rssiMax
+      rssiMin
+      rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetAuditLog($id: ID!) {
@@ -188,16 +366,23 @@ query GetAuditLog($id: ID!) {
         rssi3
         classification
         owner
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
     selectedStoreName
     owner
     rssiMax
     rssiMin
     rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -220,16 +405,59 @@ query ListAuditLogs(
       confirmTime
       scannedAssets {
         nextToken
+        startedAt
       }
       selectedStoreName
       owner
       rssiMax
       rssiMin
       rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncScannedAssetsAuditLogs(
+  $filter: ModelScannedAssetsAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncScannedAssetsAuditLogs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      auditLogID
+      uuidNumber
+      major
+      minor
+      rssi1
+      rssi2
+      rssi3
+      classification
+      owner
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetScannedAssetsAuditLog($id: ID!) {
@@ -249,6 +477,9 @@ query GetScannedAssetsAuditLog($id: ID!) {
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -279,10 +510,14 @@ query ListScannedAssetsAuditLogs(
       rssi3
       classification
       owner
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }
 query AssetByMac(
@@ -320,10 +555,14 @@ query AssetByMac(
       classification
       owner
       locationName
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }
 query AssetBylocationID(
@@ -361,10 +600,14 @@ query AssetBylocationID(
       classification
       owner
       locationName
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }
 query AssetByOwner(
@@ -402,10 +645,14 @@ query AssetByOwner(
       classification
       owner
       locationName
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }
 query AuditByDevice(
@@ -436,16 +683,21 @@ query AuditByDevice(
       confirmTime
       scannedAssets {
         nextToken
+        startedAt
       }
       selectedStoreName
       owner
       rssiMax
       rssiMin
       rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }
 query AuditByStore(
@@ -476,15 +728,20 @@ query AuditByStore(
       confirmTime
       scannedAssets {
         nextToken
+        startedAt
       }
       selectedStoreName
       owner
       rssiMax
       rssiMin
       rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
   }
 }

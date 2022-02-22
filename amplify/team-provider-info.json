@@ -16,5 +16,18 @@
         "smartee360prod0d01e8ec": {}
       }
     }
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-smartee360prod-prod-150939-authRole",
+      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-150939-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-prod-150939-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-smartee360prod-prod-150939-deployment",
+      "UnauthRoleName": "amplify-smartee360prod-prod-150939-unauthRole",
+      "StackName": "amplify-smartee360prod-prod-150939",
+      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-prod-150939/8939a4f0-9317-11ec-b834-0adec8a6997d",
+      "AmplifyAppId": "dgdyu6qym2v7e"
+    }
   }
 }

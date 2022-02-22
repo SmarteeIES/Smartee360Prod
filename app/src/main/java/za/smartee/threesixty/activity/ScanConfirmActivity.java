@@ -256,6 +256,7 @@ public class ScanConfirmActivity extends BaseActivity{
                 selectedLocation.setVisibility(View.INVISIBLE);
                 Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
                 startActivity(i);
+                ScanConfirmActivity.this.finish();
             }
         });
 
@@ -282,6 +283,7 @@ public class ScanConfirmActivity extends BaseActivity{
                         selectedLocation.setVisibility(View.INVISIBLE);
                         Intent i = new Intent(ScanConfirmActivity.this, AuthActivity.class);
                         startActivity(i);
+                        ScanConfirmActivity.this.finish();
                     }
 
                     @Override
@@ -441,6 +443,8 @@ public class ScanConfirmActivity extends BaseActivity{
                 i.putExtra("scanHistFlag",true);
                 clearData();
                 startActivity(i);
+                ScanConfirmActivity.this.finish();
+
             }
         });
 
