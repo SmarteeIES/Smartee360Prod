@@ -53,7 +53,7 @@ public class ScanActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        Log.i("VCheck","Prod");
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
