@@ -563,8 +563,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
             @Override
             public void onScanDevice(DeviceInfo device) {
-//                Log.i("Test Mac",device.mac);
-//                Log.i("Test Mac", String.valueOf(device.rssi));
+                Log.i("Test Mac",device.mac);
+                Log.i("Test Mac", String.valueOf(device.rssi));
                 Map<String, String> scanInfo = new HashMap<String, String>();
                 scanInfo.put("devMac", String.valueOf(device.mac));
                 scanInfo.put("rssi", String.valueOf(device.rssi));
@@ -708,65 +708,62 @@ public class ScanConfirmActivity extends BaseActivity{
 
                             if (locationDetailInfo == null) {
                                 dlgAlert.create().show();
-                            }
-
-                            if (locationDetailInfo.size() == null){
-
                             } else {
+                                Integer locationDetailInfoSize = locationDetailInfo.size();
+                                if (locationDetailInfoSize == null) {
+                                    locationDetailInfoSize = 0;
+                                }
 
-                            }
-                            Integer locationDetailInfoSize = locationDetailInfo.size();
-                            if (locationDetailInfoSize == null) {
-                                locationDetailInfoSize = 0;
-                            }
-
-                            for (int r = 0; r < locationDetailInfoSize; r++) {
-                                locationInfoFlag = true;
-                                String tempLoc;
-                                tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
-                                    double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
-                                    if (distResult < 501) {
-                                        calculatedLoc = locationDetailInfo.get(r).get("Address");
+                                for (int r = 0; r < locationDetailInfoSize; r++) {
+                                    locationInfoFlag = true;
+                                    String tempLoc;
+                                    tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                                    if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
+                                        double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
+                                        if (distResult < 501) {
+                                            calculatedLoc = locationDetailInfo.get(r).get("Address");
+                                        }
                                     }
                                 }
-                            }
-                            TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+                                TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
 
-                            if (finalLoadingChecked) {
-                                selectedLocation.setVisibility(View.VISIBLE);
-                                selectedLocation.setText("Select Vehicle");
-                                locDD.setVisibility(View.VISIBLE);
-                                ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
-                                LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                LocationDDAdapter.notifyDataSetChanged();
-                                locDD.setAdapter(LocationDDAdapter);
-                                calculatedLoc = "Loading Checked";
-                            } else {
-                                missingLocation.setVisibility(View.VISIBLE);
-                                if (missingLocFlag == false) {
+                                if (finalLoadingChecked) {
                                     selectedLocation.setVisibility(View.VISIBLE);
-                                    if (calculatedLoc == null || calculatedLoc.equals("")) {
-                                        calculatedLoc = "No Location Available";
+                                    selectedLocation.setText("Select Vehicle");
+                                    locDD.setVisibility(View.VISIBLE);
+                                    ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
+                                    LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    LocationDDAdapter.notifyDataSetChanged();
+                                    locDD.setAdapter(LocationDDAdapter);
+                                    calculatedLoc = "Loading Checked";
+                                } else {
+                                    missingLocation.setVisibility(View.VISIBLE);
+                                    if (missingLocFlag == false) {
+                                        selectedLocation.setVisibility(View.VISIBLE);
+                                        if (calculatedLoc == null || calculatedLoc.equals("")) {
+                                            calculatedLoc = "No Location Available";
+                                        }
+                                        selectedLocation.setText("Current Location - " + calculatedLoc);
                                     }
-                                    selectedLocation.setText("Current Location - " + calculatedLoc);
                                 }
-                            }
 
-                            if (!locationInfoFlag) {
-                                selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
-                            }
+                                if (!locationInfoFlag) {
+                                    selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
+                                }
 
-                            locationInfoFlag = false;
+                                locationInfoFlag = false;
 
-                            if (calculatedLoc.equals("No Location Available")) {
-                                if (missingLocFlag != false) {
+                                if (calculatedLoc.equals("No Location Available")) {
+                                    if (missingLocFlag != false) {
+                                        btnConfirm.setVisibility(View.VISIBLE);
+                                    }
+                                } else {
                                     btnConfirm.setVisibility(View.VISIBLE);
                                 }
-                            } else {
-                                btnConfirm.setVisibility(View.VISIBLE);
+                                btnScanCancel.setVisibility(View.VISIBLE);
+
                             }
-                            btnScanCancel.setVisibility(View.VISIBLE);
+
 
 
                             TextView infoView = (TextView) findViewById(R.id.infoView);
