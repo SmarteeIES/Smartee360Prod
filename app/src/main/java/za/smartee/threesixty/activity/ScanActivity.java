@@ -71,7 +71,9 @@ public class ScanActivity extends BaseActivity {
         dlgAlert.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
+                        Intent rs = new Intent(ScanActivity.this, AuthActivity.class);
+                        startActivity(rs);
+                        Log.i("dialog msg","clicked");
                     }
                 });
 
@@ -138,6 +140,8 @@ public class ScanActivity extends BaseActivity {
                     @Override
                     public void onError(Exception e) {
                         Log.e("Signout Msg", "sign-out error", e);
+                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+                        startActivity(i);
                     }
                 });
 
@@ -162,13 +166,9 @@ public class ScanActivity extends BaseActivity {
                 .setPositiveButton("Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-//                                moveTaskToBack(true);
-//                                android.os.Process.killProcess(android.os.Process.myPid());
-//                                ScanActivity.this.finish();
-//                                System.exit(0);
-                                finishAffinity();
-                                ScanActivity.this.finish();
-                                System.exit(0);
+                                Intent d = new Intent(ScanActivity.this, AuthActivity.class);
+                                d.putExtra("donePressedFlag",true);
+                                startActivity(d);
                             }
                         })
 

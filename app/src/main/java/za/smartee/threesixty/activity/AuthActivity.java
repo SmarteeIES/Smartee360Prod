@@ -2,9 +2,11 @@ package za.smartee.threesixty.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -25,8 +27,15 @@ public class AuthActivity extends BaseActivity {
         setContentView(R.layout.activity_auth);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Intent intent = getIntent();
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+        Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
+        if (donePressedFlag) {
+            finishAffinity();
+            AuthActivity.this.finish();
+            System.exit(0);
+        }
         AWSMobileClient.getInstance().initialize(getApplicationContext(), new Callback<UserStateDetails>() {
-
             @Override
             public void onResult(UserStateDetails userStateDetails) {
                 Log.i("TAG", userStateDetails.getUserState().toString());

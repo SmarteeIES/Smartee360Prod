@@ -154,6 +154,7 @@ public class ScanConfirmActivity extends BaseActivity{
     String user;
     String scanDurationType;
     private boolean missingLocFlag = false;
+    public boolean networkConnectStatus;
 
 
     //Array list for the scanned data
@@ -205,17 +206,50 @@ public class ScanConfirmActivity extends BaseActivity{
         Spinner locDD = (Spinner) findViewById(R.id.locationsSpinner);
         devData2 = new ArrayList<Map<String, String>>();
         devDataDetail = new ArrayList<Map<String, String>>();
+
+        //No Network Alert
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
         dlgAlert.setMessage("Please connect to the internet and retry");
         dlgAlert.setTitle("Internet Connection - Error");
         dlgAlert.setPositiveButton("OK", null);
         dlgAlert.setCancelable(true);
-
         dlgAlert.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                        startActivity(rs);
                         Log.i("dialog msg","clicked");
-                        finishAndRemoveTask();
+                    }
+                });
+
+        //Query Failure Alert
+        AlertDialog.Builder qfAlert  = new AlertDialog.Builder(this);
+        qfAlert.setMessage("Data Query Failure, Please Retry");
+        qfAlert.setTitle("Data Query - Error");
+        qfAlert.setPositiveButton("OK", null);
+        qfAlert.setCancelable(true);
+        qfAlert.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                        startActivity(rs);
+                        Log.i("dialog msg","clicked");
+                        //finishAndRemoveTask();
+                    }
+                });
+
+        AlertDialog.Builder wfAlert  = new AlertDialog.Builder(this);
+        wfAlert.setMessage("Data Write Failure, Please Retry");
+        wfAlert.setTitle("Data Write - Error");
+        wfAlert.setPositiveButton("OK", null);
+        wfAlert.setCancelable(true);
+        wfAlert.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                        startActivity(rs);
+                        Log.i("dialog msg","clicked");
+                        //finishAndRemoveTask();
                     }
                 });
 
@@ -290,6 +324,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
                     @Override
                     public void onError(Exception e) {
+                        Intent i = new Intent(ScanConfirmActivity.this, AuthActivity.class);
+                        startActivity(i);
                         Log.e("Signout Msg", "sign-out error", e);
                     }
                 });
@@ -372,80 +408,100 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
 
                 //Compare the scanned devices to the database and if found update
-                for (int y = 0; y < assetItems.size(); y++) {
-                    for (int z = 0; z < devData.size(); z++) {
-                        if (devData.get(z).equals(assetItems.get(y))) {
-                            for (int m = 0; m < assetDetailInfo.size(); m++) {
-                                if (devData.get(z).equals(assetDetailInfo.get(m).get("assetID"))) {
-                                    for (int u = 0; u < devDataDetail.size(); u++){
-                                        if (devDataDetail.get(u).get("devMac").equals(devData.get(z))){
-                                            maxRssiCap = Double.parseDouble(devDataDetail.get(u).get("maxRssi"));
-                                            minRssiCap = Double.parseDouble(devDataDetail.get(u).get("minRssi"));
-                                            avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
-                                        }
-                                    }
+               // networkConnectStatus = isNetworkAvailable();
 
-                                    if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
-                                    } else {
-                                        numberNewAssets++;
-                                        Assets AssetItem = Assets.builder()
-                                                .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
-                                                .assetName(assetDetailInfo.get(m).get("assetName"))
-                                                .assetId(devData.get(z))
-                                                .macAddress(devData.get(z))
-                                                .locationId(selectedLocID)
-                                                .latitude(Double.parseDouble(selectedLatitude))
-                                                .longitude(Double.parseDouble(selectedLongitude))
-                                                .owner(company)
-                                                .id(assetDetailInfo.get(m).get("systemID"))
+                if (isNetworkAvailable()){
+                    for (int y = 0; y < assetItems.size(); y++) {
+                        for (int z = 0; z < devData.size(); z++) {
+                            if (devData.get(z).equals(assetItems.get(y))) {
+                                for (int m = 0; m < assetDetailInfo.size(); m++) {
+                                    if (devData.get(z).equals(assetDetailInfo.get(m).get("assetID"))) {
+                                        for (int u = 0; u < devDataDetail.size(); u++){
+                                            if (devDataDetail.get(u).get("devMac").equals(devData.get(z))){
+                                                maxRssiCap = Double.parseDouble(devDataDetail.get(u).get("maxRssi"));
+                                                minRssiCap = Double.parseDouble(devDataDetail.get(u).get("minRssi"));
+                                                avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
+                                            }
+                                        }
+
+                                        if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
+                                        } else {
+                                            numberNewAssets++;
+                                            Assets AssetItem = Assets.builder()
+                                                    .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
+                                                    .assetName(assetDetailInfo.get(m).get("assetName"))
+                                                    .assetId(devData.get(z))
+                                                    .macAddress(devData.get(z))
+                                                    .locationId(selectedLocID)
+                                                    .latitude(Double.parseDouble(selectedLatitude))
+                                                    .longitude(Double.parseDouble(selectedLongitude))
+                                                    .owner(company)
+                                                    .id(assetDetailInfo.get(m).get("systemID"))
+                                                    .rssiAvg(avgRssiCap)
+                                                    .rssiMax(maxRssiCap)
+                                                    .rssiMin(minRssiCap)
+                                                    .locationName(text)
+                                                    .build();
+
+                                            // Mutation Update Start
+                                            Amplify.API.mutate(ModelMutation.update(AssetItem),
+                                                    response -> Log.i("Smartee", "Asset with id: " + response.getData().getId()),
+                                                    error -> {
+                                                        runOnUiThread(new Runnable() {
+                                                            public void run() {
+                                                                wfAlert.create().show();
+                                                            }
+                                                        });
+                                                    }
+                                            );
+                                            //Mutation Update end
+                                        }
+                                        AuditLog auditItems = AuditLog.builder()
+                                                .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
+                                                .confirmTime(String.valueOf(confirmTime))
+                                                .device(devData.get(z))
+                                                .deviceLatitude(devLat[0])
+                                                .deviceLongitude(devLng[0])
+                                                .scanTime(String.valueOf(scanTime))
+                                                .storeName(calculatedLoc)
+                                                .user(AWSMobileClient.getInstance().getUsername())
+                                                .selectedStoreName(selectedLocID)
                                                 .rssiAvg(avgRssiCap)
                                                 .rssiMax(maxRssiCap)
                                                 .rssiMin(minRssiCap)
-                                                .locationName(text)
+                                                .owner(company)
                                                 .build();
-
-                                        // Mutation Update Start
-                                        Amplify.API.mutate(ModelMutation.update(AssetItem),
-                                                response -> Log.i("Smartee", "Asset with id: " + response.getData().getId()),
-                                                error -> Log.e("Smartee", "Create failed", error)
+                                        Amplify.API.mutate(ModelMutation.create(auditItems),
+                                                response -> Log.i("Smartee", "Audit with id: " + response.getData().getId()),
+                                                error -> {
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            wfAlert.create().show();
+                                                        }
+                                                    });
+                                                }
                                         );
                                         //Mutation Update end
                                     }
-                                    AuditLog auditItems = AuditLog.builder()
-                                            .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
-                                            .confirmTime(String.valueOf(confirmTime))
-                                            .device(devData.get(z))
-                                            .deviceLatitude(devLat[0])
-                                            .deviceLongitude(devLng[0])
-                                            .scanTime(String.valueOf(scanTime))
-                                            .storeName(calculatedLoc)
-                                            .user(AWSMobileClient.getInstance().getUsername())
-                                            .selectedStoreName(selectedLocID)
-                                            .rssiAvg(avgRssiCap)
-                                            .rssiMax(maxRssiCap)
-                                            .rssiMin(minRssiCap)
-                                            .owner(company)
-                                            .build();
-                                    Amplify.API.mutate(ModelMutation.create(auditItems),
-                                            response -> Log.i("Smartee", "Audit with id: " + response.getData().getId()),
-                                            error -> Log.e("Smartee", "Create failed", error)
-                                    );
-                                    //Mutation Update end
                                 }
                             }
                         }
                     }
-                }
-                Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                i.putExtra("selectedLocation",text);
-                i.putExtra("scanTime",scanTime.toString());
-                i.putExtra("assetsInStore",numberExistingAssets.toString());
-                i.putExtra("scannedAssets",numberNewAssets.toString());
+                    Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                    i.putExtra("selectedLocation",text);
+                    i.putExtra("scanTime",scanTime.toString());
+                    i.putExtra("assetsInStore",numberExistingAssets.toString());
+                    i.putExtra("scannedAssets",numberNewAssets.toString());
 
-                i.putExtra("scanHistFlag",true);
-                clearData();
-                startActivity(i);
-                ScanConfirmActivity.this.finish();
+                    i.putExtra("scanHistFlag",true);
+                    clearData();
+                    startActivity(i);
+                    ScanConfirmActivity.this.finish();
+                } else {
+                    dlgAlert.create().show();
+                }
+
+
 
             }
         });
@@ -507,8 +563,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
             @Override
             public void onScanDevice(DeviceInfo device) {
-                Log.i("Test Mac",device.mac);
-                Log.i("Test Mac", String.valueOf(device.rssi));
+//                Log.i("Test Mac",device.mac);
+//                Log.i("Test Mac", String.valueOf(device.rssi));
                 Map<String, String> scanInfo = new HashMap<String, String>();
                 scanInfo.put("devMac", String.valueOf(device.mac));
                 scanInfo.put("rssi", String.valueOf(device.rssi));
@@ -536,87 +592,93 @@ public class ScanConfirmActivity extends BaseActivity{
                     Log.i("Ashveer",user);
                     //Start of query to find the Locations, assets and company details.
 
-//                    Amplify.API.query(
-//                            ModelQuery.list(Assets.class, Assets.OWNER.beginsWith("Spar")),
-//                            response -> {
-//                                for (Assets users : response.getData()) {
-//
-//                                        company = users.getAssetId();
-//                                        Log.i("Ash",company);
-//
-//                                }
-//                            },
-//                            error -> Log.e("Smartee 360 Message", "Query failure", error)
-//                    );
-
-
-                    Amplify.API.query(
-                            ModelQuery.list(Users.class, Users.COMPANY.contains("Spar")),
-                            response -> {
-                                for (Users users : response.getData()) {
-                                    if (user.equals(users.getPhoneNumber())) {
-                                        company = users.getCompany();
+                    networkConnectStatus = isNetworkAvailable();
+                    if (networkConnectStatus){
+                        Amplify.API.query(
+                                ModelQuery.list(Users.class, Users.COMPANY.contains("Spar")),
+                                response -> {
+                                    for (Users users : response.getData()) {
+                                        if (user.equals(users.getPhoneNumber())) {
+                                            company = users.getCompany();
+                                        }
                                     }
-                                }
 
 
-                                Amplify.API.query(
-                                        ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
-                                        locResponse -> {
-                                            locationDetailInfo = new ArrayList<Map<String, String>>();
-                                            for (Locations locationDetail : locResponse.getData()) {
-                                                if (locationDetail.getAddress() != null) {
-                                                    Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
-                                                    locationDetailInfo1.put("Address", locationDetail.getAddress());
-                                                    locationDetailInfo1.put("LocationID", locationDetail.getId());
-                                                    locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
-                                                    locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
-                                                    locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
-                                                    locationDetailInfo.add(locationDetailInfo1);
+                                    Amplify.API.query(
+                                            ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
+                                            locResponse -> {
+                                                locationDetailInfo = new ArrayList<Map<String, String>>();
+                                                for (Locations locationDetail : locResponse.getData()) {
+                                                    if (locationDetail.getAddress() != null) {
+                                                        Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
+                                                        locationDetailInfo1.put("Address", locationDetail.getAddress());
+                                                        locationDetailInfo1.put("LocationID", locationDetail.getId());
+                                                        locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
+                                                        locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
+                                                        locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
+                                                        locationDetailInfo.add(locationDetailInfo1);
+                                                    }
                                                 }
-                                            }
-                                            for (int r = 0; r < locationDetailInfo.size(); r++) {
-                                                String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                                if (finalLoadingChecked1) {
-                                                    if (tempLoc.equals("Transit")) {
+                                                for (int r = 0; r < locationDetailInfo.size(); r++) {
+                                                    String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                                                    if (finalLoadingChecked1) {
+                                                        if (tempLoc.equals("Transit")) {
+                                                            locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                                        }
+                                                    } else {
                                                         locDdData.add(locationDetailInfo.get(r).get("Address"));
                                                     }
-                                                } else {
-                                                    locDdData.add(locationDetailInfo.get(r).get("Address"));
                                                 }
+                                            },
+                                            error -> {
+                                                runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        qfAlert.create().show();
+                                                    }
+                                                });
                                             }
-                                        },
-                                        error -> {
-                                            Log.e("Smartee", "Query failure", error);
-                                            dlgAlert.create().show();
-                                        }
-                                );
+                                    );
 
-                                Amplify.API.query(
-                                        ModelQuery.list(Assets.class, Assets.OWNER.contains(company)),
-                                        assetResponse -> {
-                                            assetDetailInfo = new ArrayList<Map<String, String>>();
-                                            for (Assets assetDetail : assetResponse.getData()) {
-                                                if (assetDetail.getAssetId() != null) {
-                                                    assetItems.add(assetDetail.getAssetId().toString());
-                                                    Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-                                                    assetDetailInfo1.put("systemID", assetDetail.getId());
-                                                    assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-                                                    assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-                                                    assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-                                                    assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-                                                    assetDetailInfo.add(assetDetailInfo1);
+                                    Amplify.API.query(
+                                            ModelQuery.list(Assets.class, Assets.OWNER.contains(company)),
+                                            assetResponse -> {
+                                                assetDetailInfo = new ArrayList<Map<String, String>>();
+                                                for (Assets assetDetail : assetResponse.getData()) {
+                                                    if (assetDetail.getAssetId() != null) {
+                                                        assetItems.add(assetDetail.getAssetId().toString());
+                                                        Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
+                                                        assetDetailInfo1.put("systemID", assetDetail.getId());
+                                                        assetDetailInfo1.put("assetID", assetDetail.getAssetId());
+                                                        assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
+                                                        assetDetailInfo1.put("assetName", assetDetail.getAssetName());
+                                                        assetDetailInfo1.put("locationID", assetDetail.getLocationId());
+                                                        assetDetailInfo.add(assetDetailInfo1);
+                                                    }
                                                 }
+                                            },
+                                            error -> {
+                                                runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        qfAlert.create().show();
+                                                    }
+                                                });
                                             }
-                                        },
-                                        error -> {
-                                            Log.e("Smartee", "Query failure", error);
-                                            dlgAlert.create().show();
+                                    );
+                                },
+                                error -> {
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            qfAlert.create().show();
                                         }
-                                );
-                            },
-                            error -> Log.e("Smartee 360 Message", "Query failure", error)
-                    );
+                                    });
+                                }
+//                                Log.e("Smartee 360 Message", "Query failure", error)
+                        );
+                    } else {
+                        dlgAlert.create().show();
+                    }
+
+
 
                     Boolean finalLoadingChecked = loadingChecked;
                     scannerSetTime = (new Double(25000)).longValue();
@@ -629,7 +691,7 @@ public class ScanConfirmActivity extends BaseActivity{
                             TextView timeText = (TextView) findViewById(R.id.timerText);
 
                             infoView.setText("Scanning In Progress");
-                            Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
+                            //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
                         }
 
                         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -640,8 +702,18 @@ public class ScanConfirmActivity extends BaseActivity{
                             TextView answer = (TextView) findViewById(R.id.scanInfo);
                             selectedLocation.setVisibility(View.VISIBLE);
 
-                            if (locationDetailInfo.equals(null)) {
-                                dlgAlert.show();
+//                            if (locationDetailInfo.equals(null)) {
+//                                dlgAlert.show();
+//                            }
+
+                            if (locationDetailInfo == null) {
+                                dlgAlert.create().show();
+                            }
+
+                            if (locationDetailInfo.size() == null){
+
+                            } else {
+
                             }
                             Integer locationDetailInfoSize = locationDetailInfo.size();
                             if (locationDetailInfoSize == null) {
