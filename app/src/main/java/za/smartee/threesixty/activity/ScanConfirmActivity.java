@@ -592,20 +592,11 @@ public class ScanConfirmActivity extends BaseActivity{
                     Log.i("Ashveer",user);
                     //Start of query to find the Locations, assets and company details.
 
-                    networkConnectStatus = isNetworkAvailable();
-                    if (networkConnectStatus){
-                        Amplify.API.query(
-                                ModelQuery.list(Users.class, Users.COMPANY.contains("Spar")),
-                                response -> {
-                                    for (Users users : response.getData()) {
-                                        if (user.equals(users.getPhoneNumber())) {
-                                            company = users.getCompany();
-                                        }
-                                    }
-
-
+                    //networkConnectStatus = isNetworkAvailable();
+                    if (isNetworkAvailable()){
+                                    company="Spar";
                                     Amplify.API.query(
-                                            ModelQuery.list(Locations.class, Locations.OWNER.contains(company)),
+                                            ModelQuery.list(Locations.class),
                                             locResponse -> {
                                                 locationDetailInfo = new ArrayList<Map<String, String>>();
                                                 for (Locations locationDetail : locResponse.getData()) {
@@ -633,6 +624,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                             error -> {
                                                 runOnUiThread(new Runnable() {
                                                     public void run() {
+                                                        Log.i("QFError","Location");
                                                         qfAlert.create().show();
                                                     }
                                                 });
@@ -640,7 +632,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                     );
 
                                     Amplify.API.query(
-                                            ModelQuery.list(Assets.class, Assets.OWNER.contains(company)),
+                                            ModelQuery.list(Assets.class),
                                             assetResponse -> {
                                                 assetDetailInfo = new ArrayList<Map<String, String>>();
                                                 for (Assets assetDetail : assetResponse.getData()) {
@@ -659,21 +651,12 @@ public class ScanConfirmActivity extends BaseActivity{
                                             error -> {
                                                 runOnUiThread(new Runnable() {
                                                     public void run() {
+                                                        Log.i("QFError","Assets");
                                                         qfAlert.create().show();
                                                     }
                                                 });
                                             }
                                     );
-                                },
-                                error -> {
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            qfAlert.create().show();
-                                        }
-                                    });
-                                }
-//                                Log.e("Smartee 360 Message", "Query failure", error)
-                        );
                     } else {
                         dlgAlert.create().show();
                     }
