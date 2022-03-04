@@ -31,6 +31,12 @@ public class AuthActivity extends BaseActivity {
         wifiManager.setWifiEnabled(true);
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         if (donePressedFlag) {
+            Intent i = new Intent();
+            i.setAction(Intent.ACTION_SENDTO);
+            i.setData(Uri.parse("app://open.my.app"));
+            i.putExtra("statFlag","Ashveer Works");
+            startActivity(i);
+            Log.i("Msg","Intent Sent");
             finishAffinity();
             AuthActivity.this.finish();
             System.exit(0);

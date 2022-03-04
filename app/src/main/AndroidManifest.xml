@@ -31,9 +31,10 @@
         <activity
             android:name=".activity.AuthActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light">
+            android:theme="@style/Theme.AppCompat.Light"
             tools:ignore="LockedOrientationActivity"
-            android: launchMode="singleTask"
+            android:launchMode="singleTask"
+            android:exported="true"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

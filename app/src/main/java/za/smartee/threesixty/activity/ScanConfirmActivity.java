@@ -19,6 +19,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -496,6 +497,8 @@ public class ScanConfirmActivity extends BaseActivity{
                     i.putExtra("scanHistFlag",true);
                     clearData();
                     startActivity(i);
+
+
                     ScanConfirmActivity.this.finish();
                 } else {
                     dlgAlert.create().show();
