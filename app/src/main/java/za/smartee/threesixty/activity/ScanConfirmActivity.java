@@ -82,6 +82,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -623,6 +624,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                                         locDdData.add(locationDetailInfo.get(r).get("Address"));
                                                     }
                                                 }
+                                                Collections.sort(locDdData);
                                             },
                                             error -> {
                                                 runOnUiThread(new Runnable() {

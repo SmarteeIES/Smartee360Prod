@@ -2,6 +2,8 @@ package za.smartee.threesixty.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -31,15 +33,41 @@ public class AuthActivity extends BaseActivity {
         wifiManager.setWifiEnabled(true);
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         if (donePressedFlag) {
-            Intent i = new Intent();
-            i.setAction(Intent.ACTION_SENDTO);
-            i.setData(Uri.parse("app://open.my.app"));
-            i.putExtra("statFlag","Ashveer Works");
-            startActivity(i);
-            Log.i("Msg","Intent Sent");
-            finishAffinity();
-            AuthActivity.this.finish();
-            System.exit(0);
+            // working removed for testing Intent i = new Intent();
+           try {
+
+//               Intent result = new Intent("integration://s360vsc.RESULT_ACTION", Uri.parse("vscs360://integrationvscs360"));
+//               setResult(Activity.RESULT_OK, result);
+//               finish();
+//               finishAffinity();
+//               AuthActivity.this.finish();
+//               System.exit(0);
+
+               Intent i = new Intent(Intent.ACTION_VIEW);
+               i.setData(Uri.parse("xyz.appinstall.vsc:///open"));
+               i.putExtra("statFlag","s360success");
+               startActivity(i);
+               Log.i("Msg","Intent Sent");
+               finishAffinity();
+               AuthActivity.this.finish();
+               System.exit(0);
+
+
+//Working sending data via intent
+//               i.setAction(Intent.ACTION_VIEW);
+//               //i.setData(Uri.parse("app://open.my.app"));
+//               i.setData(Uri.parse("xyz.appinstall.vsc:///open"));
+//               i.putExtra("statFlag","s360success");
+//               startActivity(i);
+//               Log.i("Msg","Intent Sent");
+//               finishAffinity();
+//               AuthActivity.this.finish();
+//               System.exit(0);
+// End working block
+           } catch (ActivityNotFoundException e){
+               Log.i("Msg","App Not Found");
+           }
+
         }
         AWSMobileClient.getInstance().initialize(getApplicationContext(), new Callback<UserStateDetails>() {
             @Override
