@@ -19,6 +19,10 @@ import com.elvishew.xlog.printer.Printer;
 import com.elvishew.xlog.printer.file.FilePrinter;
 import com.elvishew.xlog.printer.file.naming.ChangelessFileNameGenerator;
 import za.smartee.threesixty.utils.IOUtils;
+
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.Display;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.moko.ble.lib.log.ClearLogBackStrategy;
 import za.smartee.support.MokoSupport;
 
@@ -49,6 +53,11 @@ public class BaseApplication extends Application {
         initXLog();
         MokoSupport.getInstance().init(getApplicationContext());
         Thread.setDefaultUncaughtExceptionHandler(new BTUncaughtExceptionHandler());
+        AppUpdater appUpdater = new AppUpdater(this)
+                .setDisplay(Display.DIALOG)
+                .setUpdateFrom(UpdateFrom.JSON)
+                .setUpdateJSON("https://github.com/IconixES/Smartee360Prod/update-changelog.json");
+        appUpdater.start();
     }
 
     private void initXLog() {
