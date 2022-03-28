@@ -66,9 +66,9 @@ public class ScanActivity extends BaseActivity {
         AppUpdater appUpdater = new AppUpdater(this)
                 .setDisplay(Display.DIALOG)
                 .setUpdateFrom(UpdateFrom.JSON)
-                .setUpdateJSON("https://github.com/IconixES/Smartee360Prod/tree/ProdAutoUpdate/app/update-changelog.json");
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json");
         appUpdater.start();
-        Log.i("VCheck","ProdAutoUpdate");
+        Log.i("VCheck","ProdAutoUpdatev2");
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
