@@ -30,6 +30,9 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignOutOptions;
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.Display;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,6 +62,12 @@ public class ScanActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        AppUpdater appUpdater = new AppUpdater(this)
+                .setDisplay(Display.DIALOG)
+                .setUpdateFrom(UpdateFrom.JSON)
+                .setUpdateJSON("https://github.com/IconixES/Smartee360Prod/tree/ProdAutoUpdate/app/update-changelog.json");
+        appUpdater.start();
         Log.i("VCheck","ProdAutoUpdate");
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
