@@ -64,11 +64,11 @@ public class ScanActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         AppUpdater appUpdater = new AppUpdater(this)
-                .setDisplay(Display.NOTIFICATION)
+                .setDisplay(Display.DIALOG)
                 .setUpdateFrom(UpdateFrom.JSON)
                 .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json");
         appUpdater.start();
-        Log.i("VCheck","ProdAutoUpdatev3");
+        Log.i("VCheck","ProdAutoUpdatev4");
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
