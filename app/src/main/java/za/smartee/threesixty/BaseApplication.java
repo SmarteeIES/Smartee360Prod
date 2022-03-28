@@ -53,11 +53,7 @@ public class BaseApplication extends Application {
         initXLog();
         MokoSupport.getInstance().init(getApplicationContext());
         Thread.setDefaultUncaughtExceptionHandler(new BTUncaughtExceptionHandler());
-        AppUpdater appUpdater = new AppUpdater(this)
-                .setDisplay(Display.DIALOG)
-                .setUpdateFrom(UpdateFrom.JSON)
-                .setUpdateJSON("https://github.com/IconixES/Smartee360Prod/update-changelog.json");
-        appUpdater.start();
+
     }
 
     private void initXLog() {
