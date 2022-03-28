@@ -10,7 +10,7 @@ android {
         targetSdkVersion 29
         multiDexEnabled true
         versionCode 2
-        versionName "v1.0.0.6"
+        versionName "v1.0.0.7"
     }
 
     buildTypes {
