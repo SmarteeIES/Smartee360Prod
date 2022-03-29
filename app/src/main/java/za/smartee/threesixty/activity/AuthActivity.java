@@ -25,7 +25,6 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import za.smartee.threesixty.R;
 
 public class AuthActivity extends BaseActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,18 +35,25 @@ public class AuthActivity extends BaseActivity {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
+        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
             // working removed for testing Intent i = new Intent();
             try {
                 Intent i = new Intent();
                 i.setAction("za.smartee.threeSixty");
-                i.putExtra("data","s360success");
+                if (scanCheckFlag){
+                    i.putExtra("data","s360success");
+                    Log.i("Msg","Intent success");
+                } else {
+                    i.putExtra("data","s360failure");
+                    Log.i("Msg","Intent failure");
+                }
+
                 sendBroadcast(i);
                 Log.i("Msg","Intent Sent");
                 finishAffinity();
                 AuthActivity.this.finish();
                 System.exit(0);
-
             } catch (ActivityNotFoundException e){
                 Log.i("Msg","App Not Found");
             }

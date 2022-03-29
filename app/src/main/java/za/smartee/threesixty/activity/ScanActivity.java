@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
 
 public class ScanActivity extends BaseActivity {
@@ -66,9 +67,10 @@ public class ScanActivity extends BaseActivity {
         AppUpdater appUpdater = new AppUpdater(this)
                 .setDisplay(Display.DIALOG)
                 .setUpdateFrom(UpdateFrom.JSON)
+                .setCancelable(false)
                 .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json");
         appUpdater.start();
-        Log.i("VCheck","ProdAutoUpdatev4");
+        Log.i("VCheck","ProdAutoUpdatev6");
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
@@ -76,6 +78,9 @@ public class ScanActivity extends BaseActivity {
         TextView answer3 = (TextView) findViewById(R.id.scanInfo3);
         TextView answer4 = (TextView) findViewById(R.id.TextViewSelectedStore);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
+        TextView vCode = (TextView) findViewById(R.id.vCode);
+        vCode.setText(BuildConfig.VERSION_NAME);
+
         loadingSwitch.setVisibility(View.INVISIBLE);
         loadingSwitch.setChecked(false);
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
@@ -118,7 +123,6 @@ public class ScanActivity extends BaseActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 networkConnectStatus = isNetworkAvailable();
                 if (networkConnectStatus){
                     loadingChecked = loadingSwitch.isChecked();
@@ -128,7 +132,6 @@ public class ScanActivity extends BaseActivity {
                 } else {
                     dlgAlert.show();
                 }
-
             }
         });
 
@@ -173,6 +176,7 @@ public class ScanActivity extends BaseActivity {
 
 
     public void onDonePressed() {
+        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanHistFlag",false);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Is the Smartee Scan Complete?");
         alertDialogBuilder
@@ -182,6 +186,11 @@ public class ScanActivity extends BaseActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent d = new Intent(ScanActivity.this, AuthActivity.class);
+                                if (scanCheckFlag){
+                                    d.putExtra("scanCheckFlag", true);
+                                } else {
+                                    d.putExtra("scanCheckFlag", false);
+                                }
                                 d.putExtra("donePressedFlag",true);
                                 startActivity(d);
                             }

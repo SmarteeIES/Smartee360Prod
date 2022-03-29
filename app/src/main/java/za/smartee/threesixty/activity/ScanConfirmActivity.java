@@ -494,7 +494,6 @@ public class ScanConfirmActivity extends BaseActivity{
                     i.putExtra("scanTime",scanTime.toString());
                     i.putExtra("assetsInStore",numberExistingAssets.toString());
                     i.putExtra("scannedAssets",numberNewAssets.toString());
-
                     i.putExtra("scanHistFlag",true);
                     clearData();
                     startActivity(i);
