@@ -358,7 +358,7 @@ public class ScanConfirmActivity extends BaseActivity{
                     text = locDD.getSelectedItem().toString();
                 }
 
-
+                Log.i("Scan_Count", String.valueOf(devData.size()));
                 for (int i = 0; i < locationDetailInfo.size(); i++) {
                     if (locationDetailInfo.get(i).get("Address").equals(text)) {
                         selectedLocID = locationDetailInfo.get(i).get("LocationID");
@@ -408,6 +408,8 @@ public class ScanConfirmActivity extends BaseActivity{
                     devDataDetailItems.put("avgRssi",String.valueOf(rssiSum/counter));
                     devDataDetail.add(devDataDetailItems);
                 }
+
+
 
                 //Compare the scanned devices to the database and if found update
                // networkConnectStatus = isNetworkAvailable();

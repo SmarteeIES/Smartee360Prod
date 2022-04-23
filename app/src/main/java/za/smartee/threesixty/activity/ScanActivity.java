@@ -174,6 +174,12 @@ public class ScanActivity extends BaseActivity {
         startActivity(i);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+        startActivity(i);
+    }
+
 
     public void onDonePressed() {
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanHistFlag",false);

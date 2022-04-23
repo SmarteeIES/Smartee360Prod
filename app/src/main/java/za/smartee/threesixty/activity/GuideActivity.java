@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
+import android.util.Log;
 
 import za.smartee.threesixty.AppConstants;
 import za.smartee.threesixty.R;
@@ -26,6 +27,7 @@ public class GuideActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("S360Activity","GuideActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -221,6 +223,18 @@ public class GuideActivity extends BaseActivity {
                     }
                 }).create();
         dialog.show();
+    }
+
+//        @Override
+//        public void onResume() {
+//            super.onResume();
+//            Log.i("S360Activity","GuideActivityResume");
+//        }
+
+    @Override
+    public void onBackPressed() {
+        super.onResume();
+        Log.i("S360Activity","GuideActivityBackPressed");
     }
 
     private void showRequestPermissionDialog2() {

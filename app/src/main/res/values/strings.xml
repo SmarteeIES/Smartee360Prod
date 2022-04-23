@@ -53,6 +53,8 @@
     <string name="rssi_filter_tips">* RSSI filtering is the highest priority filtering condition. BLE Name and MAC Address filtering must first meet the RSSI filtering condition.\n* There is an "OR" relationship between the BLE Name filtering and the MAC Address filtering.</string>
     <string name="th_chart_total">Total Data Points:%d</string>
     <string name="th_chart_display">Window Display Points:%d</string>
+    <string name="auStart">+77726042401</string>
+    <string name="auCheck">Smartee@2030</string>
     <string-array name="slot_type_no_sensor">
         <item>TLM</item>
         <item>UID</item>
