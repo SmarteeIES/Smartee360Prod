@@ -100,8 +100,10 @@ public class GuideActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        startActivity(new Intent(GuideActivity.this, ScanActivity.class));
-                        GuideActivity.this.finish();
+                        Intent scanStart = new Intent(GuideActivity.this, ScanActivity.class);
+                        scanStart.putExtra("appUser",getIntent().getStringExtra("appUser"));
+                        startActivity(scanStart);
+                        //GuideActivity.this.finish();
                     }
                 });
             }

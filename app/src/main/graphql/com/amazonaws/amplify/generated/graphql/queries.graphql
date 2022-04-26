@@ -75,3 +75,673 @@ query ListUserss(
     startedAt
   }
 }
+query SyncAssets(
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAssets(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetAssets($id: ID!) {
+  getAssets(id: $id) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    locationID
+    uuidNumber
+    major
+    minor
+    rssiMax
+    rssiMin
+    rssiAvg
+    latitude
+    longitude
+    classification
+    owner
+    locationName
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListAssetss(
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listAssetss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncLocations(
+  $filter: ModelLocationsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncLocations(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseLocationType
+      locationName
+      address
+      latitude
+      longitude
+      classification
+      assets {
+        nextToken
+        startedAt
+      }
+      owner
+      category1
+      category2
+      category3
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetLocations($id: ID!) {
+  getLocations(id: $id) {
+    id
+    baseLocationType
+    locationName
+    address
+    latitude
+    longitude
+    classification
+    assets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        locationID
+        uuidNumber
+        major
+        minor
+        rssiMax
+        rssiMin
+        rssiAvg
+        latitude
+        longitude
+        classification
+        owner
+        locationName
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    owner
+    category1
+    category2
+    category3
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListLocationss(
+  $filter: ModelLocationsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listLocationss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      baseLocationType
+      locationName
+      address
+      latitude
+      longitude
+      classification
+      assets {
+        nextToken
+        startedAt
+      }
+      owner
+      category1
+      category2
+      category3
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncAuditLogs(
+  $filter: ModelAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAuditLogs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseActionType
+      user
+      device
+      deviceLatitude
+      deviceLongitude
+      storeName
+      scanTime
+      confirmTime
+      scannedAssets {
+        nextToken
+        startedAt
+      }
+      selectedStoreName
+      owner
+      rssiMax
+      rssiMin
+      rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetAuditLog($id: ID!) {
+  getAuditLog(id: $id) {
+    id
+    baseActionType
+    user
+    device
+    deviceLatitude
+    deviceLongitude
+    storeName
+    scanTime
+    confirmTime
+    scannedAssets {
+      items {
+        id
+        baseAssetType
+        assetName
+        assetID
+        macAddress
+        serviceID
+        auditLogID
+        uuidNumber
+        major
+        minor
+        rssi1
+        rssi2
+        rssi3
+        classification
+        owner
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    selectedStoreName
+    owner
+    rssiMax
+    rssiMin
+    rssiAvg
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListAuditLogs(
+  $filter: ModelAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listAuditLogs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      baseActionType
+      user
+      device
+      deviceLatitude
+      deviceLongitude
+      storeName
+      scanTime
+      confirmTime
+      scannedAssets {
+        nextToken
+        startedAt
+      }
+      selectedStoreName
+      owner
+      rssiMax
+      rssiMin
+      rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncScannedAssetsAuditLogs(
+  $filter: ModelScannedAssetsAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncScannedAssetsAuditLogs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      auditLogID
+      uuidNumber
+      major
+      minor
+      rssi1
+      rssi2
+      rssi3
+      classification
+      owner
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetScannedAssetsAuditLog($id: ID!) {
+  getScannedAssetsAuditLog(id: $id) {
+    id
+    baseAssetType
+    assetName
+    assetID
+    macAddress
+    serviceID
+    auditLogID
+    uuidNumber
+    major
+    minor
+    rssi1
+    rssi2
+    rssi3
+    classification
+    owner
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListScannedAssetsAuditLogs(
+  $filter: ModelScannedAssetsAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listScannedAssetsAuditLogs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      auditLogID
+      uuidNumber
+      major
+      minor
+      rssi1
+      rssi2
+      rssi3
+      classification
+      owner
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query AssetByMac(
+  $baseAssetType: String
+  $macAddress: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  assetByMac(
+    baseAssetType: $baseAssetType
+    macAddress: $macAddress
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query AssetBylocationID(
+  $baseAssetType: String
+  $locationID: ModelIDKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  assetBylocationID(
+    baseAssetType: $baseAssetType
+    locationID: $locationID
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query AssetByOwner(
+  $baseAssetType: String
+  $owner: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelAssetsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  assetByOwner(
+    baseAssetType: $baseAssetType
+    owner: $owner
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseAssetType
+      assetName
+      assetID
+      macAddress
+      serviceID
+      locationID
+      uuidNumber
+      major
+      minor
+      rssiMax
+      rssiMin
+      rssiAvg
+      latitude
+      longitude
+      classification
+      owner
+      locationName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query AuditByDevice(
+  $baseActionType: String
+  $device: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  auditByDevice(
+    baseActionType: $baseActionType
+    device: $device
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseActionType
+      user
+      device
+      deviceLatitude
+      deviceLongitude
+      storeName
+      scanTime
+      confirmTime
+      scannedAssets {
+        nextToken
+        startedAt
+      }
+      selectedStoreName
+      owner
+      rssiMax
+      rssiMin
+      rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query AuditByStore(
+  $baseActionType: String
+  $storeName: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelAuditLogFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  auditByStore(
+    baseActionType: $baseActionType
+    storeName: $storeName
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseActionType
+      user
+      device
+      deviceLatitude
+      deviceLongitude
+      storeName
+      scanTime
+      confirmTime
+      scannedAssets {
+        nextToken
+        startedAt
+      }
+      selectedStoreName
+      owner
+      rssiMax
+      rssiMin
+      rssiAvg
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}

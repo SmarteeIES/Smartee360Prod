@@ -34,9 +34,11 @@
       "output": {
         "authConfig": {
           "defaultAuthentication": {
-            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-            "userPoolConfig": {
-              "userPoolId": "authsmartee360prodbb2322e0"
+            "authenticationType": "API_KEY",
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 365,
+              "apiKeyExpirationDate": "2023-04-24T20:04:36.659Z",
+              "description": "360apiKey"
             }
           },
           "additionalAuthenticationProviders": []

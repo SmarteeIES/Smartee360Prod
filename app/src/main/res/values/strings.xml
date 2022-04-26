@@ -95,4 +95,15 @@
         <item><![CDATA[T&H]]></item>
         <item>Time</item>
     </string-array>
+
+    <string-array name="user_list">
+        <item>Spar Admin</item>
+        <item>Spar Driver</item>
+        <item>Smartee Admin</item>
+        <item>Other</item>
+    </string-array>
+    <string name="sparAdminCheck">13579</string>
+    <string name="sparDriverCheck">12345</string>
+    <string name="smarteeAdminCheck">02468</string>
+    <string name="otherCheck">19283</string>
 </resources>

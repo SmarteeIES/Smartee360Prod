@@ -13,12 +13,8 @@
     },
     "categories": {
       "auth": {
-        "smartee360prod1d4a730b": {
-          "userPoolId": "us-east-1_HlrKQMyiw",
-          "userPoolName": "smartee3602846c3a6_userpool_2846c3a6-amplify",
-          "webClientId": "2ng0s856tn3lbu1701rv7882r3",
-          "nativeClientId": "2ng0s856tn3lbu1701rv7882r3"
-        }
+        "smartee360prodbb2322e0": {},
+        "smartee360prod1d4a730b": {}
       }
     }
   },
@@ -32,6 +28,24 @@
       "UnauthRoleName": "amplify-smartee360prod-prod-161225-unauthRole",
       "StackName": "amplify-smartee360prod-prod-161225",
       "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-prod-161225/79583650-93e9-11ec-9532-0a8554cb7fa7",
+      "AmplifyAppId": "d1tt2u4wz350rm"
+    },
+    "categories": {
+      "auth": {
+        "smartee360prodbb2322e0": {}
+      }
+    }
+  },
+  "develop": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-smartee360prod-develop-215442-authRole",
+      "UnauthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-develop-215442-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::378358802604:role/amplify-smartee360prod-develop-215442-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-smartee360prod-develop-215442-deployment",
+      "UnauthRoleName": "amplify-smartee360prod-develop-215442-unauthRole",
+      "StackName": "amplify-smartee360prod-develop-215442",
+      "StackId": "arn:aws:cloudformation:us-east-1:378358802604:stack/amplify-smartee360prod-develop-215442/65cf4e30-c408-11ec-8279-0e1be1179737",
       "AmplifyAppId": "d1tt2u4wz350rm"
     },
     "categories": {

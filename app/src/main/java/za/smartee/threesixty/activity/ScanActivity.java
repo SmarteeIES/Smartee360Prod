@@ -30,6 +30,11 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignOutOptions;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.DataStoreChannelEventName;
+import com.amplifyframework.datastore.events.NetworkStatusEvent;
+import com.amplifyframework.datastore.generated.model.Assets;
+import com.amplifyframework.hub.HubChannel;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
@@ -64,6 +69,23 @@ public class ScanActivity extends BaseActivity {
         setContentView(R.layout.activity_scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        String appUser = getIntent().getStringExtra("appUser");
+    Log.i("S360User",appUser);
+        Amplify.DataStore.start(
+                () -> Log.i("S360", "DataStore started"),
+                error -> Log.e("S360", "Error starting DataStore", error)
+        );
+
+        Amplify.Hub.subscribe(
+                HubChannel.DATASTORE,
+                hubEvent -> DataStoreChannelEventName.NETWORK_STATUS.toString().equals(hubEvent.getName()),
+                hubEvent -> {
+                    NetworkStatusEvent event = (NetworkStatusEvent) hubEvent.getData();
+                    Log.i("MyAmplifyAppStatus", "User has a network connection: " + event.getActive());
+                }
+        );
+
+        //Auto Update Check
         AppUpdater appUpdater = new AppUpdater(this)
                 .setDisplay(Display.DIALOG)
                 .setUpdateFrom(UpdateFrom.JSON)
@@ -124,14 +146,15 @@ public class ScanActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 networkConnectStatus = isNetworkAvailable();
-                if (networkConnectStatus){
+                //if (networkConnectStatus){
                     loadingChecked = loadingSwitch.isChecked();
                     Intent i = new Intent(ScanActivity.this, ScanConfirmActivity.class);
+                    i.putExtra("appUser",appUser);
                     i.putExtra("loadingFlag", loadingChecked);
                     startActivity(i);
-                } else {
-                    dlgAlert.show();
-                }
+              //  } else {
+                //    dlgAlert.show();
+              //  }
             }
         });
 
@@ -192,7 +215,16 @@ public class ScanActivity extends BaseActivity {
                                     d.putExtra("scanCheckFlag", false);
                                 }
                                 d.putExtra("donePressedFlag",true);
-                                startActivity(d);
+                                Amplify.DataStore.start(
+                                        () -> {
+                                            startActivity(d);
+                                            Log.i("S360", "DataStore started");
+                                        },
+                                        error -> {
+                                            startActivity(d);
+                                            Log.e("S360", "Error starting DataStore", error);
+                                        }
+                                );
                             }
                         })
 

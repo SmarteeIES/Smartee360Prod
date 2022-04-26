@@ -56,11 +56,17 @@ dependencies {
 
     // Support for Java 8 features
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
-    implementation 'com.amplifyframework:aws-api:1.32.0'
-    implementation 'com.amplifyframework:aws-datastore:1.28.1'
-    implementation 'com.amplifyframework:core:1.6.5'
-    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.13.7'
-    implementation 'com.amplifyframework:aws-auth-cognito:1.17.7'
+   // implementation 'com.amplifyframework:aws-api:1.32.0'
+  //  implementation 'com.amplifyframework:aws-datastore:1.28.1'
+//    implementation 'com.amplifyframework:core:1.6.5'
+//    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.41.0'
+   // implementation 'com.amplifyframework:aws-auth-cognito:1.17.7'
+
+    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.44.0'
+    implementation 'com.amplifyframework:core:1.35.2'
+    implementation 'com.amplifyframework:aws-api:1.35.2'
+    implementation 'com.amplifyframework:aws-auth-cognito:1.35.2'
+    implementation 'com.amplifyframework:aws-datastore:1.35.2'
 
 
 // Cognito UserPools for SignIn

@@ -10,6 +10,7 @@ import com.amplifyframework.AmplifyException;
 import com.amplifyframework.api.aws.AWSApiPlugin;
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.AWSDataStorePlugin;
 import com.elvishew.xlog.LogConfiguration;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
@@ -44,11 +45,12 @@ public class BaseApplication extends Application {
         try {
             Amplify.addPlugin(new AWSApiPlugin());
             Amplify.addPlugin(new AWSCognitoAuthPlugin());
+            Amplify.addPlugin(new AWSDataStorePlugin());
             Amplify.configure(getApplicationContext());
 
-            Log.i("Tutorial", "Initialized Amplify");
+            Log.i("S360", "Initialized Amplify");
         } catch (AmplifyException e) {
-            Log.e("Tutorial", "Could not initialize Amplify", e);
+            Log.e("S360", "Could not initialize Amplify", e);
         }
         initXLog();
         MokoSupport.getInstance().init(getApplicationContext());
