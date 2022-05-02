@@ -213,47 +213,17 @@ public class ScanConfirmActivity extends BaseActivity{
 
         //No Network Alert
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-        dlgAlert.setMessage("Please connect to the internet and retry");
-        dlgAlert.setTitle("Internet Connection - Error");
+        dlgAlert.setMessage("Data Sync Error");
+        dlgAlert.setTitle("Data Sync Incomplete - Please restart app");
         dlgAlert.setPositiveButton("OK", null);
         dlgAlert.setCancelable(true);
         dlgAlert.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                        Intent rs = new Intent(ScanConfirmActivity.this, AuthActivity.class);
+                        rs.putExtra("appUser",appUser);
                         startActivity(rs);
                         Log.i("dialog msg","clicked");
-                    }
-                });
-
-        //Query Failure Alert
-        AlertDialog.Builder qfAlert  = new AlertDialog.Builder(this);
-        qfAlert.setMessage("Data Query Failure, Please Retry");
-        qfAlert.setTitle("Data Query - Error");
-        qfAlert.setPositiveButton("OK", null);
-        qfAlert.setCancelable(true);
-        qfAlert.setPositiveButton("Ok",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                        startActivity(rs);
-                        Log.i("dialog msg","clicked");
-                        //finishAndRemoveTask();
-                    }
-                });
-
-        AlertDialog.Builder wfAlert  = new AlertDialog.Builder(this);
-        wfAlert.setMessage("Data Write Failure, Please Retry");
-        wfAlert.setTitle("Data Write - Error");
-        wfAlert.setPositiveButton("OK", null);
-        wfAlert.setCancelable(true);
-        wfAlert.setPositiveButton("Ok",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent rs = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                        startActivity(rs);
-                        Log.i("dialog msg","clicked");
-                        //finishAndRemoveTask();
                     }
                 });
 
@@ -295,6 +265,7 @@ public class ScanConfirmActivity extends BaseActivity{
                 TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
                 selectedLocation.setVisibility(View.INVISIBLE);
                 Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                i.putExtra("appUser",appUser);
                 startActivity(i);
                 ScanConfirmActivity.this.finish();
             }
@@ -322,6 +293,7 @@ public class ScanConfirmActivity extends BaseActivity{
                         TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
                         selectedLocation.setVisibility(View.INVISIBLE);
                         Intent i = new Intent(ScanConfirmActivity.this, AuthActivity.class);
+                        i.putExtra("appUser",appUser);
                         startActivity(i);
                         ScanConfirmActivity.this.finish();
                     }
@@ -447,17 +419,6 @@ public class ScanConfirmActivity extends BaseActivity{
                                                     .serviceId(String.valueOf(scanTime))
                                                     .build();
 
-                                            // Mutation Update Start
-//                                            Amplify.API.mutate(ModelMutation.update(AssetItem),
-//                                                    response -> Log.i("Smartee", "Asset with id: " + response.getData().getId()),
-//                                                    error -> {
-//                                                        runOnUiThread(new Runnable() {
-//                                                            public void run() {
-//                                                                wfAlert.create().show();
-//                                                            }
-//                                                        });
-//                                                    }
-//                                            );
                                             Amplify.DataStore.save(AssetItem,
                                                     result -> Log.i("S360", "Created a new post successfully"),
                                                     error -> Log.e("S360Assets",  "Error creating post", error)
@@ -479,16 +440,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                                 .rssiMin(minRssiCap)
                                                 .owner(company)
                                                 .build();
-//                                        Amplify.API.mutate(ModelMutation.create(auditItems),
-//                                                response -> Log.i("Smartee", "Audit with id: " + response.getData().getId()),
-//                                                error -> {
-//                                                    runOnUiThread(new Runnable() {
-//                                                        public void run() {
-//                                                            wfAlert.create().show();
-//                                                        }
-//                                                    });
-//                                                }
-//                                        );
+
                                         Amplify.DataStore.save(auditItems,
                                                 result -> Log.i("S360", "Created a new post successfully"),
                                                 error -> Log.e("S360",  "Error creating post", error)
@@ -547,7 +499,6 @@ public class ScanConfirmActivity extends BaseActivity{
 
         scanTime = Calendar.getInstance().getTime();
 
-
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
         answer1.setVisibility(View.INVISIBLE);
         TextView answer2 = (TextView) findViewById(R.id.scanInfo2);
@@ -569,8 +520,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
             @Override
             public void onScanDevice(DeviceInfo device) {
-                Log.i("Test Mac",device.mac);
-                Log.i("Test Mac", String.valueOf(device.rssi));
+//                Log.i("Test Mac",device.mac);
+//                Log.i("Test Mac", String.valueOf(device.rssi));
                 Map<String, String> scanInfo = new HashMap<String, String>();
                 scanInfo.put("devMac", String.valueOf(device.mac));
                 scanInfo.put("rssi", String.valueOf(device.rssi));
@@ -586,26 +537,11 @@ public class ScanConfirmActivity extends BaseActivity{
 
 
         Boolean finalLoadingChecked1 = loadingChecked;
-//        AuthUser currentUser = Amplify.Auth.getCurrentUser();
-
-
-//                if (Amplify.Auth.getCurrentUser() == null){
-//                    Intent i = new Intent(ScanConfirmActivity.this, AuthActivity.class);
-//                    startActivity(i);
-//                }
-//                else {
-//                    String user = currentUser.getUsername().toString();
-//                    Log.i("Ashveer",user);
-//                    //Start of query to find the Locations, assets and company details.
-//
-//                    //networkConnectStatus = isNetworkAvailable();
-//                    if (isNetworkAvailable()){
                                     company="Spar";
-
                                     Amplify.DataStore.query(Locations.class,
                                             locResponse -> {
                                                 if (locResponse.hasNext()) {
-                                                    Log.i("S360", "Successful query, found posts.");
+                                                   // Log.i("S360", "Successful query, found posts.");
                                                     locationDetailInfo = new ArrayList<Map<String, String>>();
                                                     while (locResponse.hasNext()) {
                                                         Locations locationDetail = locResponse.next();
@@ -636,42 +572,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                             },
                                             error -> Log.e("S360",  "Error retrieving posts", error)
                                     );
-//                                    Amplify.API.query(
-//                                            ModelQuery.list(Locations.class),
-//                                            locResponse -> {
-//                                                locationDetailInfo = new ArrayList<Map<String, String>>();
-//                                                for (Locations locationDetail : locResponse.getData()) {
-//                                                    if (locationDetail.getAddress() != null) {
-//                                                        Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
-//                                                        locationDetailInfo1.put("Address", locationDetail.getAddress());
-//                                                        locationDetailInfo1.put("LocationID", locationDetail.getId());
-//                                                        locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
-//                                                        locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
-//                                                        locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
-//                                                        locationDetailInfo.add(locationDetailInfo1);
-//                                                    }
-//                                                }
-//                                                for (int r = 0; r < locationDetailInfo.size(); r++) {
-//                                                    String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-//                                                    if (finalLoadingChecked1) {
-//                                                        if (tempLoc.equals("Transit")) {
-//                                                            locDdData.add(locationDetailInfo.get(r).get("Address"));
-//                                                        }
-//                                                    } else {
-//                                                        locDdData.add(locationDetailInfo.get(r).get("Address"));
-//                                                    }
-//                                                }
-//                                                Collections.sort(locDdData);
-//                                            },
-//                                            error -> {
-//                                                runOnUiThread(new Runnable() {
-//                                                    public void run() {
-//                                                        Log.i("QFError","Location");
-//                                                        qfAlert.create().show();
-//                                                    }
-//                                                });
-//                                            }
-//                                    );
+
 
                         Amplify.DataStore.query(Assets.class,
                                 assetResponse -> {
@@ -696,68 +597,6 @@ public class ScanConfirmActivity extends BaseActivity{
                                 },
                                 error -> Log.e("S360",  "Error retrieving posts", error)
                         );
-
-//                        Amplify.API.query(
-//                                ModelQuery.list(Assets.class),
-//                                assetResponse -> {
-//                                    assetDetailInfo = new ArrayList<Map<String, String>>();
-//                                    for (Assets assetDetail : assetResponse.getData()) {
-//                                        if (assetDetail.getAssetId() != null) {
-//                                            assetItems.add(assetDetail.getAssetId().toString());
-//                                            Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-//                                            assetDetailInfo1.put("systemID", assetDetail.getId());
-//                                            assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-//                                            assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-//                                            assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-//                                            assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-//                                            assetDetailInfo.add(assetDetailInfo1);
-//                                        }
-//                                    }
-//                                },
-//                                error -> {
-//                                    runOnUiThread(new Runnable() {
-//                                        public void run() {
-//                                            Log.i("QFError","Assets");
-//                                            qfAlert.create().show();
-//                                        }
-//                                    });
-//                                }
-//                        );
-//                    } else {
-//                        dlgAlert.create().show();
-//                    }
-
-//                                    Amplify.API.query(
-//                                            ModelQuery.list(Assets.class),
-//                                            assetResponse -> {
-//                                                assetDetailInfo = new ArrayList<Map<String, String>>();
-//                                                for (Assets assetDetail : assetResponse.getData()) {
-//                                                    if (assetDetail.getAssetId() != null) {
-//                                                        assetItems.add(assetDetail.getAssetId().toString());
-//                                                        Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-//                                                        assetDetailInfo1.put("systemID", assetDetail.getId());
-//                                                        assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-//                                                        assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-//                                                        assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-//                                                        assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-//                                                        assetDetailInfo.add(assetDetailInfo1);
-//                                                    }
-//                                                }
-//                                            },
-//                                            error -> {
-//                                                runOnUiThread(new Runnable() {
-//                                                    public void run() {
-//                                                        Log.i("QFError","Assets");
-//                                                        qfAlert.create().show();
-//                                                    }
-//                                                });
-//                                            }
-//                                    );
-//                    } else {
-//                        dlgAlert.create().show();
-//                    }
-
-
 
                     Boolean finalLoadingChecked = loadingChecked;
                     scannerSetTime = (new Double(25000)).longValue();
@@ -842,8 +681,6 @@ public class ScanConfirmActivity extends BaseActivity{
                                 btnScanCancel.setVisibility(View.VISIBLE);
 
                             }
-
-
 
                             TextView infoView = (TextView) findViewById(R.id.infoView);
                             TextView timeText = (TextView) findViewById(R.id.timerText);

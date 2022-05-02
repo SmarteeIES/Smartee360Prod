@@ -64,7 +64,7 @@ public class AuthActivity extends BaseActivity {
         int userLen=userArray.length;
         for (int r = 0; r < userLen; r++) {
             userList.add(userArray[r]);
-            Log.i("User Entry", userArray[r]);
+           // Log.i("User Entry", userArray[r]);
         }
         Spinner userDD = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<String> UserDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, userList);
@@ -106,28 +106,26 @@ public class AuthActivity extends BaseActivity {
                 Log.i("Msg","App Not Found");
             }
 
-        }
-
-
-        // ATTENTION: This was auto-generated to handle app links.
-        Intent appLinkIntent = getIntent();
-        String appLinkAction = appLinkIntent.getAction();
-        Uri appLinkData = appLinkIntent.getData();
-        //Determine if the app was started from VSc or manually
-        if (appLinkData == null){
-            tve1.setVisibility(View.VISIBLE);
-            tv1.setVisibility(View.VISIBLE);
-            tv2.setVisibility(View.VISIBLE);
-            tv3.setVisibility(View.VISIBLE);
-            loginButton.setVisibility(View.VISIBLE);
-            userDD.setVisibility(View.VISIBLE);
         } else {
-            Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
-            iStart.putExtra("appUser",appLinkData.toString());
-            Log.i("s360","VSC User");
-            startActivity(iStart);
+            // ATTENTION: This was auto-generated to handle app links.
+            Intent appLinkIntent = getIntent();
+            String appLinkAction = appLinkIntent.getAction();
+            Uri appLinkData = appLinkIntent.getData();
+            //Determine if the app was started from VSc or manually
+            if (appLinkData == null){
+                tve1.setVisibility(View.VISIBLE);
+                tv1.setVisibility(View.VISIBLE);
+                tv2.setVisibility(View.VISIBLE);
+                tv3.setVisibility(View.VISIBLE);
+                loginButton.setVisibility(View.VISIBLE);
+                userDD.setVisibility(View.VISIBLE);
+            } else {
+                Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
+                iStart.putExtra("appUser",appLinkData.toString());
+                Log.i("s360","VSC User");
+                startActivity(iStart);
+            }
         }
-
     }
 
     private void verifyuser(String text){
@@ -149,10 +147,7 @@ public class AuthActivity extends BaseActivity {
         Log.i("s360-user",text);
         switch (text) {
             case "Spar Admin":
-                Log.i("s360-user",text);
-                Log.i("s360check", getResources().getString(R.string.sparAdminCheck));
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparAdminCheck))){
-                    Log.i("s360-passwordCheck",text);
                     iStart.putExtra("appUser","Spar Admin");
                     startActivity(iStart);
                 } else {

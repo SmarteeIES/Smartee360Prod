@@ -20,9 +20,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +33,11 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignOutOptions;
 import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.AWSDataStorePlugin;
 import com.amplifyframework.datastore.DataStoreChannelEventName;
+import com.amplifyframework.datastore.DataStoreConfiguration;
+import com.amplifyframework.datastore.DataStoreConflictHandler;
+import com.amplifyframework.datastore.DataStoreException;
 import com.amplifyframework.datastore.events.NetworkStatusEvent;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.hub.HubChannel;
@@ -44,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
@@ -54,6 +61,9 @@ public class ScanActivity extends BaseActivity {
     TextView infoText1;
     TextView infoText2;
     TextView infoText3;
+    TextView infoHeader;
+    Button doneButton;
+
     List<Map<String, String>> locationDetailInfo;
     ArrayList<String> locDdData = new ArrayList<String>();
     List<Map<String, String>> assetDetailInfo;
@@ -61,6 +71,8 @@ public class ScanActivity extends BaseActivity {
     private boolean loadingChecked = false;
     private boolean DSSuccess = true;
     public boolean networkConnectStatus;
+    private ProgressBar spinner;
+    Long scannerSetTime;
 
 
     @Override
@@ -70,20 +82,8 @@ public class ScanActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         String appUser = getIntent().getStringExtra("appUser");
-    Log.i("S360User",appUser);
-        Amplify.DataStore.start(
-                () -> Log.i("S360", "DataStore started"),
-                error -> Log.e("S360", "Error starting DataStore", error)
-        );
+        Log.i("S360User",appUser);
 
-        Amplify.Hub.subscribe(
-                HubChannel.DATASTORE,
-                hubEvent -> DataStoreChannelEventName.NETWORK_STATUS.toString().equals(hubEvent.getName()),
-                hubEvent -> {
-                    NetworkStatusEvent event = (NetworkStatusEvent) hubEvent.getData();
-                    Log.i("MyAmplifyAppStatus", "User has a network connection: " + event.getActive());
-                }
-        );
 
         //Auto Update Check
         AppUpdater appUpdater = new AppUpdater(this)
@@ -93,18 +93,25 @@ public class ScanActivity extends BaseActivity {
                 .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json");
         appUpdater.start();
         Log.i("VCheck","ProdAutoUpdatev6");
+
+
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
         TextView answer2 = (TextView) findViewById(R.id.scanInfo2);
         TextView answer3 = (TextView) findViewById(R.id.scanInfo3);
+        infoHeader = (TextView) findViewById(R.id.infoHeader);
         TextView answer4 = (TextView) findViewById(R.id.TextViewSelectedStore);
+        doneButton = (Button) findViewById(R.id.DONE);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
         TextView vCode = (TextView) findViewById(R.id.vCode);
         vCode.setText(BuildConfig.VERSION_NAME);
 
         loadingSwitch.setVisibility(View.INVISIBLE);
+        scanButton.setVisibility(View.INVISIBLE);
+        doneButton.setVisibility(View.INVISIBLE);
         loadingSwitch.setChecked(false);
+
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
         dlgAlert.setMessage("No Network Available, please connect and retry");
         dlgAlert.setTitle("Internet Connection Error");
@@ -119,11 +126,7 @@ public class ScanActivity extends BaseActivity {
                     }
                 });
 
-        //DS Confirm Scan Error management
-        Boolean DSSaveError = getIntent().getBooleanExtra("DSSaveError",false);
-        if (DSSaveError){
-            Toast.makeText(getApplicationContext(),"Error - Please Rescan", Toast.LENGTH_LONG).show();
-        }
+
 
         //Confirm Scan Error Handling
         Boolean scanHistFlag = getIntent().getBooleanExtra("scanHistFlag",false);
@@ -145,22 +148,16 @@ public class ScanActivity extends BaseActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                networkConnectStatus = isNetworkAvailable();
-                //if (networkConnectStatus){
                     loadingChecked = loadingSwitch.isChecked();
                     Intent i = new Intent(ScanActivity.this, ScanConfirmActivity.class);
                     i.putExtra("appUser",appUser);
                     i.putExtra("loadingFlag", loadingChecked);
                     startActivity(i);
-              //  } else {
-                //    dlgAlert.show();
-              //  }
             }
         });
 
-        Button doneButton = (Button) findViewById(R.id.DONE);
-        doneButton.setOnClickListener(new View.OnClickListener() {
 
+        doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                onDonePressed();
@@ -175,6 +172,7 @@ public class ScanActivity extends BaseActivity {
                     public void onResult(final Void result) {
                         Log.d("Signout Msg", "signed-out");
                         Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+                        i.putExtra("appUser",appUser);
                         startActivity(i);
                     }
 
@@ -191,8 +189,50 @@ public class ScanActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+
+        Amplify.DataStore.start(
+                () -> Log.i("S360", "DataStore started"),
+                error -> Log.e("S360", "Error starting DataStore", error)
+        );
+
+
+        Amplify.Hub.subscribe(
+                HubChannel.DATASTORE,
+                hubEvent -> DataStoreChannelEventName.NETWORK_STATUS.toString().equals(hubEvent.getName()),
+                hubEvent -> {
+                    NetworkStatusEvent event = (NetworkStatusEvent) hubEvent.getData();
+                    if (event.getActive()){
+                        Amplify.DataStore.start(
+                                () -> Log.i("S360", "DataStore started"),
+                                error -> Log.e("S360", "Error starting DataStore", error)
+                        );
+                    }
+                    Log.i("MyAmplifyAppStatus", "User has a network connection: " + event.getActive());
+                }
+        );
+        scannerSetTime = (new Double(15000)).longValue();
+
+        new CountDownTimer(scannerSetTime, 1000) {
+            public void onTick(long millisUntilFinished) {
+
+                infoHeader.setText("Sync In Progress");
+            }
+            public void onFinish() {
+                infoHeader.setText("SCANNER INFORMATION");
+                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                spinner.setVisibility(View.GONE);
+                doneButton.setVisibility(View.VISIBLE);
+                scanButton.setVisibility(View.VISIBLE);
+            }
+        }.start();
+    }
+
+    @Override
     protected void onDestroy(){
         super.onDestroy();
+//        Amplify.ub.unsubscribe();
         Intent i = new Intent(ScanActivity.this, AuthActivity.class);
         startActivity(i);
     }

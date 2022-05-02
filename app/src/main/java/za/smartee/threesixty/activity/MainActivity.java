@@ -108,25 +108,25 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
         rvDevices.addItemDecoration(itemDecoration);
         rvDevices.setAdapter(adapter);
 
-        Amplify.API.query(
-                ModelQuery.list(Users.class, Users.NAME.beginsWith("A")),
-                response -> {
-                    for (Users todo : response.getData()) {
-                        Log.i("MyAmplifyApp", todo.getName());
-                    }
-                },
-                error -> Log.e("MyAmplifyApp", "Query failure", error)
-        );
-
-        Amplify.API.query(
-                ModelQuery.list(Assets.class, Assets.CLASSIFICATION.beginsWith("a")),
-                response -> {
-                    for (Assets assets : response.getData()) {
-                        Log.i("MyAmplifyApp", assets.getAssetName());
-                    }
-                },
-                error -> Log.e("MyAmplifyApp", "Query failure", error)
-        );
+//        Amplify.API.query(
+//                ModelQuery.list(Users.class, Users.NAME.beginsWith("A")),
+//                response -> {
+//                    for (Users todo : response.getData()) {
+//                        Log.i("MyAmplifyApp", todo.getName());
+//                    }
+//                },
+//                error -> Log.e("MyAmplifyApp", "Query failure", error)
+//        );
+//
+//        Amplify.API.query(
+//                ModelQuery.list(Assets.class, Assets.CLASSIFICATION.beginsWith("a")),
+//                response -> {
+//                    for (Assets assets : response.getData()) {
+//                        Log.i("MyAmplifyApp", assets.getAssetName());
+//                    }
+//                },
+//                error -> Log.e("MyAmplifyApp", "Query failure", error)
+//        );
 
 
         mHandler = new Handler(Looper.getMainLooper());
