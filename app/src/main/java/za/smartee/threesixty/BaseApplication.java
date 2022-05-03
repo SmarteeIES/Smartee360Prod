@@ -54,24 +54,24 @@ public class BaseApplication extends Application {
             DataStoreConfiguration config = null;
                 Log.i("S360","datastore setup");
                 config = DataStoreConfiguration.builder()
-                        .errorHandler(error -> {
-                            // handle DataStore exception here
-                            Log.e("YourApp", "Error.", error);
-                        })
-                        .conflictHandler((conflictData, onDecision) -> {
-                            // retry mutation with the same title and the most recent remote data for other fields
-                            if (conflictData.getRemote() instanceof Assets) {
-                                Log.i("S360Conflict", String.valueOf(((Assets) conflictData.getRemote())));
-                                Assets patched = ((Assets) conflictData.getRemote())
-                                        .copyOfBuilder()
-                                        .locationName(((Assets) conflictData.getLocal()).getLocationName())
-                                        .locationId(((Assets) conflictData.getLocal()).getLocationId())
-                                        .build();
-                                onDecision.accept(DataStoreConflictHandler.ConflictResolutionDecision.retry(patched));
-                            } else {
-                                onDecision.accept(DataStoreConflictHandler.ConflictResolutionDecision.applyRemote());
-                            }
-                        })
+//                        .errorHandler(error -> {
+//                            // handle DataStore exception here
+//                            Log.e("YourApp", "Error.", error);
+//                        })
+//                        .conflictHandler((conflictData, onDecision) -> {
+//                            // retry mutation with the same title and the most recent remote data for other fields
+//                            if (conflictData.getRemote() instanceof Assets) {
+//                                Log.i("S360Conflict", String.valueOf(((Assets) conflictData.getRemote())));
+//                                Assets patched = ((Assets) conflictData.getRemote())
+//                                        .copyOfBuilder()
+//                                        .locationName(((Assets) conflictData.getLocal()).getLocationName())
+//                                        .locationId(((Assets) conflictData.getLocal()).getLocationId())
+//                                        .build();
+//                                onDecision.accept(DataStoreConflictHandler.ConflictResolutionDecision.retry(patched));
+//                            } else {
+//                                onDecision.accept(DataStoreConflictHandler.ConflictResolutionDecision.applyRemote());
+//                            }
+//                        })
                         // Set the duration of time after which delta syncs will not be preferred over base syncs
                         .syncInterval(3, TimeUnit.DAYS)
                         // Set the maximum number of records, from the server, to process from a sync operation
@@ -88,14 +88,8 @@ public class BaseApplication extends Application {
             Log.e("S360", "Could not initialize Amplify", e);
         }
         initXLog();
-        datastoreConflictResolutionSetup();
         MokoSupport.getInstance().init(getApplicationContext());
         Thread.setDefaultUncaughtExceptionHandler(new BTUncaughtExceptionHandler());
-
-    }
-
-    private void datastoreConflictResolutionSetup(){
-
 
     }
 

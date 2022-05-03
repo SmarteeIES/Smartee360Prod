@@ -16,7 +16,10 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,6 +43,7 @@ import com.amplifyframework.datastore.DataStoreConflictHandler;
 import com.amplifyframework.datastore.DataStoreException;
 import com.amplifyframework.datastore.events.NetworkStatusEvent;
 import com.amplifyframework.datastore.generated.model.Assets;
+import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.hub.HubChannel;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
@@ -81,8 +85,19 @@ public class ScanActivity extends BaseActivity {
         setContentView(R.layout.activity_scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        //Get the app user who initiatied the start of teh app
         String appUser = getIntent().getStringExtra("appUser");
-        Log.i("S360User",appUser);
+
+        //Setup a subscription which checks fvor changes in network connection
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                .build();
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(ConnectivityManager.class);
+        connectivityManager.requestNetwork(networkRequest, networkCallback);
 
 
         //Auto Update Check
@@ -191,32 +206,42 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onResume(){
         super.onResume();
+//
+//        Amplify.DataStore.start(
+//                () -> Log.i("S360", "DataStore started"),
+//                error -> Log.e("S360", "Error starting DataStore", error)
+//        );
 
-        Amplify.DataStore.start(
-                () -> Log.i("S360", "DataStore started"),
-                error -> Log.e("S360", "Error starting DataStore", error)
+        Amplify.DataStore.observe(Assets.class,
+                cancelable -> Log.i("MyAmplifyApp", "Observation began."),
+                postChanged -> {
+                    Assets post = postChanged.item();
+                    Log.i("MyAmplifyApp", "Post: " + post);
+                },
+                failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
+                () -> Log.i("MyAmplifyApp", "Observation complete.")
+        );
+
+        Amplify.DataStore.observe(Locations.class,
+                cancelable -> Log.i("MyAmplifyApp", "Observation began."),
+                locPostChanged -> {
+                    Locations post2 = locPostChanged.item();
+                    Log.i("MyAmplifyApp", "Post2: " + post2);
+                },
+                failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
+                () -> Log.i("MyAmplifyApp", "Observation complete.")
         );
 
 
-        Amplify.Hub.subscribe(
-                HubChannel.DATASTORE,
-                hubEvent -> DataStoreChannelEventName.NETWORK_STATUS.toString().equals(hubEvent.getName()),
-                hubEvent -> {
-                    NetworkStatusEvent event = (NetworkStatusEvent) hubEvent.getData();
-                    if (event.getActive()){
-                        Amplify.DataStore.start(
-                                () -> Log.i("S360", "DataStore started"),
-                                error -> Log.e("S360", "Error starting DataStore", error)
-                        );
-                    }
-                    Log.i("MyAmplifyAppStatus", "User has a network connection: " + event.getActive());
-                }
-        );
+
         scannerSetTime = (new Double(15000)).longValue();
 
         new CountDownTimer(scannerSetTime, 1000) {
             public void onTick(long millisUntilFinished) {
-
+                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                spinner.setVisibility(View.VISIBLE);
+                doneButton.setVisibility(View.INVISIBLE);
+                scanButton.setVisibility(View.INVISIBLE);
                 infoHeader.setText("Sync In Progress");
             }
             public void onFinish() {
@@ -232,7 +257,6 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-//        Amplify.ub.unsubscribe();
         Intent i = new Intent(ScanActivity.this, AuthActivity.class);
         startActivity(i);
     }
@@ -255,16 +279,7 @@ public class ScanActivity extends BaseActivity {
                                     d.putExtra("scanCheckFlag", false);
                                 }
                                 d.putExtra("donePressedFlag",true);
-                                Amplify.DataStore.start(
-                                        () -> {
-                                            startActivity(d);
-                                            Log.i("S360", "DataStore started");
-                                        },
-                                        error -> {
-                                            startActivity(d);
-                                            Log.e("S360", "Error starting DataStore", error);
-                                        }
-                                );
+                                startActivity(d);
                             }
                         })
 
@@ -285,6 +300,47 @@ public class ScanActivity extends BaseActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+    private ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onAvailable(@NonNull Network network) {
+            super.onAvailable(network);
+            Amplify.DataStore.start(
+                    () -> Log.i("S360", "DataStore started"),
+                    error -> Log.e("S360", "Error starting DataStore", error)
+            );
+            Amplify.DataStore.observe(Assets.class,
+                    cancelable -> Log.i("S360", "Observation began."),
+                    postChanged -> {
+                        Assets post = postChanged.item();
+                        //Log.i("MyAmplifyApp", "Post: " + post);
+                    },
+                    failure -> Log.e("S360", "Observation failed.", failure),
+                    () -> Log.i("S360", "Observation complete.")
+            );
+
+            Amplify.DataStore.observe(Locations.class,
+                    cancelable -> Log.i("S360", "Observation began."),
+                    locPostChanged -> {
+                        Locations post2 = locPostChanged.item();
+                        //Log.i("MyAmplifyApp", "Post2: " + post2);
+                    },
+                    failure -> Log.e("S360", "Observation failed.", failure),
+                    () -> Log.i("S360", "Observation complete.")
+            );
+        }
+
+        @Override
+        public void onLost(@NonNull Network network) {
+            super.onLost(network);
+        }
+
+        @Override
+        public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
+            super.onCapabilitiesChanged(network, networkCapabilities);
+            final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+        }
+    };
 
 
 

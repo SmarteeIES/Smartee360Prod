@@ -10,11 +10,13 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -32,6 +34,8 @@ public class AuthActivity extends BaseActivity {
     TextView tv2;
     TextView tv3;
     EditText tve1;
+    private ProgressBar spinner;
+    Long scannerSetTime;
 
 
     @Override
@@ -39,7 +43,6 @@ public class AuthActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        Log.i("Msg","temp");
         Intent intent = getIntent();
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
@@ -53,6 +56,8 @@ public class AuthActivity extends BaseActivity {
         tv1.setVisibility(View.INVISIBLE);
         tv2.setVisibility(View.INVISIBLE);
         tv3.setVisibility(View.INVISIBLE);
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
+        spinner.setVisibility(View.GONE);
 
 
 
@@ -85,7 +90,7 @@ public class AuthActivity extends BaseActivity {
         });
 
         if (donePressedFlag) {
-            // working removed for testing Intent i = new Intent();
+
             try {
                 Intent i = new Intent();
                 i.setAction("za.smartee.threeSixty");
@@ -105,6 +110,7 @@ public class AuthActivity extends BaseActivity {
             } catch (ActivityNotFoundException e){
                 Log.i("Msg","App Not Found");
             }
+
 
         } else {
             // ATTENTION: This was auto-generated to handle app links.
@@ -144,7 +150,6 @@ public class AuthActivity extends BaseActivity {
                         Log.i("dialog msg","clicked");
                     }
                 });
-        Log.i("s360-user",text);
         switch (text) {
             case "Spar Admin":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparAdminCheck))){

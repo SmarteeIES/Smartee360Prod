@@ -3,28 +3,28 @@
     "ElasticsearchWarning": true,
     "ResolverConfig": {
         "project": {
-            "ConflictHandler": "AUTOMERGE",
+            "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
             "ConflictDetection": "VERSION"
         },
         "models": {
             "Users": {
-                "ConflictHandler": "AUTOMERGE",
+                "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
                 "ConflictDetection": "VERSION"
             },
             "Assets": {
-                "ConflictHandler": "AUTOMERGE",
+                "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
                 "ConflictDetection": "VERSION"
             },
             "Locations": {
-                "ConflictHandler": "AUTOMERGE",
+                "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
                 "ConflictDetection": "VERSION"
             },
             "AuditLog": {
-                "ConflictHandler": "AUTOMERGE",
+                "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
                 "ConflictDetection": "VERSION"
             },
             "ScannedAssetsAuditLog": {
-                "ConflictHandler": "AUTOMERGE",
+                "ConflictHandler": "OPTIMISTIC_CONCURRENCY",
                 "ConflictDetection": "VERSION"
             }
         }
