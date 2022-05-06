@@ -128,12 +128,12 @@ public class ScanActivity extends BaseActivity {
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
         TextView vCode = (TextView) findViewById(R.id.vCode);
         vCode.setText(BuildConfig.VERSION_NAME);
-
         loadingSwitch.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
         loadingSwitch.setChecked(false);
 
+        //Alert Dialog for no network connection
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
         dlgAlert.setMessage("No Network Available, please connect and retry");
         dlgAlert.setTitle("Internet Connection Error");
@@ -150,7 +150,7 @@ public class ScanActivity extends BaseActivity {
 
 
 
-        //Confirm Scan Error Handling
+        //Confirm Scan Error Handling and display scanned information
         Boolean scanHistFlag = getIntent().getBooleanExtra("scanHistFlag",false);
         if (scanHistFlag){
             String text = getIntent().getStringExtra("selectedLocation");
@@ -175,10 +175,8 @@ public class ScanActivity extends BaseActivity {
                     i.putExtra("appUser",appUser);
                     i.putExtra("loadingFlag", loadingChecked);
                     startActivity(i);
-//                ScanActivity.this.finish();
             }
         });
-
 
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,6 +215,7 @@ public class ScanActivity extends BaseActivity {
 
         Log.i("S360Screen","ScanResume");
 
+        //Start Datastore observations for Assets and Locations
         Amplify.DataStore.observe(Assets.class,
                 cancelable -> Log.i("S360", "Observation began."),
                 postChanged -> {
@@ -262,79 +261,93 @@ public class ScanActivity extends BaseActivity {
                 () -> Log.i("S360", "Observation complete.")
         );
 
+        //Display the spinner and indicate to teh users that synchronization is in progress
         spinner = (ProgressBar) findViewById(R.id.progressBar);
         spinner.setVisibility(View.VISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         infoHeader.setText("Sync In Progress");
 
+        Boolean scanHistFlag = getIntent().getBooleanExtra("scanHistFlag",false);
         if (isNetworkAvailable()){
-            Amplify.Hub.subscribe(
-                    HubChannel.DATASTORE,
-                    hubEvent -> DataStoreChannelEventName.SYNC_QUERIES_READY.toString().equals(hubEvent.getName()),
-                    hubEvent -> {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                infoHeader.setText("SCANNER INFORMATION");
-                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                spinner.setVisibility(View.GONE);
-                                doneButton.setVisibility(View.VISIBLE);
-                                scanButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-            );
-
-            Amplify.Hub.subscribe(
-                    HubChannel.DATASTORE,
-                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_ENQUEUED.toString().equals(hubEvent.getName()),
-                    hubEvent -> {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                infoHeader.setText("SCANNER INFORMATION");
-                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                spinner.setVisibility(View.GONE);
-                                doneButton.setVisibility(View.VISIBLE);
-                                scanButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-            );
-            Amplify.Hub.subscribe(
-                    HubChannel.DATASTORE,
-                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_PROCESSED.toString().equals(hubEvent.getName()),
-                    hubEvent -> {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                infoHeader.setText("SCANNER INFORMATION");
-                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                spinner.setVisibility(View.GONE);
-                                doneButton.setVisibility(View.VISIBLE);
-                                scanButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-            );
-            Amplify.Hub.subscribe(
-                    HubChannel.DATASTORE,
-                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_FAILED.toString().equals(hubEvent.getName()),
-                    hubEvent -> {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                infoHeader.setText("SCANNER INFORMATION");
-                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                spinner.setVisibility(View.GONE);
-                                doneButton.setVisibility(View.VISIBLE);
-                                scanButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-            );
-        } else {
+            //If this page is generated without a scanConfirmation being completed
+            if (!scanHistFlag){
+                Amplify.Hub.subscribe(
+                        HubChannel.DATASTORE,
+                        hubEvent -> DataStoreChannelEventName.SYNC_QUERIES_READY.toString().equals(hubEvent.getName()),
+                        hubEvent -> {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    infoHeader.setText("SCANNER INFORMATION");
+                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                    spinner.setVisibility(View.GONE);
+                                    doneButton.setVisibility(View.VISIBLE);
+                                    scanButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                );
+            }
+            //Scan confirmation has been completed, check for any hub events regarding mutations
+            else {
+                Log.i("S360","Scan Hist Flag True");
+                Amplify.Hub.subscribe(
+                        HubChannel.DATASTORE,
+                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_ENQUEUED.toString().equals(hubEvent.getName()),
+                        hubEvent -> {
+                            Log.i("S360","Data Enqueud");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    infoHeader.setText("SCANNER INFORMATION");
+                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                    spinner.setVisibility(View.GONE);
+                                    doneButton.setVisibility(View.VISIBLE);
+                                    scanButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                );
+                Amplify.Hub.subscribe(
+                        HubChannel.DATASTORE,
+                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_PROCESSED.toString().equals(hubEvent.getName()),
+                        hubEvent -> {
+                            Log.i("S360","Data Processed");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    infoHeader.setText("SCANNER INFORMATION");
+                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                    spinner.setVisibility(View.GONE);
+                                    doneButton.setVisibility(View.VISIBLE);
+                                    scanButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                );
+                Amplify.Hub.subscribe(
+                        HubChannel.DATASTORE,
+                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_FAILED.toString().equals(hubEvent.getName()),
+                        hubEvent -> {
+                            Log.i("S360","Data Failed");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    infoHeader.setText("SCANNER INFORMATION");
+                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                    spinner.setVisibility(View.GONE);
+                                    doneButton.setVisibility(View.VISIBLE);
+                                    scanButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                );
+            }
+        }
+        // If no network connection then just display the buttons for offline operations
+        else {
+            Log.i("S360","No Network Connection");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -347,19 +360,13 @@ public class ScanActivity extends BaseActivity {
             });
         }
 
-
-
+        //Start the default countdown for 25 seconds, if there are any failures allow offline operations
         scannerSetTime = (new Double(25000)).longValue();
-
         new CountDownTimer(scannerSetTime, 1000) {
             public void onTick(long millisUntilFinished) {
-//                spinner = (ProgressBar) findViewById(R.id.progressBar);
-//                spinner.setVisibility(View.VISIBLE);
-//                doneButton.setVisibility(View.INVISIBLE);
-//                scanButton.setVisibility(View.INVISIBLE);
-//                infoHeader.setText("Sync In Progress");
             }
             public void onFinish() {
+                Log.i("S360","Default Timer Executed");
                 infoHeader.setText("SCANNER INFORMATION");
                 spinner = (ProgressBar) findViewById(R.id.progressBar);
                 spinner.setVisibility(View.GONE);
@@ -398,7 +405,6 @@ public class ScanActivity extends BaseActivity {
         finishAffinity();
         ScanActivity.this.finish();
     }
-
 
     public void onDonePressed() {
         Log.i("S360Scan","Done Pressed Function");
