@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
+import android.util.Log;
 
 import za.smartee.threesixty.AppConstants;
 import za.smartee.threesixty.R;
@@ -29,6 +30,7 @@ public class GuideActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.i("S360Screen","GuideCreate");
         ButterKnife.bind(this);
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             finish();

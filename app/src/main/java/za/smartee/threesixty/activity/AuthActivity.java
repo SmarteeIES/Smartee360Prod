@@ -43,6 +43,7 @@ public class AuthActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
@@ -90,18 +91,20 @@ public class AuthActivity extends BaseActivity {
         });
 
         if (donePressedFlag) {
-
+            Log.i("S360","Done Pressed Flag True");
+            Log.i("S360", String.valueOf(scanCheckFlag));
             try {
                 Intent i = new Intent();
                 i.setAction("za.smartee.threeSixty");
                 if (scanCheckFlag){
+                    Log.i("S360","Scan Check Flag True");
                     i.putExtra("data","s360success");
                     Log.i("Msg","Intent success");
                 } else {
+                    Log.i("S360","Scan Check Flag True");
                     i.putExtra("data","s360failure");
                     Log.i("Msg","Intent failure");
                 }
-
                 sendBroadcast(i);
                 Log.i("Msg","Intent Sent");
                 finishAffinity();
@@ -113,6 +116,7 @@ public class AuthActivity extends BaseActivity {
 
 
         } else {
+            Log.i("S360","VSC Login");
             // ATTENTION: This was auto-generated to handle app links.
             Intent appLinkIntent = getIntent();
             String appLinkAction = appLinkIntent.getAction();
@@ -130,8 +134,15 @@ public class AuthActivity extends BaseActivity {
                 iStart.putExtra("appUser",appLinkData.toString());
                 Log.i("s360","VSC User");
                 startActivity(iStart);
+                AuthActivity.this.finish();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("S360Screen","Auth Resume");
     }
 
     private void verifyuser(String text){

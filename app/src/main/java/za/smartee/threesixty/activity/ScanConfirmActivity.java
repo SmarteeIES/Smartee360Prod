@@ -157,6 +157,7 @@ public class ScanConfirmActivity extends BaseActivity{
     String scanDurationType;
     private boolean missingLocFlag = false;
     public boolean networkConnectStatus;
+    Integer scanCount;
 
 
     //Array list for the scanned data
@@ -200,6 +201,8 @@ public class ScanConfirmActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_confirm);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.i("S360Screen","ScanConfirmCreate");
+        scanCount = 0;
         btnScan = (Button) findViewById(R.id.btnScan);
         btnConfirm = (Button) findViewById(R.id.btnConfirm);
         btnScanCancel = (Button) findViewById(R.id.btnCancelScan);
@@ -445,6 +448,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                                 result -> Log.i("S360", "Created a new post successfully"),
                                                 error -> Log.e("S360",  "Error creating post", error)
                                         );
+                                        scanCount++;
                                         //Mutation Update end
                                     }
                                 }
@@ -457,6 +461,7 @@ public class ScanConfirmActivity extends BaseActivity{
                     i.putExtra("assetsInStore",numberExistingAssets.toString());
                     i.putExtra("scannedAssets",numberNewAssets.toString());
                     i.putExtra("scanHistFlag",true);
+                    i.putExtra("scanCount",scanCount);
                     i.putExtra("appUser",appUser);
                     clearData();
                     startActivity(i);

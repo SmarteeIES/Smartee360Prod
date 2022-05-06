@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +45,7 @@ import com.amplifyframework.datastore.DataStoreException;
 import com.amplifyframework.datastore.events.NetworkStatusEvent;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.Locations;
+import com.amplifyframework.datastore.syncengine.PendingMutation;
 import com.amplifyframework.hub.HubChannel;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
@@ -75,8 +77,13 @@ public class ScanActivity extends BaseActivity {
     private boolean loadingChecked = false;
     private boolean DSSuccess = true;
     public boolean networkConnectStatus;
+    public int mutationCounter;
     private ProgressBar spinner;
     Long scannerSetTime;
+    Long waitSetTime;
+    public Boolean mutationCompleteFlag = false;
+
+
 
 
     @Override
@@ -84,9 +91,13 @@ public class ScanActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        Log.i("S360Screen","ScanCreate");
         //Get the app user who initiatied the start of teh app
         String appUser = getIntent().getStringExtra("appUser");
+
+        //Make mutation counter equal to zero
+        mutationCounter = 0;
+
 
         //Setup a subscription which checks fvor changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -168,6 +179,7 @@ public class ScanActivity extends BaseActivity {
                     i.putExtra("appUser",appUser);
                     i.putExtra("loadingFlag", loadingChecked);
                     startActivity(i);
+//                ScanActivity.this.finish();
             }
         });
 
@@ -206,6 +218,8 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onResume(){
         super.onResume();
+
+        Log.i("S360Screen","ScanResume");
 //
 //        Amplify.DataStore.start(
 //                () -> Log.i("S360", "DataStore started"),
@@ -216,7 +230,7 @@ public class ScanActivity extends BaseActivity {
                 cancelable -> Log.i("MyAmplifyApp", "Observation began."),
                 postChanged -> {
                     Assets post = postChanged.item();
-                    Log.i("MyAmplifyApp", "Post: " + post);
+                    //Log.i("MyAmplifyApp", "Post: " + post);
                 },
                 failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
                 () -> Log.i("MyAmplifyApp", "Observation complete.")
@@ -226,7 +240,7 @@ public class ScanActivity extends BaseActivity {
                 cancelable -> Log.i("MyAmplifyApp", "Observation began."),
                 locPostChanged -> {
                     Locations post2 = locPostChanged.item();
-                    Log.i("MyAmplifyApp", "Post2: " + post2);
+                   // Log.i("MyAmplifyApp", "Post2: " + post2);
                 },
                 failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
                 () -> Log.i("MyAmplifyApp", "Observation complete.")
@@ -257,13 +271,38 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
-        startActivity(i);
+        Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
+        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
+        try {
+            Log.i("S360Screen","ScanDestroy");
+            Intent i = new Intent();
+            i.setAction("za.smartee.threeSixty");
+            if (scanCheckFlag){
+                i.putExtra("data","s360success");
+                Log.i("Msg","Intent success");
+            } else {
+                i.putExtra("data","s360failure");
+                Log.i("Msg","Intent failure");
+            }
+
+            sendBroadcast(i);
+            Log.i("Msg","Intent Sent");
+            finishAffinity();
+            ScanActivity.this.finish();
+            System.exit(0);
+        } catch (ActivityNotFoundException e){
+            Log.i("Msg","App Not Found");
+        }
+
+        finishAffinity();
+        ScanActivity.this.finish();
     }
 
 
     public void onDonePressed() {
+        Log.i("S360Scan","Done Pressed Function");
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanHistFlag",false);
+        final Integer[] scanCount = {getIntent().getIntExtra("scanCount", 1)};
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Is the Smartee Scan Complete?");
         alertDialogBuilder
@@ -274,18 +313,61 @@ public class ScanActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent d = new Intent(ScanActivity.this, AuthActivity.class);
                                 if (scanCheckFlag){
+                                    Log.i("S360Scan","Scan Flag True");
                                     d.putExtra("scanCheckFlag", true);
                                 } else {
+                                    Log.i("S360Scan","Scan Flag False");
                                     d.putExtra("scanCheckFlag", false);
                                 }
                                 d.putExtra("donePressedFlag",true);
-                                startActivity(d);
+                                Amplify.DataStore.query(PendingMutation.PersistentRecord.class,
+                                        results -> {
+                                            Log.i("S360","Results");
+                                            if (!results.hasNext()) {
+                                                startActivity(d);
+                                                Log.i("S360Scan","Start Activity Sent - No Pending Mutations");
+                                            } else {
+                                                // The queue has outstanding records waiting to be processed.
+                                                if (scanCount[0] > 200) {
+                                                    scanCount[0] = 180;
+                                                }
+                                                waitSetTime = (new Double(500)).longValue()* scanCount[0];
+                                                Log.i("S360WaitTime", String.valueOf(waitSetTime));
+                                                runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        new CountDownTimer(waitSetTime, 1000) {
+                                                            public void onTick(long millisUntilFinished) {
+                                                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                                                spinner.setVisibility(View.VISIBLE);
+                                                                doneButton.setVisibility(View.INVISIBLE);
+                                                                scanButton.setVisibility(View.INVISIBLE);
+                                                                infoHeader.setText("Processing Data - Approx " + waitSetTime/1000 + " secs");
+                                                            }
+                                                            public void onFinish() {
+                                                                infoHeader.setText("SCANNER INFORMATION");
+                                                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                                                spinner.setVisibility(View.GONE);
+                                                                startActivity(d);
+                                                            }
+                                                        }.start();
+                                                        //Log.i("S360Scan","Start Activity Sent - No Pending Mutations");
+                                                    }
+                                                });
+                                            }
+                                        }, failure -> {
+                                            Log.i("S360","Failure");
+                                            startActivity(d);
+                                            Log.i("S360Scan","Check failure");
+                                        }
+                                );
+
+
+                                //ScanActivity.this.finish();
                             }
                         })
 
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
                         dialog.cancel();
                     }
                 });
@@ -341,6 +423,11 @@ public class ScanActivity extends BaseActivity {
             final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
     };
+
+    private void checkPendingMutations(){
+        Log.i("S360Counter", String.valueOf(mutationCounter));
+
+    }
 
 
 
