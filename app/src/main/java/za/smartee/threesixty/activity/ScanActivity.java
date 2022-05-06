@@ -95,10 +95,6 @@ public class ScanActivity extends BaseActivity {
         //Get the app user who initiatied the start of teh app
         String appUser = getIntent().getStringExtra("appUser");
 
-        //Make mutation counter equal to zero
-        mutationCounter = 0;
-
-
         //Setup a subscription which checks fvor changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -220,20 +216,28 @@ public class ScanActivity extends BaseActivity {
         super.onResume();
 
         Log.i("S360Screen","ScanResume");
-//
-//        Amplify.DataStore.start(
-//                () -> Log.i("S360", "DataStore started"),
-//                error -> Log.e("S360", "Error starting DataStore", error)
-//        );
 
         Amplify.DataStore.observe(Assets.class,
-                cancelable -> Log.i("MyAmplifyApp", "Observation began."),
+                cancelable -> Log.i("S360", "Observation began."),
                 postChanged -> {
                     Assets post = postChanged.item();
                     //Log.i("MyAmplifyApp", "Post: " + post);
                 },
-                failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
-                () -> Log.i("MyAmplifyApp", "Observation complete.")
+                failure -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            infoHeader.setText("SCANNER INFORMATION");
+                            spinner = (ProgressBar) findViewById(R.id.progressBar);
+                            spinner.setVisibility(View.GONE);
+                            doneButton.setVisibility(View.VISIBLE);
+                            scanButton.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    Log.e("S360", "Observation failed.", failure);
+                },
+                () -> Log.i("S360", "Observation complete.")
         );
 
         Amplify.DataStore.observe(Locations.class,
@@ -242,21 +246,118 @@ public class ScanActivity extends BaseActivity {
                     Locations post2 = locPostChanged.item();
                    // Log.i("MyAmplifyApp", "Post2: " + post2);
                 },
-                failure -> Log.e("MyAmplifyApp", "Observation failed.", failure),
-                () -> Log.i("MyAmplifyApp", "Observation complete.")
+                failure -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            infoHeader.setText("SCANNER INFORMATION");
+                            spinner = (ProgressBar) findViewById(R.id.progressBar);
+                            spinner.setVisibility(View.GONE);
+                            doneButton.setVisibility(View.VISIBLE);
+                            scanButton.setVisibility(View.VISIBLE);
+                        }
+                    });
+                    Log.e("S360", "Observation failed.", failure);
+                },
+                () -> Log.i("S360", "Observation complete.")
         );
 
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
+        spinner.setVisibility(View.VISIBLE);
+        doneButton.setVisibility(View.INVISIBLE);
+        scanButton.setVisibility(View.INVISIBLE);
+        infoHeader.setText("Sync In Progress");
+
+        if (isNetworkAvailable()){
+            Amplify.Hub.subscribe(
+                    HubChannel.DATASTORE,
+                    hubEvent -> DataStoreChannelEventName.SYNC_QUERIES_READY.toString().equals(hubEvent.getName()),
+                    hubEvent -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                infoHeader.setText("SCANNER INFORMATION");
+                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                spinner.setVisibility(View.GONE);
+                                doneButton.setVisibility(View.VISIBLE);
+                                scanButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+            );
+
+            Amplify.Hub.subscribe(
+                    HubChannel.DATASTORE,
+                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_ENQUEUED.toString().equals(hubEvent.getName()),
+                    hubEvent -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                infoHeader.setText("SCANNER INFORMATION");
+                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                spinner.setVisibility(View.GONE);
+                                doneButton.setVisibility(View.VISIBLE);
+                                scanButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+            );
+            Amplify.Hub.subscribe(
+                    HubChannel.DATASTORE,
+                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_PROCESSED.toString().equals(hubEvent.getName()),
+                    hubEvent -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                infoHeader.setText("SCANNER INFORMATION");
+                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                spinner.setVisibility(View.GONE);
+                                doneButton.setVisibility(View.VISIBLE);
+                                scanButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+            );
+            Amplify.Hub.subscribe(
+                    HubChannel.DATASTORE,
+                    hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_FAILED.toString().equals(hubEvent.getName()),
+                    hubEvent -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                infoHeader.setText("SCANNER INFORMATION");
+                                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                spinner.setVisibility(View.GONE);
+                                doneButton.setVisibility(View.VISIBLE);
+                                scanButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+            );
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    infoHeader.setText("SCANNER INFORMATION");
+                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                    spinner.setVisibility(View.GONE);
+                    doneButton.setVisibility(View.VISIBLE);
+                    scanButton.setVisibility(View.VISIBLE);
+                }
+            });
+        }
 
 
-        scannerSetTime = (new Double(15000)).longValue();
+
+        scannerSetTime = (new Double(25000)).longValue();
 
         new CountDownTimer(scannerSetTime, 1000) {
             public void onTick(long millisUntilFinished) {
-                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                spinner.setVisibility(View.VISIBLE);
-                doneButton.setVisibility(View.INVISIBLE);
-                scanButton.setVisibility(View.INVISIBLE);
-                infoHeader.setText("Sync In Progress");
+//                spinner = (ProgressBar) findViewById(R.id.progressBar);
+//                spinner.setVisibility(View.VISIBLE);
+//                doneButton.setVisibility(View.INVISIBLE);
+//                scanButton.setVisibility(View.INVISIBLE);
+//                infoHeader.setText("Sync In Progress");
             }
             public void onFinish() {
                 infoHeader.setText("SCANNER INFORMATION");
@@ -423,13 +524,4 @@ public class ScanActivity extends BaseActivity {
             final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
     };
-
-    private void checkPendingMutations(){
-        Log.i("S360Counter", String.valueOf(mutationCounter));
-
-    }
-
-
-
-
 }
