@@ -292,57 +292,12 @@ public class ScanActivity extends BaseActivity {
             //Scan confirmation has been completed, check for any hub events regarding mutations
             else {
                 Log.i("S360","Scan Hist Flag True");
-                Amplify.Hub.subscribe(
-                        HubChannel.DATASTORE,
-                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_ENQUEUED.toString().equals(hubEvent.getName()),
-                        hubEvent -> {
-                            Log.i("S360","Data Enqueud");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    infoHeader.setText("SCANNER INFORMATION");
-                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                    spinner.setVisibility(View.GONE);
-                                    doneButton.setVisibility(View.VISIBLE);
-                                    scanButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-                        }
-                );
-                Amplify.Hub.subscribe(
-                        HubChannel.DATASTORE,
-                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_PROCESSED.toString().equals(hubEvent.getName()),
-                        hubEvent -> {
-                            Log.i("S360","Data Processed");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    infoHeader.setText("SCANNER INFORMATION");
-                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                    spinner.setVisibility(View.GONE);
-                                    doneButton.setVisibility(View.VISIBLE);
-                                    scanButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-                        }
-                );
-                Amplify.Hub.subscribe(
-                        HubChannel.DATASTORE,
-                        hubEvent -> DataStoreChannelEventName.OUTBOX_MUTATION_FAILED.toString().equals(hubEvent.getName()),
-                        hubEvent -> {
-                            Log.i("S360","Data Failed");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    infoHeader.setText("SCANNER INFORMATION");
-                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                    spinner.setVisibility(View.GONE);
-                                    doneButton.setVisibility(View.VISIBLE);
-                                    scanButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-                        }
-                );
+                infoHeader.setText("SCANNER INFORMATION");
+                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                spinner.setVisibility(View.GONE);
+                doneButton.setVisibility(View.VISIBLE);
+                scanButton.setVisibility(View.VISIBLE);
+
             }
         }
         // If no network connection then just display the buttons for offline operations
@@ -435,10 +390,10 @@ public class ScanActivity extends BaseActivity {
                                                 Log.i("S360Scan","Start Activity Sent - No Pending Mutations");
                                             } else {
                                                 // The queue has outstanding records waiting to be processed.
-                                                if (scanCount[0] > 200) {
-                                                    scanCount[0] = 180;
+                                                if (scanCount[0] > 500) {
+                                                    scanCount[0] = 380;
                                                 }
-                                                waitSetTime = (new Double(500)).longValue()* scanCount[0];
+                                                waitSetTime = (new Double(750)).longValue()* scanCount[0];
                                                 Log.i("S360WaitTime", String.valueOf(waitSetTime));
                                                 runOnUiThread(new Runnable() {
                                                     public void run() {

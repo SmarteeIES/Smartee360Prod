@@ -1,6 +1,8 @@
 package za.smartee.threesixty.activity;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,6 +38,9 @@ public class AuthActivity extends BaseActivity {
     EditText tve1;
     private ProgressBar spinner;
     Long scannerSetTime;
+    public static final int REQUEST_ENABLE_BT = 4001;
+    Button loginButton;
+    Spinner userDD;
 
 
     @Override
@@ -47,6 +52,12 @@ public class AuthActivity extends BaseActivity {
         Intent intent = getIntent();
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
+        BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         tve1 = (EditText) findViewById(R.id.userCheck);
@@ -90,6 +101,63 @@ public class AuthActivity extends BaseActivity {
             }
         });
 
+//        if (donePressedFlag) {
+//            Log.i("S360","Done Pressed Flag True");
+//            Log.i("S360", String.valueOf(scanCheckFlag));
+//            try {
+//                Intent i = new Intent();
+//                i.setAction("za.smartee.threeSixty");
+//                if (scanCheckFlag){
+//                    Log.i("S360","Scan Check Flag True");
+//                    i.putExtra("data","s360success");
+//                    Log.i("Msg","Intent success");
+//                } else {
+//                    Log.i("S360","Scan Check Flag True");
+//                    i.putExtra("data","s360failure");
+//                    Log.i("Msg","Intent failure");
+//                }
+//                sendBroadcast(i);
+//                Log.i("Msg","Intent Sent");
+//                finishAffinity();
+//                AuthActivity.this.finish();
+//                System.exit(0);
+//            } catch (ActivityNotFoundException e){
+//                Log.i("Msg","App Not Found");
+//            }
+//
+//
+//        } else {
+//            Log.i("S360","VSC Login");
+//            // ATTENTION: This was auto-generated to handle app links.
+//            Intent appLinkIntent = getIntent();
+//            String appLinkAction = appLinkIntent.getAction();
+//            Uri appLinkData = appLinkIntent.getData();
+//            //Determine if the app was started from VSc or manually
+//            if (appLinkData == null){
+//                tve1.setVisibility(View.VISIBLE);
+//                tv1.setVisibility(View.VISIBLE);
+//                tv2.setVisibility(View.VISIBLE);
+//                tv3.setVisibility(View.VISIBLE);
+//                loginButton.setVisibility(View.VISIBLE);
+//                userDD.setVisibility(View.VISIBLE);
+//            } else {
+//                Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
+//                iStart.putExtra("appUser",appLinkData.toString());
+//                Log.i("s360","VSC User");
+//                startActivity(iStart);
+//                AuthActivity.this.finish();
+//            }
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Button loginButton = (Button) findViewById(R.id.signInButton);
+        Spinner userDD = (Spinner) findViewById(R.id.userSpinner);
+        Log.i("S360Screen","Auth Resume");
+        Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
+        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
             Log.i("S360","Done Pressed Flag True");
             Log.i("S360", String.valueOf(scanCheckFlag));
@@ -121,6 +189,8 @@ public class AuthActivity extends BaseActivity {
             Intent appLinkIntent = getIntent();
             String appLinkAction = appLinkIntent.getAction();
             Uri appLinkData = appLinkIntent.getData();
+            Log.i("S360","AppLinkAction: " + appLinkAction);
+            Log.i("S360","AppLinkAction: " + appLinkData);
             //Determine if the app was started from VSc or manually
             if (appLinkData == null){
                 tve1.setVisibility(View.VISIBLE);
@@ -137,12 +207,6 @@ public class AuthActivity extends BaseActivity {
                 AuthActivity.this.finish();
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("S360Screen","Auth Resume");
     }
 
     private void verifyuser(String text){

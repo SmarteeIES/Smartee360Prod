@@ -32,6 +32,7 @@ public class AppConstants {
     public static final int REQUEST_CODE_LOCATION_SETTINGS = 122;
     public static final int PERMISSION_REQUEST_CODE = 1;
 
+
     // result_code
     public static final int RESULT_CONN_DISCONNECTED = 2;
 }

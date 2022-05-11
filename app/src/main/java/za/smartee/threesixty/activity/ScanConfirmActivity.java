@@ -3,6 +3,7 @@ package za.smartee.threesixty.activity;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
@@ -18,7 +19,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,11 +50,13 @@ import com.amplifyframework.api.graphql.model.ModelMutation;
 import com.amplifyframework.api.graphql.model.ModelQuery;
 import com.amplifyframework.auth.AuthUser;
 import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.DataStoreChannelEventName;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.AuditLog;
 import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.datastore.generated.model.Todo;
 import com.amplifyframework.datastore.generated.model.Users;
+import com.amplifyframework.hub.HubChannel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
 import za.smartee.threesixty.AppConstants;
@@ -158,6 +164,7 @@ public class ScanConfirmActivity extends BaseActivity{
     private boolean missingLocFlag = false;
     public boolean networkConnectStatus;
     Integer scanCount;
+    Integer saveCount;
 
 
     //Array list for the scanned data
@@ -182,6 +189,7 @@ public class ScanConfirmActivity extends BaseActivity{
     private BluetoothLeScanner mBluetoothLeScanner = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     String company;
+    public static final int REQUEST_ENABLE_BT = 4001;
 
 
 
@@ -202,7 +210,14 @@ public class ScanConfirmActivity extends BaseActivity{
         setContentView(R.layout.activity_scan_confirm);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.i("S360Screen","ScanConfirmCreate");
+        BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
         scanCount = 0;
+        saveCount = 0;
         btnScan = (Button) findViewById(R.id.btnScan);
         btnConfirm = (Button) findViewById(R.id.btnConfirm);
         btnScanCancel = (Button) findViewById(R.id.btnCancelScan);
@@ -214,7 +229,19 @@ public class ScanConfirmActivity extends BaseActivity{
         Intent intent = getIntent();
         String appUser = intent.getStringExtra("appUser");
 
-        //No Network Alert
+        //Setup a subscription which checks for changes in network connection
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                .build();
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(ConnectivityManager.class);
+        connectivityManager.requestNetwork(networkRequest, networkCallback);
+
+
+        //No Sync Alert
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
         dlgAlert.setMessage("Data Sync Error");
         dlgAlert.setTitle("Data Sync Incomplete - Please restart app");
@@ -319,6 +346,13 @@ public class ScanConfirmActivity extends BaseActivity{
                 selectedLocation.setVisibility(View.INVISIBLE);
                 TextView missingLoc = (TextView) findViewById(R.id.textViewMissingLocation);
                 missingLoc.setVisibility(View.INVISIBLE);
+
+                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                spinner.setVisibility(View.VISIBLE);
+                TextView infoHeader = (TextView) findViewById(R.id.infoHeader);
+                infoHeader.setText("Processing Data");
+                infoHeader.setVisibility(View.VISIBLE);
+
                 Object[] devDataTemp = devData.toArray();
                 for (Object s : devDataTemp) {
                     if (devData.indexOf(s) != devData.lastIndexOf(s)) {
@@ -423,7 +457,10 @@ public class ScanConfirmActivity extends BaseActivity{
                                                     .build();
 
                                             Amplify.DataStore.save(AssetItem,
-                                                    result -> Log.i("S360", "Created a new post successfully"),
+                                                    result -> {
+                                                        Log.i("S360", "Created a new post successfully");
+                                                        scanCount++;
+                                                    },
                                                     error -> Log.e("S360Assets",  "Error creating post", error)
                                             );
                                             //Mutation Update end
@@ -445,16 +482,20 @@ public class ScanConfirmActivity extends BaseActivity{
                                                 .build();
 
                                         Amplify.DataStore.save(auditItems,
-                                                result -> Log.i("S360", "Created a new post successfully"),
+                                                result -> {
+                                                    Log.i("S360", "Created a new post successfully");
+                                                    scanCount++;
+                                                },
                                                 error -> Log.e("S360",  "Error creating post", error)
                                         );
-                                        scanCount++;
-                                        //Mutation Update end
                                     }
                                 }
                             }
                         }
                     }
+                    final Integer existAssets = numberExistingAssets;
+                    final Integer newAssets = numberNewAssets;
+
                     Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
                     i.putExtra("selectedLocation",text);
                     i.putExtra("scanTime",scanTime.toString());
@@ -748,6 +789,47 @@ public class ScanConfirmActivity extends BaseActivity{
         btnConfirm.setVisibility(View.INVISIBLE);
         btnScanCancel.setVisibility(View.INVISIBLE);
     }
+
+    private ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onAvailable(@NonNull Network network) {
+            super.onAvailable(network);
+            Amplify.DataStore.start(
+                    () -> Log.i("S360", "DataStore started"),
+                    error -> Log.e("S360", "Error starting DataStore", error)
+            );
+            Amplify.DataStore.observe(Assets.class,
+                    cancelable -> Log.i("S360", "Observation began."),
+                    postChanged -> {
+                        Assets post = postChanged.item();
+                        //Log.i("MyAmplifyApp", "Post: " + post);
+                    },
+                    failure -> Log.e("S360", "Observation failed.", failure),
+                    () -> Log.i("S360", "Observation complete.")
+            );
+
+            Amplify.DataStore.observe(Locations.class,
+                    cancelable -> Log.i("S360", "Observation began."),
+                    locPostChanged -> {
+                        Locations post2 = locPostChanged.item();
+                        //Log.i("MyAmplifyApp", "Post2: " + post2);
+                    },
+                    failure -> Log.e("S360", "Observation failed.", failure),
+                    () -> Log.i("S360", "Observation complete.")
+            );
+        }
+
+        @Override
+        public void onLost(@NonNull Network network) {
+            super.onLost(network);
+        }
+
+        @Override
+        public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
+            super.onCapabilitiesChanged(network, networkCapabilities);
+            final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+        }
+    };
 
 }
 
