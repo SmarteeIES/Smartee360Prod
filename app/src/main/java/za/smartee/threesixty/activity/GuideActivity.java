@@ -212,7 +212,6 @@ public class GuideActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        // 根据包名打开对应的设置界面
                         intent.setData(Uri.parse("package:" + getPackageName()));
                         startActivityForResult(intent, AppConstants.REQUEST_CODE_PERMISSION_2);
                     }

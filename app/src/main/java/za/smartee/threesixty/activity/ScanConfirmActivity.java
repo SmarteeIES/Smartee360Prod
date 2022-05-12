@@ -495,7 +495,6 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
                     final Integer existAssets = numberExistingAssets;
                     final Integer newAssets = numberNewAssets;
-
                     Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
                     i.putExtra("selectedLocation",text);
                     i.putExtra("scanTime",scanTime.toString());

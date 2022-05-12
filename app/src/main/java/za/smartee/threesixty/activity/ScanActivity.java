@@ -82,6 +82,7 @@ public class ScanActivity extends BaseActivity {
     Long scannerSetTime;
     Long waitSetTime;
     public Boolean mutationCompleteFlag = false;
+    public Boolean processingFlag = false;
 
 
 
@@ -95,7 +96,7 @@ public class ScanActivity extends BaseActivity {
         //Get the app user who initiatied the start of teh app
         String appUser = getIntent().getStringExtra("appUser");
 
-        //Setup a subscription which checks fvor changes in network connection
+        //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -171,6 +172,7 @@ public class ScanActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                     loadingChecked = loadingSwitch.isChecked();
+                    processingFlag = false;
                     Intent i = new Intent(ScanActivity.this, ScanConfirmActivity.class);
                     i.putExtra("appUser",appUser);
                     i.putExtra("loadingFlag", loadingChecked);
@@ -261,7 +263,7 @@ public class ScanActivity extends BaseActivity {
                 () -> Log.i("S360", "Observation complete.")
         );
 
-        //Display the spinner and indicate to teh users that synchronization is in progress
+        //Display the spinner and indicate to the users that synchronization is in progress
         spinner = (ProgressBar) findViewById(R.id.progressBar);
         spinner.setVisibility(View.VISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
@@ -315,20 +317,22 @@ public class ScanActivity extends BaseActivity {
             });
         }
 
-        //Start the default countdown for 25 seconds, if there are any failures allow offline operations
-        scannerSetTime = (new Double(25000)).longValue();
-        new CountDownTimer(scannerSetTime, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-            public void onFinish() {
-                Log.i("S360","Default Timer Executed");
-                infoHeader.setText("SCANNER INFORMATION");
-                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                spinner.setVisibility(View.GONE);
-                doneButton.setVisibility(View.VISIBLE);
-                scanButton.setVisibility(View.VISIBLE);
-            }
-        }.start();
+        if (!scanHistFlag){
+            //Start the default countdown for 60 seconds, if there are any failures allow offline operations upon app startup
+            scannerSetTime = (new Double(60000)).longValue();
+            new CountDownTimer(scannerSetTime, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+                public void onFinish() {
+                    Log.i("S360","Default Timer Executed");
+                    infoHeader.setText("SCANNER INFORMATION");
+                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                    spinner.setVisibility(View.GONE);
+                    doneButton.setVisibility(View.VISIBLE);
+                    scanButton.setVisibility(View.VISIBLE);
+                }
+            }.start();
+        }
     }
 
     @Override
@@ -375,10 +379,8 @@ public class ScanActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent d = new Intent(ScanActivity.this, AuthActivity.class);
                                 if (scanCheckFlag){
-                                    Log.i("S360Scan","Scan Flag True");
                                     d.putExtra("scanCheckFlag", true);
                                 } else {
-                                    Log.i("S360Scan","Scan Flag False");
                                     d.putExtra("scanCheckFlag", false);
                                 }
                                 d.putExtra("donePressedFlag",true);
@@ -389,32 +391,37 @@ public class ScanActivity extends BaseActivity {
                                                 startActivity(d);
                                                 Log.i("S360Scan","Start Activity Sent - No Pending Mutations");
                                             } else {
-                                                // The queue has outstanding records waiting to be processed.
-                                                if (scanCount[0] > 500) {
-                                                    scanCount[0] = 380;
-                                                }
-                                                waitSetTime = (new Double(750)).longValue()* scanCount[0];
-                                                Log.i("S360WaitTime", String.valueOf(waitSetTime));
-                                                runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        new CountDownTimer(waitSetTime, 1000) {
-                                                            public void onTick(long millisUntilFinished) {
-                                                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                                                spinner.setVisibility(View.VISIBLE);
-                                                                doneButton.setVisibility(View.INVISIBLE);
-                                                                scanButton.setVisibility(View.INVISIBLE);
-                                                                infoHeader.setText("Processing Data - Approx " + waitSetTime/1000 + " secs");
-                                                            }
-                                                            public void onFinish() {
-                                                                infoHeader.setText("SCANNER INFORMATION");
-                                                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                                                spinner.setVisibility(View.GONE);
-                                                                startActivity(d);
-                                                            }
-                                                        }.start();
-                                                        //Log.i("S360Scan","Start Activity Sent - No Pending Mutations");
+                                                if (!processingFlag){
+                                                    Log.i("S360","Processing Mutations");
+                                                    Log.i("S360", "Scan Count: " + String.valueOf(scanCount[0]));
+                                                    // The queue has outstanding records waiting to be processed.
+                                                    if (scanCount[0] > 500) {
+                                                        scanCount[0] = 380;
                                                     }
-                                                });
+                                                    waitSetTime = (new Double(1500)).longValue()* scanCount[0];
+                                                    Log.i("S360WaitTime", String.valueOf(waitSetTime));
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            new CountDownTimer(waitSetTime, 1000) {
+                                                                public void onTick(long millisUntilFinished) {
+                                                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                                                    spinner.setVisibility(View.VISIBLE);
+                                                                    doneButton.setVisibility(View.INVISIBLE);
+                                                                    scanButton.setVisibility(View.INVISIBLE);
+                                                                    infoHeader.setText("Processing Data - Approx " + waitSetTime/1000 + " secs");
+                                                                    processingFlag = true;
+                                                                }
+                                                                public void onFinish() {
+                                                                    infoHeader.setText("SCANNER INFORMATION");
+                                                                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                                                                    spinner.setVisibility(View.GONE);
+                                                                    startActivity(d);
+                                                                    processingFlag = false;
+                                                                }
+                                                            }.start();
+                                                        }
+                                                    });
+                                                }
                                             }
                                         }, failure -> {
                                             Log.i("S360","Failure");

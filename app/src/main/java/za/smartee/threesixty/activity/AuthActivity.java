@@ -81,8 +81,7 @@ public class AuthActivity extends BaseActivity {
         int userLen=userArray.length;
         for (int r = 0; r < userLen; r++) {
             userList.add(userArray[r]);
-           // Log.i("User Entry", userArray[r]);
-        }
+                   }
         Spinner userDD = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<String> UserDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, userList);
         UserDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -97,57 +96,8 @@ public class AuthActivity extends BaseActivity {
             public void onClick(View v) {
                 String userText = userDD.getSelectedItem().toString();
                 verifyuser(userText);
-                Log.i("User Selected", userText);
             }
         });
-
-//        if (donePressedFlag) {
-//            Log.i("S360","Done Pressed Flag True");
-//            Log.i("S360", String.valueOf(scanCheckFlag));
-//            try {
-//                Intent i = new Intent();
-//                i.setAction("za.smartee.threeSixty");
-//                if (scanCheckFlag){
-//                    Log.i("S360","Scan Check Flag True");
-//                    i.putExtra("data","s360success");
-//                    Log.i("Msg","Intent success");
-//                } else {
-//                    Log.i("S360","Scan Check Flag True");
-//                    i.putExtra("data","s360failure");
-//                    Log.i("Msg","Intent failure");
-//                }
-//                sendBroadcast(i);
-//                Log.i("Msg","Intent Sent");
-//                finishAffinity();
-//                AuthActivity.this.finish();
-//                System.exit(0);
-//            } catch (ActivityNotFoundException e){
-//                Log.i("Msg","App Not Found");
-//            }
-//
-//
-//        } else {
-//            Log.i("S360","VSC Login");
-//            // ATTENTION: This was auto-generated to handle app links.
-//            Intent appLinkIntent = getIntent();
-//            String appLinkAction = appLinkIntent.getAction();
-//            Uri appLinkData = appLinkIntent.getData();
-//            //Determine if the app was started from VSc or manually
-//            if (appLinkData == null){
-//                tve1.setVisibility(View.VISIBLE);
-//                tv1.setVisibility(View.VISIBLE);
-//                tv2.setVisibility(View.VISIBLE);
-//                tv3.setVisibility(View.VISIBLE);
-//                loginButton.setVisibility(View.VISIBLE);
-//                userDD.setVisibility(View.VISIBLE);
-//            } else {
-//                Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
-//                iStart.putExtra("appUser",appLinkData.toString());
-//                Log.i("s360","VSC User");
-//                startActivity(iStart);
-//                AuthActivity.this.finish();
-//            }
-//        }
     }
 
     @Override
@@ -159,19 +109,14 @@ public class AuthActivity extends BaseActivity {
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
-            Log.i("S360","Done Pressed Flag True");
-            Log.i("S360", String.valueOf(scanCheckFlag));
             try {
                 Intent i = new Intent();
                 i.setAction("za.smartee.threeSixty");
                 if (scanCheckFlag){
-                    Log.i("S360","Scan Check Flag True");
                     i.putExtra("data","s360success");
-                    Log.i("Msg","Intent success");
-                } else {
-                    Log.i("S360","Scan Check Flag True");
+                }
+                else {
                     i.putExtra("data","s360failure");
-                    Log.i("Msg","Intent failure");
                 }
                 sendBroadcast(i);
                 Log.i("Msg","Intent Sent");
@@ -189,8 +134,6 @@ public class AuthActivity extends BaseActivity {
             Intent appLinkIntent = getIntent();
             String appLinkAction = appLinkIntent.getAction();
             Uri appLinkData = appLinkIntent.getData();
-            Log.i("S360","AppLinkAction: " + appLinkAction);
-            Log.i("S360","AppLinkAction: " + appLinkData);
             //Determine if the app was started from VSc or manually
             if (appLinkData == null){
                 tve1.setVisibility(View.VISIBLE);
@@ -202,7 +145,6 @@ public class AuthActivity extends BaseActivity {
             } else {
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
                 iStart.putExtra("appUser",appLinkData.toString());
-                Log.i("s360","VSC User");
                 startActivity(iStart);
                 AuthActivity.this.finish();
             }
@@ -222,7 +164,6 @@ public class AuthActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Intent rs = new Intent(AuthActivity.this, AuthActivity.class);
                         startActivity(rs);
-                        Log.i("dialog msg","clicked");
                     }
                 });
         switch (text) {
