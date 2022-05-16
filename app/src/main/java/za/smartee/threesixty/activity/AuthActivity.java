@@ -29,6 +29,7 @@ import com.amazonaws.mobile.client.SignInUIOptions;
 
 import java.util.ArrayList;
 
+import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
 
 public class AuthActivity extends BaseActivity {
@@ -50,8 +51,10 @@ public class AuthActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(true);
+        TextView vCode = (TextView) findViewById(R.id.vCode);
+        vCode.setText(BuildConfig.VERSION_NAME);
+//        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        wifiManager.setWifiEnabled(true);
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
         if (!bluetoothAdapter.isEnabled()) {
