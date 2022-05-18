@@ -190,22 +190,26 @@ public class ScanActivity extends BaseActivity {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AWSMobileClient.getInstance().signOut(SignOutOptions.builder().signOutGlobally(true).build(), new Callback<Void>() {
-                    @Override
-                    public void onResult(final Void result) {
-                        Log.d("Signout Msg", "signed-out");
-                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+                        Intent i = new Intent(ScanActivity.this, AdminActivity.class);
                         i.putExtra("appUser",appUser);
                         startActivity(i);
-                    }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e("Signout Msg", "sign-out error", e);
-                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
-                        startActivity(i);
-                    }
-                });
+//                AWSMobileClient.getInstance().signOut(SignOutOptions.builder().signOutGlobally(true).build(), new Callback<Void>() {
+//                    @Override
+//                    public void onResult(final Void result) {
+//                        Log.d("Signout Msg", "signed-out");
+//                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+//                        i.putExtra("appUser",appUser);
+//                        startActivity(i);
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        Log.e("Signout Msg", "sign-out error", e);
+//                        Intent i = new Intent(ScanActivity.this, AuthActivity.class);
+//                        startActivity(i);
+//                    }
+//                });
 
             }
         });

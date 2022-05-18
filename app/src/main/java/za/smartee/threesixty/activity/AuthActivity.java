@@ -99,6 +99,7 @@ public class AuthActivity extends BaseActivity {
             public void onClick(View v) {
                 String userText = userDD.getSelectedItem().toString();
                 verifyuser(userText);
+                //showSignIn();
             }
         });
     }
