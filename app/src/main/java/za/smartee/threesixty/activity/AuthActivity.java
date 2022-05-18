@@ -219,6 +219,30 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
+            case "Reverse Logistics":
+                if (textCheck.getText().toString().equals(getResources().getString(R.string.reverseLogisticsCheck))){
+                    iStart.putExtra("appUser","Reverse Logistics");
+                    startActivity(iStart);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            dlgAlert.create().show();
+                        }
+                    });
+                }
+                break;
+            case "Assets":
+                if (textCheck.getText().toString().equals(getResources().getString(R.string.assetsCheck))){
+                    iStart.putExtra("appUser","Assets");
+                    startActivity(iStart);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            dlgAlert.create().show();
+                        }
+                    });
+                }
+                break;
         }
     }
 

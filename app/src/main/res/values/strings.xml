@@ -97,6 +97,8 @@
     </string-array>
 
     <string-array name="user_list">
+        <item>Reverse Logistics</item>
+        <item>Assets</item>
         <item>Spar Admin</item>
         <item>Spar Driver</item>
         <item>Smartee Admin</item>
@@ -105,5 +107,7 @@
     <string name="sparAdminCheck">13579</string>
     <string name="sparDriverCheck">12345</string>
     <string name="smarteeAdminCheck">02468</string>
+    <string name="reverseLogisticsCheck">19283</string>
+    <string name="assetsCheck">91823</string>
     <string name="otherCheck">19283</string>
 </resources>
