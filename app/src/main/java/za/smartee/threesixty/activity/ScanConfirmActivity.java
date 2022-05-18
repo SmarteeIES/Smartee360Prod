@@ -166,12 +166,14 @@ public class ScanConfirmActivity extends BaseActivity{
     public boolean networkConnectStatus;
     Integer scanCount;
     Integer saveCount;
+    Integer beaconCounter;
     private boolean scanStopFlag = false;
     private boolean defaultTimeDoneFlag = false;
 
 
     //Array list for the scanned data
     ArrayList<String> devData = new ArrayList<String>();
+    ArrayList<String> beaconCounterList = new ArrayList<String>();
 
     List<Map<String, String>> devDataDetail;
 
@@ -221,6 +223,7 @@ public class ScanConfirmActivity extends BaseActivity{
         }
         scanCount = 0;
         saveCount = 0;
+        beaconCounter = 0;
         scanStopFlag = false;
         defaultTimeDoneFlag = false;
         btnScan = (Button) findViewById(R.id.btnScan);
@@ -229,6 +232,10 @@ public class ScanConfirmActivity extends BaseActivity{
         btnLogout = (Button) findViewById(R.id.btnSignOut);
         stopScan = (Button) findViewById(R.id.stopScan);
         TextView missingLocation = (TextView) findViewById(R.id.textViewMissingLocation);
+        TextView scannerCounter = (TextView) findViewById(R.id.scannerCounter);
+        scannerCounter.setVisibility(View.INVISIBLE);
+        TextView detectedCounter = (TextView) findViewById(R.id.detectedCounter);
+        detectedCounter.setVisibility(View.INVISIBLE);
         Spinner locDD = (Spinner) findViewById(R.id.locationsSpinner);
         devData2 = new ArrayList<Map<String, String>>();
         devDataDetail = new ArrayList<Map<String, String>>();
@@ -579,6 +586,30 @@ public class ScanConfirmActivity extends BaseActivity{
                 scanInfo.put("rssi", String.valueOf(device.rssi));
                 devData2.add(scanInfo);
                 devData.add(device.mac);
+
+                if (assetDetailInfo != null){
+                    for (int n = 0; n < assetDetailInfo.size(); n++){
+                        if (device.mac.equals(assetDetailInfo.get(n).get("assetID"))){
+                            if (beaconCounterList != null){
+                                Boolean beaconAddedFlag = false;
+                                for (int m = 0; m < beaconCounterList.size(); m++){
+                                    if (beaconCounterList.get(m).equals(device.mac)){
+                                        beaconAddedFlag = true;
+                                    }
+                                }
+                                if (!beaconAddedFlag){
+                                    beaconCounterList.add(device.mac);
+                                    beaconCounter++;
+                                    break;
+                                }
+                            } else {
+                                beaconCounterList.add(device.mac);
+                                beaconCounter++;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             @Override
@@ -738,12 +769,16 @@ public class ScanConfirmActivity extends BaseActivity{
                     new CountDownTimer(scannerSetTime, 1000) {
                         @RequiresApi(api = Build.VERSION_CODES.N)
                         public void onTick(long millisUntilFinished) {
+                            detectedCounter.setVisibility(View.VISIBLE);
+                            detectedCounter.setText("Assets Detected: " + beaconCounter);
                             btnScan.setVisibility(View.INVISIBLE);
                             TextView infoView = (TextView) findViewById(R.id.infoView);
                             TextView timeText = (TextView) findViewById(R.id.timerText);
                             infoView.setText("Scanning In Progress");
                             if (scanStopFlag){
-                                infoView.setText("Scanning In Progress " + String.valueOf((millisUntilFinished / 1000)) + " Seconds Remaining");
+                                scannerCounter.setText(String.valueOf((millisUntilFinished / 1000)) + " Seconds Remaining");
+                                scannerCounter.setVisibility(View.VISIBLE);
+                                infoView.setText("Scanning In Progress ");
                             }
                             //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
                         }
@@ -751,6 +786,7 @@ public class ScanConfirmActivity extends BaseActivity{
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         public void onFinish() {
                             defaultTimeDoneFlag = true;
+                            scannerCounter.setVisibility(View.INVISIBLE);
                             if (scanStopFlag) {
                                 mokoBleScanner.stopScanDevice();
                                 spinner = (ProgressBar) findViewById(R.id.progressBar);
