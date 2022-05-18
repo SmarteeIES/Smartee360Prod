@@ -28,7 +28,7 @@ android {
 
         driver {
             dimension "Spar"
-            applicationId 'za.smartee.threeSixty'
+            applicationId 'za.smartee.threeSixty.Driver'
         }
     }
 
