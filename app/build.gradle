@@ -21,7 +21,7 @@ android {
 
     flavorDimensions "Spar"
     productFlavors {
-        Warehouse {
+        warehouse {
             dimension "Spar"
             applicationId 'za.smartee.threeSixty.Warehouse'
         }
