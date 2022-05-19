@@ -123,11 +123,16 @@ public class AuthActivity extends BaseActivity {
                 else {
                     i.putExtra("data","s360failure");
                 }
-                sendBroadcast(i);
-                Log.i("Msg","Intent Sent");
-                finishAffinity();
-                AuthActivity.this.finish();
-                System.exit(0);
+                String appUser = getIntent().getStringExtra("appUser");
+                Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
+                iStart.putExtra("appUser",appUser);
+                startActivity(iStart);
+
+//                sendBroadcast(i);
+//                Log.i("Msg","Intent Sent");
+//                finishAffinity();
+//                AuthActivity.this.finish();
+//                System.exit(0);
             } catch (ActivityNotFoundException e){
                 Log.i("Msg","App Not Found");
             }

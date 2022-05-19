@@ -374,6 +374,7 @@ public class ScanActivity extends BaseActivity {
     public void onDonePressed() {
         Log.i("S360Scan","Done Pressed Function");
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanHistFlag",false);
+        String appUser = getIntent().getStringExtra("appUser");
         final Integer[] scanCount = {getIntent().getIntExtra("scanCount", 1)};
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Is the Smartee Scan Complete?");
@@ -384,6 +385,7 @@ public class ScanActivity extends BaseActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent d = new Intent(ScanActivity.this, AuthActivity.class);
+                                d.putExtra("appUser",appUser);
                                 if (scanCheckFlag){
                                     d.putExtra("scanCheckFlag", true);
                                 } else {
@@ -401,9 +403,6 @@ public class ScanActivity extends BaseActivity {
                                                     Log.i("S360","Processing Mutations");
                                                     Log.i("S360", "Scan Count: " + String.valueOf(scanCount[0]));
                                                     // The queue has outstanding records waiting to be processed.
-                                                    if (scanCount[0] > 500) {
-                                                        scanCount[0] = 380;
-                                                    }
                                                     waitSetTime = (new Double(1500)).longValue()* scanCount[0];
                                                     Log.i("S360WaitTime", String.valueOf(waitSetTime));
                                                     runOnUiThread(new Runnable() {
