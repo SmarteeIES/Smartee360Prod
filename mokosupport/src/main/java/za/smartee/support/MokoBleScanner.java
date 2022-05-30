@@ -63,6 +63,9 @@ public final class MokoBleScanner {
         }
     }
 
+    public void startScanDevice() {
+    }
+
     public static class MokoLeScanHandler extends ScanCallback {
 
         private MokoScanDeviceCallback callback;

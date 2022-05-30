@@ -159,6 +159,8 @@ public class ScanConfirmActivity extends BaseActivity{
     Double minRssiCap;
     Double avgRssiCap;
     Long scannerSetTime;
+    Long scannerResetTime;
+    Long waitSetTime;
     Date scanTime;
     Date confirmTime;
     String user;
@@ -581,8 +583,8 @@ public class ScanConfirmActivity extends BaseActivity{
 
             @Override
             public void onScanDevice(DeviceInfo device) {
-//                Log.i("Test Mac",device.mac);
-//                Log.i("Test Mac", String.valueOf(device.rssi));
+                Log.i("Test Mac",device.mac);
+                Log.i("Test Mac", String.valueOf(device.rssi));
                 Map<String, String> scanInfo = new HashMap<String, String>();
                 scanInfo.put("devMac", String.valueOf(device.mac));
                 scanInfo.put("rssi", String.valueOf(device.rssi));
@@ -618,6 +620,8 @@ public class ScanConfirmActivity extends BaseActivity{
             public void onStopScan() {
             }
         });
+
+
 
 
 
@@ -696,10 +700,6 @@ public class ScanConfirmActivity extends BaseActivity{
                     spinner.setVisibility(View.GONE);
                     TextView answer = (TextView) findViewById(R.id.scanInfo);
                     selectedLocation.setVisibility(View.VISIBLE);
-
-//                            if (locationDetailInfo.equals(null)) {
-//                                dlgAlert.show();
-//                            }
 
                     if (locationDetailInfo == null) {
                         dlgAlert.create().show();
