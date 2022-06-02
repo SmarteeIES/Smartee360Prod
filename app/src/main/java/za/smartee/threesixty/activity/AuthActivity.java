@@ -115,24 +115,11 @@ public class AuthActivity extends BaseActivity {
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
             try {
-                Intent i = new Intent();
-                i.setAction("za.smartee.threeSixty");
-                if (scanCheckFlag){
-                    i.putExtra("data","s360success");
-                }
-                else {
-                    i.putExtra("data","s360failure");
-                }
                 String appUser = getIntent().getStringExtra("appUser");
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
                 iStart.putExtra("appUser",appUser);
                 startActivity(iStart);
-
-//                sendBroadcast(i);
-//                Log.i("Msg","Intent Sent");
-//                finishAffinity();
-//                AuthActivity.this.finish();
-//                System.exit(0);
+                AuthActivity.this.finish();
             } catch (ActivityNotFoundException e){
                 Log.i("Msg","App Not Found");
             }

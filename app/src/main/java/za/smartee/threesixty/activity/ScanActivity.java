@@ -237,7 +237,7 @@ public class ScanActivity extends BaseActivity {
                             infoHeader.setText("SCANNER INFORMATION");
                             spinner = (ProgressBar) findViewById(R.id.progressBar);
                             spinner.setVisibility(View.GONE);
-                            doneButton.setVisibility(View.VISIBLE);
+                            doneButton.setVisibility(View.INVISIBLE);
                             scanButton.setVisibility(View.VISIBLE);
                         }
                     });
@@ -260,7 +260,7 @@ public class ScanActivity extends BaseActivity {
                             infoHeader.setText("SCANNER INFORMATION");
                             spinner = (ProgressBar) findViewById(R.id.progressBar);
                             spinner.setVisibility(View.GONE);
-                            doneButton.setVisibility(View.VISIBLE);
+                            doneButton.setVisibility(View.INVISIBLE);
                             scanButton.setVisibility(View.VISIBLE);
                         }
                     });
@@ -290,7 +290,7 @@ public class ScanActivity extends BaseActivity {
                                     infoHeader.setText("SCANNER INFORMATION");
                                     spinner = (ProgressBar) findViewById(R.id.progressBar);
                                     spinner.setVisibility(View.GONE);
-                                    doneButton.setVisibility(View.VISIBLE);
+                                    doneButton.setVisibility(View.INVISIBLE);
                                     scanButton.setVisibility(View.VISIBLE);
                                 }
                             });
@@ -303,7 +303,7 @@ public class ScanActivity extends BaseActivity {
                 infoHeader.setText("SCANNER INFORMATION");
                 spinner = (ProgressBar) findViewById(R.id.progressBar);
                 spinner.setVisibility(View.GONE);
-                doneButton.setVisibility(View.VISIBLE);
+                doneButton.setVisibility(View.INVISIBLE);
                 scanButton.setVisibility(View.VISIBLE);
 
             }
@@ -317,7 +317,7 @@ public class ScanActivity extends BaseActivity {
                     infoHeader.setText("SCANNER INFORMATION");
                     spinner = (ProgressBar) findViewById(R.id.progressBar);
                     spinner.setVisibility(View.GONE);
-                    doneButton.setVisibility(View.VISIBLE);
+                    doneButton.setVisibility(View.INVISIBLE);
                     scanButton.setVisibility(View.VISIBLE);
                 }
             });
@@ -334,7 +334,7 @@ public class ScanActivity extends BaseActivity {
                     infoHeader.setText("SCANNER INFORMATION");
                     spinner = (ProgressBar) findViewById(R.id.progressBar);
                     spinner.setVisibility(View.GONE);
-                    doneButton.setVisibility(View.VISIBLE);
+                    doneButton.setVisibility(View.INVISIBLE);
                     scanButton.setVisibility(View.VISIBLE);
                 }
             }.start();
@@ -434,8 +434,6 @@ public class ScanActivity extends BaseActivity {
                                             Log.i("S360Scan","Check failure");
                                         }
                                 );
-
-
                                 //ScanActivity.this.finish();
                             }
                         })

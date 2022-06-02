@@ -170,19 +170,28 @@ public class ScanConfirmActivity extends BaseActivity{
     Integer scanCount;
     Integer saveCount;
     Integer beaconCounter;
+    Integer generalCounter;
     private boolean scanStopFlag = false;
     private boolean defaultTimeDoneFlag = false;
+    Boolean startedTimerFlag = false;
+    Boolean startedTimerExpiredFlag = false;
+    Boolean waitingTimerFlag = false;
+    Boolean waitingTimerExpiredFlag = false;
+    Boolean devData2Flag = false;
+    Boolean beaconCountedFlag = false;
 
 
     //Array list for the scanned data
     ArrayList<String> devData = new ArrayList<String>();
     ArrayList<String> beaconCounterList = new ArrayList<String>();
+    ArrayList<String> beaconCountedCompleteList = new ArrayList<String>();
 
     List<Map<String, String>> devDataDetail;
 
     //Declare array map to store the details of the locations
     List<Map<String, String>> locationDetailInfo;
     List<Map<String, String>> devData2;
+    List<Map<String, String>> tempDevData2;
 
 
     //Declare array map to store the details of the assets
@@ -198,6 +207,7 @@ public class ScanConfirmActivity extends BaseActivity{
     private BluetoothAdapter mBluetoothAdapter = null;
     String company;
     public static final int REQUEST_ENABLE_BT = 4001;
+    TextView detectedCounter;
 
 
 
@@ -242,9 +252,13 @@ public class ScanConfirmActivity extends BaseActivity{
         detectedCounter.setVisibility(View.INVISIBLE);
         Spinner locDD = (Spinner) findViewById(R.id.locationsSpinner);
         devData2 = new ArrayList<Map<String, String>>();
+        tempDevData2 = new ArrayList<Map<String, String>>();
+
         devDataDetail = new ArrayList<Map<String, String>>();
         Intent intent = getIntent();
         String appUser = intent.getStringExtra("appUser");
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
+        spinner.setVisibility(View.VISIBLE);
 
         //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -293,7 +307,6 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
             }
         });
-
 
         btnScanCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -356,7 +369,7 @@ public class ScanConfirmActivity extends BaseActivity{
             }
         });
 
-        //Confirm Button
+        //Confirm Button processing data after scans are completed
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -365,7 +378,7 @@ public class ScanConfirmActivity extends BaseActivity{
                 TextView missingLoc = (TextView) findViewById(R.id.textViewMissingLocation);
                 missingLoc.setVisibility(View.INVISIBLE);
 
-                spinner = (ProgressBar) findViewById(R.id.progressBar);
+
                 spinner.setVisibility(View.VISIBLE);
                 TextView infoHeader = (TextView) findViewById(R.id.infoHeader);
                 infoHeader.setText("Processing Data");
@@ -513,6 +526,8 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
                     final Integer existAssets = numberExistingAssets;
                     final Integer newAssets = numberNewAssets;
+
+                    spinner.setVisibility(View.GONE);
                     Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
                     i.putExtra("selectedLocation",text);
                     i.putExtra("scanTime",scanTime.toString());
@@ -561,7 +576,6 @@ public class ScanConfirmActivity extends BaseActivity{
         }
 
         scanTime = Calendar.getInstance().getTime();
-
         TextView answer1 = (TextView) findViewById(R.id.scanInfo);
         answer1.setVisibility(View.INVISIBLE);
         TextView answer2 = (TextView) findViewById(R.id.scanInfo2);
@@ -575,14 +589,20 @@ public class ScanConfirmActivity extends BaseActivity{
         TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
 
 
-        MokoBleScanner mokoBleScanner = new MokoBleScanner(this);
+        //Start the BLE Scanner and create the first callback to get scanned data
+        MokoBleScanner mokoBleScanner = new MokoBleScanner(ScanConfirmActivity.this);
         mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
             @Override
             public void onStartScan() {
+                Log.i("S360","Pos - Start Scan Initial");
+                beaconCounterList.clear();
+                manageScanTime();
+                generalCounter = 0;
             }
 
             @Override
             public void onScanDevice(DeviceInfo device) {
+                Log.i("S360","Pos - On Scan Initial");
                 Log.i("Test Mac",device.mac);
                 Log.i("Test Mac", String.valueOf(device.rssi));
                 Map<String, String> scanInfo = new HashMap<String, String>();
@@ -590,105 +610,170 @@ public class ScanConfirmActivity extends BaseActivity{
                 scanInfo.put("rssi", String.valueOf(device.rssi));
                 devData2.add(scanInfo);
                 devData.add(device.mac);
-
-                if (assetDetailInfo != null){
-                    for (int n = 0; n < assetDetailInfo.size(); n++){
-                        if (device.mac.equals(assetDetailInfo.get(n).get("assetID"))){
-                            if (beaconCounterList != null){
-                                Boolean beaconAddedFlag = false;
-                                for (int m = 0; m < beaconCounterList.size(); m++){
-                                    if (beaconCounterList.get(m).equals(device.mac)){
-                                        beaconAddedFlag = true;
-                                    }
-                                }
-                                if (!beaconAddedFlag){
-                                    beaconCounterList.add(device.mac);
-                                    beaconCounter++;
-                                    break;
-                                }
-                            } else {
-                                beaconCounterList.add(device.mac);
-                                beaconCounter++;
-                                break;
-                            }
-                        }
-                    }
+                beaconCounterList.add(device.mac);
+                if (startedTimerExpiredFlag){
+                    mokoBleScanner.stopScanDevice();
                 }
+
             }
 
             @Override
             public void onStopScan() {
+                Log.i("S360","Pos - Stop Scan Initial");
+                //Log.i("S360", "BeaconList Unprocessed" + beaconCounterList);
+                Object[] beaconCounterListTemp = beaconCounterList.toArray();
+                for (Object s : beaconCounterListTemp) {
+                    if (beaconCounterList.indexOf(s) != beaconCounterList.lastIndexOf(s)) {
+                        beaconCounterList.remove(beaconCounterList.lastIndexOf(s));
+                    }
+                }
+               // Log.i("S360", "BeaconList Processed" + beaconCounterList);
+                for (String device : beaconCounterList){
+                    beaconCountedFlag = false;
+                    for (String deviceComp : beaconCountedCompleteList){
+                        if (device.equals(deviceComp)){
+                            beaconCountedFlag = true;
+                        }
+                    }
+                    if (!beaconCountedFlag){
+                        if (assetDetailInfo != null){
+                           // Log.i("S360","Ready to Add");
+                            for (int n = 0; n < assetDetailInfo.size(); n++){
+                                if (device.equals(assetDetailInfo.get(n).get("assetID"))){
+                                    Log.i("S360","Added");
+                                    beaconCountedCompleteList.add(device);
+                                    beaconCounter++;
+                                  //  Log.i("S360","Beacon Counter" + beaconCounter);
+                                }
+                            }
+                        }
+                    }
+                }
+               // Log.i("S360","Pre Dev Data Array" + devData);
+              //  Log.i("S360","Pre Dev Data2 Array" + devData2);
+
+                Object[] devDataTemp = devData.toArray();
+                for (Object s : devDataTemp) {
+                    if (devData.indexOf(s) != devData.lastIndexOf(s)) {
+                        devData.remove(devData.lastIndexOf(s));
+                    }
+                }
+               // Log.i("S360","No Duplicate Devdata" + devData);
+                // Variable to get the number of valid scanned Assets
+                Integer numberNewAssets = 0;
+                //Calculate the min, max and average RSSI per mac address
+                for (int t = 0; t < devData.size(); t++){
+                    Integer counter = 0;
+                    Integer rssiSum = 0;
+                    Integer rssi = 0;
+                    Integer minRssi = 0;
+                    Integer maxRssi = -1000;
+                    for (int q = 0; q < devData2.size(); q++){
+                        if (devData2.get(q).get("devMac").equals(devData.get(t))){
+                            counter++;
+                            devData2Flag = true;
+                            rssi = Integer.parseInt(devData2.get(q).get("rssi"));
+                            rssiSum = rssiSum + rssi;
+                            if (rssi < minRssi){
+                                minRssi = rssi;
+                            }
+                            if (rssi > maxRssi){
+                                maxRssi = rssi;
+                            }
+                        }
+                    }
+                    if (devData2Flag){
+                        Map<String, String> tempScanInfo = new HashMap<String, String>();
+                        tempScanInfo.put("devMac", String.valueOf(devData.get(t)));
+                        tempScanInfo.put("rssi", String.valueOf(String.valueOf(rssiSum/counter)));
+                        tempDevData2.add(tempScanInfo);
+                    }
+                    devData2Flag=false;
+                  //  Log.i("S360","TempDevdata2 Processing" + tempDevData2);
+                }
+//                Log.i("S360","Post Dev Data Array" + devData);
+//                Log.i("S360","Post Dev Data2 Array" + devData2);
+                devData2.clear();
+//                Log.i("S360","DevData2 Cleared Array"+ devData2);
+                devData2.addAll(tempDevData2);
+                tempDevData2.clear();
+                Log.i("S360","DevData2 Updated Array"+ devData2);
+                Log.i("S360","BeaconCountedList Updated Array"+ beaconCountedCompleteList);
+
+                detectedCounter.setText("Assets Detected: " + beaconCounter);
+                manageScanTime();
             }
         });
 
 
 
 
-
+        // Query the datastore to get the updated Locations and Asset Info
         Boolean finalLoadingChecked1 = loadingChecked;
-                                    company="Spar";
-                                    Amplify.DataStore.query(Locations.class,
-                                            locResponse -> {
-                                                if (locResponse.hasNext()) {
-                                                   // Log.i("S360", "Successful query, found posts.");
-                                                    locationDetailInfo = new ArrayList<Map<String, String>>();
-                                                    while (locResponse.hasNext()) {
-                                                        Locations locationDetail = locResponse.next();
-                                                        if (locationDetail.getAddress() != null) {
-                                                            Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
-                                                            locationDetailInfo1.put("Address", locationDetail.getAddress());
-                                                            locationDetailInfo1.put("LocationID", locationDetail.getId());
-                                                            locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
-                                                            locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
-                                                            locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
-                                                            locationDetailInfo.add(locationDetailInfo1);
-                                                        }
-                                                    }
-                                                    for (int r = 0; r < locationDetailInfo.size(); r++) {
-                                                        String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                                        if (finalLoadingChecked1) {
-                                                            if (tempLoc.equals("Transit")) {
-                                                                locDdData.add(locationDetailInfo.get(r).get("Address"));
-                                                            }
-                                                        } else {
-                                                            locDdData.add(locationDetailInfo.get(r).get("Address"));
-                                                        }
-                                                    }
-                                                    Collections.sort(locDdData);
-                                                } else {
-                                                    Log.i("S360", "Successful query, but no posts.");
-                                                }
-                                            },
-                                            error -> Log.e("S360",  "Error retrieving posts", error)
-                                    );
+        company="Spar";
+        Amplify.DataStore.query(Locations.class,
+                locResponse -> {
+                    if (locResponse.hasNext()) {
+                        // Log.i("S360", "Successful query, found posts.");
+                        locationDetailInfo = new ArrayList<Map<String, String>>();
+                        while (locResponse.hasNext()) {
+                            Locations locationDetail = locResponse.next();
+                            if (locationDetail.getAddress() != null) {
+                                Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
+                                locationDetailInfo1.put("Address", locationDetail.getAddress());
+                                locationDetailInfo1.put("LocationID", locationDetail.getId());
+                                locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
+                                locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
+                                locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
+                                locationDetailInfo.add(locationDetailInfo1);
+                            }
+                        }
+                        for (int r = 0; r < locationDetailInfo.size(); r++) {
+                            String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                            if (finalLoadingChecked1) {
+                                if (tempLoc.equals("Transit")) {
+                                    locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                }
+                            } else {
+                                locDdData.add(locationDetailInfo.get(r).get("Address"));
+                            }
+                        }
+                        Collections.sort(locDdData);
+                    } else {
+                        Log.i("S360", "Successful query, but no posts.");
+                    }
+                },
+                error -> Log.e("S360",  "Error retrieving posts", error)
+        );
+        Amplify.DataStore.query(Assets.class,
+                assetResponse -> {
+                    if (assetResponse.hasNext()) {
+                        assetDetailInfo = new ArrayList<Map<String, String>>();
+                        while (assetResponse.hasNext()) {
+                            Assets assetDetail = assetResponse.next();
+                            if (assetDetail.getAssetId() != null) {
+                                assetItems.add(assetDetail.getAssetId().toString());
+                                Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
+                                assetDetailInfo1.put("systemID", assetDetail.getId());
+                                assetDetailInfo1.put("assetID", assetDetail.getAssetId());
+                                assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
+                                assetDetailInfo1.put("assetName", assetDetail.getAssetName());
+                                assetDetailInfo1.put("locationID", assetDetail.getLocationId());
+                                assetDetailInfo.add(assetDetailInfo1);
+                            }
+                        }
+                    } else {
+                        Log.i("S360", "Successful query, but no posts.");
+                    }
+                },
+                error -> Log.e("S360",  "Error retrieving posts", error)
+        );
+
+        Boolean finalLoadingChecked = loadingChecked;
 
 
-                        Amplify.DataStore.query(Assets.class,
-                                assetResponse -> {
-                                    if (assetResponse.hasNext()) {
-                                        assetDetailInfo = new ArrayList<Map<String, String>>();
-                                        while (assetResponse.hasNext()) {
-                                            Assets assetDetail = assetResponse.next();
-                                            if (assetDetail.getAssetId() != null) {
-                                                assetItems.add(assetDetail.getAssetId().toString());
-                                                Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-                                                assetDetailInfo1.put("systemID", assetDetail.getId());
-                                                assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-                                                assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-                                                assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-                                                assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-                                                assetDetailInfo.add(assetDetailInfo1);
-                                            }
-                                        }
-                                    } else {
-                                        Log.i("S360", "Successful query, but no posts.");
-                                    }
-                                },
-                                error -> Log.e("S360",  "Error retrieving posts", error)
-                        );
 
-                    Boolean finalLoadingChecked = loadingChecked;
-
+        // When stop button is pressed after the 90 second minimum time, display the confirm screen information
         stopScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -697,7 +782,7 @@ public class ScanConfirmActivity extends BaseActivity{
                 if (defaultTimeDoneFlag){
                     mokoBleScanner.stopScanDevice();
                     spinner = (ProgressBar) findViewById(R.id.progressBar);
-                    spinner.setVisibility(View.GONE);
+                    spinner.setVisibility(View.INVISIBLE);
                     TextView answer = (TextView) findViewById(R.id.scanInfo);
                     selectedLocation.setVisibility(View.VISIBLE);
 
@@ -767,107 +852,107 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
             }
         });
-                    scannerSetTime = (new Double(90000)).longValue();
-                    new CountDownTimer(scannerSetTime, 1000) {
-                        @RequiresApi(api = Build.VERSION_CODES.N)
-                        public void onTick(long millisUntilFinished) {
-                            detectedCounter.setVisibility(View.VISIBLE);
-                            detectedCounter.setText("Assets Detected: " + beaconCounter);
-                            btnScan.setVisibility(View.INVISIBLE);
-                            TextView infoView = (TextView) findViewById(R.id.infoView);
-                            TextView timeText = (TextView) findViewById(R.id.timerText);
-                            infoView.setText("Scanning In Progress");
-                            if (scanStopFlag){
-                                scannerCounter.setText(String.valueOf((millisUntilFinished / 1000)) + " Seconds Remaining");
-                                scannerCounter.setVisibility(View.VISIBLE);
-                                infoView.setText("Scanning In Progress ");
-                            }
-                            //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
-                        }
 
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        public void onFinish() {
-                            defaultTimeDoneFlag = true;
-                            scannerCounter.setVisibility(View.INVISIBLE);
-                            if (scanStopFlag) {
-                                mokoBleScanner.stopScanDevice();
-                                spinner = (ProgressBar) findViewById(R.id.progressBar);
-                                spinner.setVisibility(View.GONE);
-                                TextView answer = (TextView) findViewById(R.id.scanInfo);
-                                selectedLocation.setVisibility(View.VISIBLE);
-                                stopScan.setVisibility(View.INVISIBLE);
-
-//                            if (locationDetailInfo.equals(null)) {
-//                                dlgAlert.show();
-//                            }
-
-                                if (locationDetailInfo == null) {
-                                    dlgAlert.create().show();
-                                } else {
-                                    Integer locationDetailInfoSize = locationDetailInfo.size();
-                                    if (locationDetailInfoSize == null) {
-                                        locationDetailInfoSize = 0;
-                                    }
-
-                                    for (int r = 0; r < locationDetailInfoSize; r++) {
-                                        locationInfoFlag = true;
-                                        String tempLoc;
-                                        tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                        if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
-                                            double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
-                                            if (distResult < 501) {
-                                                calculatedLoc = locationDetailInfo.get(r).get("Address");
-                                            }
-                                        }
-                                    }
-                                    TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
-
-                                    if (finalLoadingChecked) {
-                                        selectedLocation.setVisibility(View.VISIBLE);
-                                        selectedLocation.setText("Select Vehicle");
-                                        locDD.setVisibility(View.VISIBLE);
-                                        ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
-                                        LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                        LocationDDAdapter.notifyDataSetChanged();
-                                        locDD.setAdapter(LocationDDAdapter);
-                                        calculatedLoc = "Loading Checked";
-                                    } else {
-                                        missingLocation.setVisibility(View.VISIBLE);
-                                        if (missingLocFlag == false) {
-                                            selectedLocation.setVisibility(View.VISIBLE);
-                                            if (calculatedLoc == null || calculatedLoc.equals("")) {
-                                                calculatedLoc = "No Location Available";
-                                            }
-                                            selectedLocation.setText("Current Location - " + calculatedLoc);
-                                        }
-                                    }
-
-                                    if (!locationInfoFlag) {
-                                        selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
-                                    }
-
-                                    locationInfoFlag = false;
-
-                                    if (calculatedLoc.equals("No Location Available")) {
-                                        if (missingLocFlag != false) {
-                                            btnConfirm.setVisibility(View.VISIBLE);
-                                        }
-                                    } else {
-                                        btnConfirm.setVisibility(View.VISIBLE);
-                                    }
-                                    btnScanCancel.setVisibility(View.VISIBLE);
-
-                                }
-
-                                TextView infoView = (TextView) findViewById(R.id.infoView);
-                                TextView timeText = (TextView) findViewById(R.id.timerText);
-                                timeText.setText("");
-                                infoView.setText("");
-                                ArrayList<String> devData = new ArrayList<String>();
-                            }
-                        }
-                    }.start();
+        //Check for the stop button pressed flag after a minimum of 90 seconds to stop the scanning process and display the confirm screen
+        scannerSetTime = (new Double(90000)).longValue();
+        new CountDownTimer(scannerSetTime, 1000) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            public void onTick(long millisUntilFinished) {
+                detectedCounter.setVisibility(View.VISIBLE);
+                detectedCounter.setText("Assets Detected: " + beaconCounter);
+                btnScan.setVisibility(View.INVISIBLE);
+                TextView infoView = (TextView) findViewById(R.id.infoView);
+                TextView timeText = (TextView) findViewById(R.id.timerText);
+                infoView.setText("Scanning In Progress");
+                if (scanStopFlag){
+                    scannerCounter.setText(String.valueOf((millisUntilFinished / 1000)) + " Seconds Remaining");
+                    scannerCounter.setVisibility(View.VISIBLE);
+                    infoView.setText("Scanning In Progress ");
                 }
+                //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            public void onFinish() {
+                defaultTimeDoneFlag = true;
+                scannerCounter.setVisibility(View.INVISIBLE);
+                if (scanStopFlag) {
+                    mokoBleScanner.stopScanDevice();
+                    spinner = (ProgressBar) findViewById(R.id.progressBar);
+                    spinner.setVisibility(View.GONE);
+                    TextView answer = (TextView) findViewById(R.id.scanInfo);
+                    selectedLocation.setVisibility(View.VISIBLE);
+                    stopScan.setVisibility(View.INVISIBLE);
+
+                    if (locationDetailInfo == null) {
+                        dlgAlert.create().show();
+                    } else {
+                        Integer locationDetailInfoSize = locationDetailInfo.size();
+                        if (locationDetailInfoSize == null) {
+                            locationDetailInfoSize = 0;
+                        }
+
+                        for (int r = 0; r < locationDetailInfoSize; r++) {
+                            locationInfoFlag = true;
+                            String tempLoc;
+                            tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                            if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
+                                double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
+                                if (distResult < 501) {
+                                    calculatedLoc = locationDetailInfo.get(r).get("Address");
+                                }
+                            }
+                        }
+                        TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+
+                        if (finalLoadingChecked) {
+                            selectedLocation.setVisibility(View.VISIBLE);
+                            selectedLocation.setText("Select Vehicle");
+                            locDD.setVisibility(View.VISIBLE);
+                            ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
+                            LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            LocationDDAdapter.notifyDataSetChanged();
+                            locDD.setAdapter(LocationDDAdapter);
+                            calculatedLoc = "Loading Checked";
+                        } else {
+                            missingLocation.setVisibility(View.VISIBLE);
+                            if (missingLocFlag == false) {
+                                selectedLocation.setVisibility(View.VISIBLE);
+                                if (calculatedLoc == null || calculatedLoc.equals("")) {
+                                    calculatedLoc = "No Location Available";
+                                }
+                                selectedLocation.setText("Current Location - " + calculatedLoc);
+                            }
+                        }
+
+                        if (!locationInfoFlag) {
+                            selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
+                        }
+
+                        locationInfoFlag = false;
+
+                        if (calculatedLoc.equals("No Location Available")) {
+                            if (missingLocFlag != false) {
+                                btnConfirm.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            btnConfirm.setVisibility(View.VISIBLE);
+                        }
+                        btnScanCancel.setVisibility(View.VISIBLE);
+
+                    }
+
+                    TextView infoView = (TextView) findViewById(R.id.infoView);
+                    TextView timeText = (TextView) findViewById(R.id.timerText);
+                    timeText.setText("");
+                    infoView.setText("");
+                    ArrayList<String> devData = new ArrayList<String>();
+                }
+            }
+        }.start();
+
+        //End of the onCreate method
+    }
 
 
     //Check Permissions
@@ -883,6 +968,170 @@ public class ScanConfirmActivity extends BaseActivity{
                     "Permission already granted",
                     Toast.LENGTH_SHORT)
                     .show();
+        }
+    }
+
+    //Function to stop and start scanner
+    private void manageScanTime(){
+        Log.i("S360","Scan Stop Flag - " + scanStopFlag);
+        if (!startedTimerFlag){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startedTimerFlag = true;
+                    scannerResetTime = (new Double(15000)).longValue();
+                    new CountDownTimer(scannerResetTime, 1000) {
+                        public void onTick(long millisUntilFinished) {
+
+                        }
+                        public void onFinish() {
+                            startedTimerExpiredFlag=true;
+                            generalCounter++;
+                        }}.start();
+                }});
+        }
+
+
+        if (startedTimerExpiredFlag){
+            if (!scanStopFlag || !defaultTimeDoneFlag){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        scannerResetTime = (new Double(1000)).longValue();
+                        new CountDownTimer(scannerResetTime, 1000) {
+                            public void onTick(long millisUntilFinished) {
+
+                            }
+                            public void onFinish() {
+//                                Call the function which managed scanning data again
+                                MokoBleScanner mokoBleScanner = new MokoBleScanner(ScanConfirmActivity.this);
+                                mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
+                                    @Override
+                                    public void onStartScan() {
+                                        Log.i("S360","Pos - Start Scan" + generalCounter);
+                                        beaconCounterList.clear();
+                                        startedTimerExpiredFlag=false;
+                                        startedTimerFlag = false;
+                                        manageScanTime();
+                                    }
+
+                                    @Override
+                                    public void onScanDevice(DeviceInfo device) {
+                                        Log.i("S360","Pos - On Scan " + generalCounter);
+                                        Log.i("Test Mac",device.mac);
+                                        Log.i("Test Mac", String.valueOf(device.rssi));
+                                        Map<String, String> scanInfo = new HashMap<String, String>();
+                                        scanInfo.put("devMac", String.valueOf(device.mac));
+                                        scanInfo.put("rssi", String.valueOf(device.rssi));
+                                        devData2.add(scanInfo);
+                                        devData.add(device.mac);
+                                        if (startedTimerExpiredFlag){
+                                            mokoBleScanner.stopScanDevice();
+                                        }
+
+                                        if (scanStopFlag && defaultTimeDoneFlag){
+                                            mokoBleScanner.stopScanDevice();
+                                            startedTimerExpiredFlag = false;
+                                            startedTimerFlag = false;
+                                        }
+                                        beaconCounterList.add(device.mac);
+                                    }
+
+                                    @Override
+                                    public void onStopScan() {
+                                        Log.i("S360","Pos - Stop Scan" + generalCounter);
+//                                        Log.i("S360", "BeaconList Unprocessed" + beaconCounterList);
+                                        Object[] beaconCounterListTemp = beaconCounterList.toArray();
+                                        for (Object s : beaconCounterListTemp) {
+                                            if (beaconCounterList.indexOf(s) != beaconCounterList.lastIndexOf(s)) {
+                                                beaconCounterList.remove(beaconCounterList.lastIndexOf(s));
+                                            }
+                                        }
+//                                        Log.i("S360", "BeaconList Processed" + beaconCounterList);
+                                        for (String device : beaconCounterList){
+                                            beaconCountedFlag = false;
+                                            for (String deviceComp : beaconCountedCompleteList){
+                                                if (device.equals(deviceComp)){
+                                                    Log.i("S360","counted already" + deviceComp);
+                                                    beaconCountedFlag = true;
+                                                }
+                                            }
+                                            if (!beaconCountedFlag){
+                                              //  Log.i("S360","Ready to Add");
+                                                if (assetDetailInfo != null){
+                                                    for (int n = 0; n < assetDetailInfo.size(); n++){
+                                                        if (device.equals(assetDetailInfo.get(n).get("assetID"))){
+
+                                                            Log.i("S360","Added");
+                                                            beaconCountedCompleteList.add(device);
+                                                            beaconCounter++;
+//                                                            Log.i("S360","Beacon Counter" + beaconCounter);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (beaconCounter == null){
+                                            beaconCounter = 0;
+                                        }
+                                        TextView detectedCounter = (TextView) findViewById(R.id.detectedCounter);
+//                                        Log.i("S360","Pre Dev Data Array" + devData);
+//                                        Log.i("S360","Pre Dev Data2 Array" + devData2);
+
+                                        Object[] devDataTemp = devData.toArray();
+                                        for (Object s : devDataTemp) {
+                                            if (devData.indexOf(s) != devData.lastIndexOf(s)) {
+                                                devData.remove(devData.lastIndexOf(s));
+                                            }
+                                        }
+//                                        Log.i("S360","No Duplicate Devdata" + devData);
+                                        // Variable to get the number of valid scanned Assets
+                                        Integer numberNewAssets = 0;
+                                        //Calculate the min, max and average RSSI per mac address
+                                        for (int t = 0; t < devData.size(); t++){
+                                            Integer counter = 0;
+                                            Integer rssiSum = 0;
+                                            Integer rssi = 0;
+                                            Integer minRssi = 0;
+                                            Integer maxRssi = -1000;
+                                            for (int q = 0; q < devData2.size(); q++){
+                                                if (devData2.get(q).get("devMac").equals(devData.get(t))){
+                                                    counter++;
+                                                    devData2Flag = true;
+                                                    rssi = Integer.parseInt(devData2.get(q).get("rssi"));
+                                                    rssiSum = rssiSum + rssi;
+                                                    if (rssi < minRssi){
+                                                        minRssi = rssi;
+                                                    }
+                                                    if (rssi > maxRssi){
+                                                        maxRssi = rssi;
+                                                    }
+                                                }
+                                            }
+                                            if (devData2Flag){
+                                                Map<String, String> tempScanInfo = new HashMap<String, String>();
+                                                tempScanInfo.put("devMac", String.valueOf(devData.get(t)));
+                                                tempScanInfo.put("rssi", String.valueOf(String.valueOf(rssiSum/counter)));
+                                                tempDevData2.add(tempScanInfo);
+                                            }
+                                            devData2Flag=false;
+                                           // Log.i("S360","TempDevdata2 Processing" + tempDevData2);
+                                        }
+//                                        Log.i("S360","Post Dev Data Array" + devData);
+//                                        Log.i("S360","Post Dev Data2 Array" + devData2);
+                                        devData2.clear();
+//                                        Log.i("S360","DevData2 Cleared Array"+ devData2);
+                                        devData2.addAll(tempDevData2);
+                                        tempDevData2.clear();
+                                        Log.i("S360","DevData2 Updated Array " + generalCounter + " - " + devData2);
+                                        Log.i("S360","BeaconCountedList Updated Array"+ beaconCountedCompleteList);
+                                        detectedCounter.setText("Assets Detected: " + beaconCounter);
+                                        manageScanTime();
+                                    }
+                                });
+                            }}.start();
+                    }});
+            }
         }
     }
 
