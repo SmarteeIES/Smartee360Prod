@@ -24,22 +24,25 @@
         android:requestLegacyExternalStorage="true"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.Light">
-        <activity android:name=".activity.AssetAllocationsActivity"></activity>
+        <activity
+            android:name=".activity.AssetAllocationsActivity"
+            android:screenOrientation="landscape"
+            ></activity>
         <activity android:name=".activity.AdminActivity" />
         <activity
             android:name=".activity.ScanConfirmActivity"
-            android:label="Smartee 360 Warehouse"
+            android:label="Smartee 360 Allocations"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".activity.ScanActivity"
-            android:label="Smartee 360 Warehouse"
+            android:label="Smartee 360 Allocations"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".activity.AuthActivity"
             android:exported="true"
-            android:label="Smartee 360 Warehouse"
+            android:label="Smartee 360 Allocations"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light"
