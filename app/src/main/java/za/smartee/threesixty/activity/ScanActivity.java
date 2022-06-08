@@ -70,6 +70,7 @@ public class ScanActivity extends BaseActivity {
     TextView infoText3;
     TextView infoHeader;
     Button doneButton;
+    Switch loadingSwitch;
 
     List<Map<String, String>> locationDetailInfo;
     ArrayList<String> locDdData = new ArrayList<String>();
@@ -88,11 +89,13 @@ public class ScanActivity extends BaseActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+      // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Log.i("S360Screen","ScanCreate");
         //Get the app user who initiatied the start of teh app
@@ -134,7 +137,7 @@ public class ScanActivity extends BaseActivity {
         loadingSwitch.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
-        loadingSwitch.setChecked(false);
+       // loadingSwitch.setChecked(false);
 
         //Alert Dialog for no network connection
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
@@ -220,6 +223,7 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onResume(){
         super.onResume();
+        Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
 
         Log.i("S360Screen","ScanResume");
 
@@ -239,6 +243,8 @@ public class ScanActivity extends BaseActivity {
                             spinner.setVisibility(View.GONE);
                             doneButton.setVisibility(View.INVISIBLE);
                             scanButton.setVisibility(View.VISIBLE);
+                            loadingSwitch.setVisibility(View.VISIBLE);
+
                         }
                     });
 
@@ -262,6 +268,7 @@ public class ScanActivity extends BaseActivity {
                             spinner.setVisibility(View.GONE);
                             doneButton.setVisibility(View.INVISIBLE);
                             scanButton.setVisibility(View.VISIBLE);
+                            loadingSwitch.setVisibility(View.VISIBLE);
                         }
                     });
                     Log.e("S360", "Observation failed.", failure);
@@ -292,6 +299,7 @@ public class ScanActivity extends BaseActivity {
                                     spinner.setVisibility(View.GONE);
                                     doneButton.setVisibility(View.INVISIBLE);
                                     scanButton.setVisibility(View.VISIBLE);
+                                    loadingSwitch.setVisibility(View.VISIBLE);
                                 }
                             });
                         }
@@ -305,6 +313,7 @@ public class ScanActivity extends BaseActivity {
                 spinner.setVisibility(View.GONE);
                 doneButton.setVisibility(View.INVISIBLE);
                 scanButton.setVisibility(View.VISIBLE);
+                loadingSwitch.setVisibility(View.VISIBLE);
 
             }
         }
@@ -319,6 +328,7 @@ public class ScanActivity extends BaseActivity {
                     spinner.setVisibility(View.GONE);
                     doneButton.setVisibility(View.INVISIBLE);
                     scanButton.setVisibility(View.VISIBLE);
+                    loadingSwitch.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -336,6 +346,7 @@ public class ScanActivity extends BaseActivity {
                     spinner.setVisibility(View.GONE);
                     doneButton.setVisibility(View.INVISIBLE);
                     scanButton.setVisibility(View.VISIBLE);
+                    loadingSwitch.setVisibility(View.VISIBLE);
                 }
             }.start();
         }
@@ -344,31 +355,31 @@ public class ScanActivity extends BaseActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
-        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
-        try {
-            Log.i("S360Screen","ScanDestroy");
-            Intent i = new Intent();
-            i.setAction("za.smartee.threeSixty");
-            if (scanCheckFlag){
-                i.putExtra("data","s360success");
-                Log.i("Msg","Intent success");
-            } else {
-                i.putExtra("data","s360failure");
-                Log.i("Msg","Intent failure");
-            }
-
-            sendBroadcast(i);
-            Log.i("Msg","Intent Sent");
-            finishAffinity();
-            ScanActivity.this.finish();
-            System.exit(0);
-        } catch (ActivityNotFoundException e){
-            Log.i("Msg","App Not Found");
-        }
-
-        finishAffinity();
-        ScanActivity.this.finish();
+//        Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
+//        Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
+//        try {
+//            Log.i("S360Screen","ScanDestroy");
+//            Intent i = new Intent();
+//            i.setAction("za.smartee.threeSixty");
+//            if (scanCheckFlag){
+//                i.putExtra("data","s360success");
+//                Log.i("Msg","Intent success");
+//            } else {
+//                i.putExtra("data","s360failure");
+//                Log.i("Msg","Intent failure");
+//            }
+//
+//            sendBroadcast(i);
+//            Log.i("Msg","Intent Sent");
+//            finishAffinity();
+//            ScanActivity.this.finish();
+//            System.exit(0);
+//        } catch (ActivityNotFoundException e){
+//            Log.i("Msg","App Not Found");
+//        }
+//
+//        finishAffinity();
+//        ScanActivity.this.finish();
     }
 
     public void onDonePressed() {

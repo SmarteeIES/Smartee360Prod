@@ -29,7 +29,7 @@ public class GuideActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.i("S360Screen","GuideCreate");
         ButterKnife.bind(this);
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {

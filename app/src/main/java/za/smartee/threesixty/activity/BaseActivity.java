@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.elvishew.xlog.XLog;
 
@@ -19,12 +20,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            Intent intent = new Intent(this, GuideActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return;
-        }
+//        if (savedInstanceState != null) {
+//            Intent intent = new Intent(this, AuthActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//            return;
+//        }
     }
 
     @Override

@@ -49,7 +49,7 @@ public class AuthActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
         TextView vCode = (TextView) findViewById(R.id.vCode);
@@ -114,6 +114,7 @@ public class AuthActivity extends BaseActivity {
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
+            Log.i("S360","Done Pressed " + donePressedFlag);
             try {
                 String appUser = getIntent().getStringExtra("appUser");
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
@@ -132,7 +133,9 @@ public class AuthActivity extends BaseActivity {
             String appLinkAction = appLinkIntent.getAction();
             Uri appLinkData = appLinkIntent.getData();
             //Determine if the app was started from VSc or manually
+            Log.i("S360","App Link Data " + appLinkData);
             if (appLinkData == null){
+                Log.i("S360","Applink Data null");
                 tve1.setVisibility(View.VISIBLE);
                 tv1.setVisibility(View.VISIBLE);
                 tv2.setVisibility(View.VISIBLE);
@@ -140,6 +143,7 @@ public class AuthActivity extends BaseActivity {
                 loginButton.setVisibility(View.VISIBLE);
                 userDD.setVisibility(View.VISIBLE);
             } else {
+                Log.i("S360","Applink Data NOT null");
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
                 iStart.putExtra("appUser",appLinkData.toString());
                 startActivity(iStart);
@@ -149,6 +153,7 @@ public class AuthActivity extends BaseActivity {
     }
 
     private void verifyuser(String text){
+        Log.i("S360", "Verify User");
         Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
         TextView textCheck = (EditText) findViewById(R.id.userCheck);
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
@@ -190,7 +195,7 @@ public class AuthActivity extends BaseActivity {
                 break;
             case "Smartee Admin":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.smarteeAdminCheck))){
-                    iStart.putExtra("appUser","Smartee Admin");
+                    iStart.putExtra("appUser","Smartee Admin - SR");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
