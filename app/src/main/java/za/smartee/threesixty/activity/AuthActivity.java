@@ -169,9 +169,9 @@ public class AuthActivity extends BaseActivity {
                     }
                 });
         switch (text) {
-            case "Spar Admin":
+            case "Spar Admin - SR":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparAdminCheck))){
-                    iStart.putExtra("appUser","Spar Admin");
+                    iStart.putExtra("appUser","Spar Admin - SR");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -193,7 +193,7 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Smartee Admin":
+            case "Smartee Admin - SR":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.smarteeAdminCheck))){
                     iStart.putExtra("appUser","Smartee Admin - SR");
                     startActivity(iStart);
@@ -217,9 +217,9 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Reverse Logistics":
+            case "Reverse Logistics - SR":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.reverseLogisticsCheck))){
-                    iStart.putExtra("appUser","Reverse Logistics");
+                    iStart.putExtra("appUser","Reverse Logistics - SR");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -229,9 +229,9 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Assets":
+            case "Assets - SR":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.assetsCheck))){
-                    iStart.putExtra("appUser","Assets");
+                    iStart.putExtra("appUser","Assets - SR");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
