@@ -24,11 +24,15 @@ android {
         warehouse {
             dimension "Spar"
             applicationId 'za.smartee.threeSixty.Warehouse'
+            versionCode 21
+            versionName "v1.0.0.27"
         }
 
         driver {
             dimension "Spar"
             applicationId 'za.smartee.threeSixty'
+            versionCode 20
+            versionName "v1.0.0.26"
         }
     }
 
