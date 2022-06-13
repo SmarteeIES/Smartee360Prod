@@ -651,6 +651,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                 if (locationDetailInfoSize == null) {
                                     locationDetailInfoSize = 0;
                                 }
+                                
 
                                 for (int r = 0; r < locationDetailInfoSize; r++) {
                                     locationInfoFlag = true;

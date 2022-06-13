@@ -15,6 +15,7 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.SignOutOptions;
 
+import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
 
 public class AdminActivity extends BaseActivity {
@@ -31,6 +32,8 @@ public class AdminActivity extends BaseActivity {
         tv1 = (TextView) findViewById(R.id.textView2);
         tv3 = (TextView) findViewById(R.id.textView4);
         TextView codeCheck = (EditText) findViewById(R.id.userCheck);
+        TextView vCode = (TextView) findViewById(R.id.vCode);
+        vCode.setText(BuildConfig.VERSION_NAME);
         Button loginButton = (Button) findViewById(R.id.signInButton);
         Button signOut = (Button) findViewById(R.id.signout);
         Button vscReturn = (Button) findViewById(R.id.returnVSC);
