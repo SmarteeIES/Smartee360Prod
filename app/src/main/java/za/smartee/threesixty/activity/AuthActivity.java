@@ -48,7 +48,6 @@ public class AuthActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
         TextView vCode = (TextView) findViewById(R.id.vCode);

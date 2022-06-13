@@ -133,6 +133,8 @@ public class ScanConfirmActivity extends BaseActivity{
     public static final int REQUEST_FINE_LOCATION = 3;
     LocationManager locationManager;
     LocationListener locationListener;
+    LocationListener networkLocationListener;
+    LocationListener gpsLocationListener;
     //Setup the device GPS variables
     final double[] devLat = new double[1];
     final double[] devLng = new double[1];
@@ -166,6 +168,7 @@ public class ScanConfirmActivity extends BaseActivity{
     public boolean networkConnectStatus;
     Integer scanCount;
     Integer saveCount;
+    Boolean locationFoundFlag = false;
 
 
     //Array list for the scanned data
@@ -209,7 +212,6 @@ public class ScanConfirmActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_confirm);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Log.i("S360Screen","ScanConfirmCreate");
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
@@ -220,6 +222,7 @@ public class ScanConfirmActivity extends BaseActivity{
         }
         scanCount = 0;
         saveCount = 0;
+        locationFoundFlag = false;
         btnScan = (Button) findViewById(R.id.btnScan);
         btnConfirm = (Button) findViewById(R.id.btnConfirm);
         btnScanCancel = (Button) findViewById(R.id.btnCancelScan);
@@ -512,37 +515,7 @@ public class ScanConfirmActivity extends BaseActivity{
         });
 
         //Setup location parameters
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                devLat[0] = location.getLatitude();
-                devLng[0] = location.getLongitude();
-                //locationManager.removeUpdates(this);
-            }
-            @Override
-            public void onProviderEnabled(@NonNull String provider) {
-                Log.i("location","provider");
-            }
-
-            @Override
-            public void onProviderDisabled(@NonNull String provider) {
-                Log.i("location","provider disabled");
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.i("location","status changed");
-            }
-        };
-
-
-        //Get the current GPS Location
-        if (ContextCompat.checkSelfPermission(ScanConfirmActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(ScanConfirmActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, locationListener);
-        }
+        getLocation();
 
         scanTime = Calendar.getInstance().getTime();
 
@@ -831,6 +804,91 @@ public class ScanConfirmActivity extends BaseActivity{
             final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
     };
+
+    private void getLocation(){
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Boolean hasGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        Boolean hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        final Location[] locationByGps = new Location[1];
+        final Location[] locationByNetwork = new Location[1];
+
+        gpsLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                locationByGps[0] = location;
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+                Log.i("location", "provider");
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+                Log.i("location", "provider disabled");
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("location", "status changed");
+            }
+        };
+        networkLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                locationByNetwork[0] = location;
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+                Log.i("location", "provider");
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+                Log.i("location", "provider disabled");
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("location", "status changed");
+            }
+        };
+
+        if (hasGPS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ScanConfirmActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, gpsLocationListener);
+        }
+        if (hasNetwork) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ScanConfirmActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0F, networkLocationListener);
+        }
+        Location lastKnownLocationByGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location lastKnownLocationByNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (lastKnownLocationByGPS != null && lastKnownLocationByNetwork != null){
+            if (lastKnownLocationByGPS.getAccuracy() < lastKnownLocationByNetwork.getAccuracy()){
+                devLat[0] = lastKnownLocationByGPS.getLatitude();
+                devLng[0] = lastKnownLocationByGPS.getLongitude();
+                locationFoundFlag = true;
+            }
+        }
+        else if (lastKnownLocationByNetwork != null) {
+            devLat[0] = lastKnownLocationByNetwork.getLatitude();
+            devLng[0] = lastKnownLocationByNetwork.getLongitude();
+            locationFoundFlag=true;
+
+        }
+        if (!locationFoundFlag) {
+            devLat[0] = 0;
+            devLng[0] = 0;
+        }
+    }
 
 }
 
