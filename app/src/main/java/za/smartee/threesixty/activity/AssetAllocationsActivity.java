@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.generated.model.Locations;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +26,10 @@ public class AssetAllocationsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_asset_allocations);
         String[][] testArray = {{"a","123"},{"bill","245"},{"test","246"}};
         updateButtonList(testArray);
+    }
+
+    public void readLocations(){
+        Amplify.DataStore.query(Locations.Class);
     }
 
     void updateButtonList(final String[][] contactsArray){
