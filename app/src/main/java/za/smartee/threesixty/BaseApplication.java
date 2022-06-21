@@ -15,6 +15,7 @@ import com.amplifyframework.datastore.DataStoreConfiguration;
 import com.amplifyframework.datastore.DataStoreConflictHandler;
 import com.amplifyframework.datastore.DataStoreException;
 import com.amplifyframework.datastore.generated.model.Assets;
+import com.amplifyframework.rx.RxAmplify;
 import com.elvishew.xlog.LogConfiguration;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
@@ -48,9 +49,9 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         try {
-            Amplify.addPlugin(new AWSApiPlugin());
-            Amplify.addPlugin(new AWSCognitoAuthPlugin());
-            Amplify.addPlugin(new AWSDataStorePlugin());
+            RxAmplify.addPlugin(new AWSApiPlugin());
+            RxAmplify.addPlugin(new AWSCognitoAuthPlugin());
+            RxAmplify.addPlugin(new AWSDataStorePlugin());
             DataStoreConfiguration config = null;
                 Log.i("S360","datastore setup");
                 config = DataStoreConfiguration.builder()

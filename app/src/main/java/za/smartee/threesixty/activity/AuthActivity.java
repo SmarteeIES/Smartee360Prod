@@ -103,6 +103,11 @@ public class AuthActivity extends BaseActivity {
                 //showSignIn();
             }
         });
+
+        Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
+        //iStart.putExtra("appUser",appUser);
+        startActivity(iStart);
+        AuthActivity.this.finish();
     }
 
     @Override
