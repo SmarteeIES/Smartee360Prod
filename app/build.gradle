@@ -34,6 +34,13 @@ android {
             versionCode 21
             versionName "v1.0.0.27"
         }
+
+        driverCognitoLogin {
+            dimension "Spar"
+            applicationId 'za.smartee.threeSixty.CognitoLogin'
+            versionCode 21
+            versionName "v1.0.1.27"
+        }
     }
 
     compileOptions {

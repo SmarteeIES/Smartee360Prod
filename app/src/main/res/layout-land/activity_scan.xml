@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="82dp"
+        android:layout_marginBottom="40dp"
         android:text="Scan Assets"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -127,7 +127,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="82dp"
+        android:layout_marginBottom="40dp"
         android:text="DONE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView" />
