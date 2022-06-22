@@ -53,12 +53,14 @@
         android:id="@+id/btnScan"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="140dp"
         android:text="Scan Assets"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/DONE"
+        app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 
     <ImageView
@@ -93,7 +95,8 @@
         android:id="@+id/switchLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="550dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:checked="true"
         android:scaleX="2"
@@ -105,6 +108,7 @@
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/btnScan"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="parent"
         tools:checked="true"
         tools:visibility="visible" />
 
@@ -123,7 +127,7 @@
         android:id="@+id/DONE"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="512dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="140dp"
         android:text="DONE"
         app:layout_constraintBottom_toBottomOf="parent"
