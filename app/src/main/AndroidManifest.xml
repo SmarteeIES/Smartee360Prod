@@ -28,14 +28,14 @@
         <activity android:name=".activity.AdminActivity"></activity>
         <activity
             android:name=".activity.ScanConfirmActivity"
-            android:label="Smartee 360 Warehouse"
+            android:label="Smartee 360 Demo"
             android:screenOrientation="locked"/>
 <!--            tools:ignore="LockedOrientationActivity" -->
 <!--            android:screenOrientation="portrait"-->
 
         <activity
             android:name=".activity.ScanActivity"
-            android:label="Smartee 360 Warehouse"
+            android:label="Smartee 360 Demo"
             tools:ignore="LockedOrientationActivity"
             android:screenOrientation="locked"
             />
@@ -46,7 +46,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.Light"
-            android:label="Smartee 360 Warehouse">
+            android:label="Smartee 360 Demo">
 <!--            tools:ignore="LockedOrientationActivity"-->
 <!--            android:screenOrientation="portrait"-->
             <intent-filter>

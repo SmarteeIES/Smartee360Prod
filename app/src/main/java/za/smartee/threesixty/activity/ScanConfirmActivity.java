@@ -410,7 +410,7 @@ public class ScanConfirmActivity extends BaseActivity {
 
         // Query the datastore to get the updated Locations and Asset Info
         Boolean finalLoadingChecked1 = loadingChecked;
-        company="Spar";
+
         Amplify.DataStore.query(Locations.class,
                 locResponse -> {
                     if (locResponse.hasNext()) {
@@ -482,7 +482,7 @@ public class ScanConfirmActivity extends BaseActivity {
         });
 
         //Check for the stop button pressed flag after a minimum of 90 seconds to stop the scanning process and display the confirm screen
-        scannerSetTime = (new Double(90000)).longValue();
+        scannerSetTime = (new Double(20000)).longValue();
         new CountDownTimer(scannerSetTime, 1000) {
             @RequiresApi(api = Build.VERSION_CODES.N)
             public void onTick(long millisUntilFinished) {
@@ -696,7 +696,6 @@ public class ScanConfirmActivity extends BaseActivity {
         TextView missingLoc = (TextView) findViewById(R.id.textViewMissingLocation);
         missingLoc.setVisibility(View.INVISIBLE);
 
-
         spinner.setVisibility(View.VISIBLE);
         TextView infoHeader = (TextView) findViewById(R.id.infoHeader);
         infoHeader.setText("Processing Data");
@@ -719,7 +718,7 @@ public class ScanConfirmActivity extends BaseActivity {
                 case "Reverse Logistics - SR":
                 case "Spar Admin - SR":
                 case "Smartee Admin - SR":
-                    text = "Spar Southrand DC";
+                    text = "Southrand DC";
                     break;
                 case "Assets - NR":
                 case "Reverse Logistics - NR":
@@ -782,13 +781,12 @@ public class ScanConfirmActivity extends BaseActivity {
                     }
                 }
             }
-            Map<String, String> devDataDetailItems = new HashMap<String, String>();
-
-            devDataDetailItems.put("devMac", devData.get(t));
-            devDataDetailItems.put("maxRssi",maxRssi.toString());
-            devDataDetailItems.put("minRssi",minRssi.toString());
-            devDataDetailItems.put("avgRssi",String.valueOf(rssiSum/counter));
-            devDataDetail.add(devDataDetailItems);
+                Map<String, String> devDataDetailItems = new HashMap<String, String>();
+                devDataDetailItems.put("devMac", devData.get(t));
+                devDataDetailItems.put("maxRssi", maxRssi.toString());
+                devDataDetailItems.put("minRssi", minRssi.toString());
+                devDataDetailItems.put("avgRssi", String.valueOf(rssiSum / counter));
+                devDataDetail.add(devDataDetailItems);
         }
 
         //Compare the scanned devices to the database and if found update
@@ -806,59 +804,63 @@ public class ScanConfirmActivity extends BaseActivity {
                                     avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
                                 }
                             }
+                            if (avgRssiCap > -65){
 
                             if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
-                            } else {
-                                numberNewAssets++;
-                                Assets AssetItem = Assets.builder()
-                                        .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
-                                        .assetName(assetDetailInfo.get(m).get("assetName"))
-                                        .assetId(devData.get(z))
-                                        .macAddress(devData.get(z))
-                                        .locationId(selectedLocID)
-                                        .latitude(Double.parseDouble(selectedLatitude))
-                                        .longitude(Double.parseDouble(selectedLongitude))
-                                        .owner(company)
-                                        .id(assetDetailInfo.get(m).get("systemID"))
+                            }
+                            //Threshold of -65 to consider a valid scan
+                            else  {
+                                    numberNewAssets++;
+                                    Assets AssetItem = Assets.builder()
+                                            .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
+                                            .assetName(assetDetailInfo.get(m).get("assetName"))
+                                            .assetId(devData.get(z))
+                                            .macAddress(devData.get(z))
+                                            .locationId(selectedLocID)
+                                            .latitude(Double.parseDouble(selectedLatitude))
+                                            .longitude(Double.parseDouble(selectedLongitude))
+                                            .owner(company)
+                                            .id(assetDetailInfo.get(m).get("systemID"))
+                                            .rssiAvg(avgRssiCap)
+                                            .rssiMax(maxRssiCap)
+                                            .rssiMin(minRssiCap)
+                                            .locationName(text)
+                                            .serviceId(String.valueOf(scanTime))
+                                            .build();
+
+                                    Amplify.DataStore.save(AssetItem,
+                                            result -> {
+                                                Log.i("S360", "Created a new post successfully");
+                                                scanCount++;
+                                            },
+                                            error -> Log.e("S360Assets", "Error creating post", error)
+                                    );
+                                    //Mutation Update end
+                                }
+                                AuditLog auditItems = AuditLog.builder()
+                                        .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
+                                        .confirmTime(String.valueOf(confirmTime))
+                                        .device(devData.get(z))
+                                        .deviceLatitude(devLat[0])
+                                        .deviceLongitude(devLng[0])
+                                        .scanTime(String.valueOf(scanTime))
+                                        .storeName(calculatedLoc)
+                                        .user(appUser)
+                                        .selectedStoreName(selectedLocID)
                                         .rssiAvg(avgRssiCap)
                                         .rssiMax(maxRssiCap)
                                         .rssiMin(minRssiCap)
-                                        .locationName(text)
-                                        .serviceId(String.valueOf(scanTime))
+                                        .owner(company)
                                         .build();
 
-                                Amplify.DataStore.save(AssetItem,
+                                Amplify.DataStore.save(auditItems,
                                         result -> {
                                             Log.i("S360", "Created a new post successfully");
                                             scanCount++;
                                         },
-                                        error -> Log.e("S360Assets",  "Error creating post", error)
+                                        error -> Log.e("S360", "Error creating post", error)
                                 );
-                                //Mutation Update end
                             }
-                            AuditLog auditItems = AuditLog.builder()
-                                    .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
-                                    .confirmTime(String.valueOf(confirmTime))
-                                    .device(devData.get(z))
-                                    .deviceLatitude(devLat[0])
-                                    .deviceLongitude(devLng[0])
-                                    .scanTime(String.valueOf(scanTime))
-                                    .storeName(calculatedLoc)
-                                    .user(appUser)
-                                    .selectedStoreName(selectedLocID)
-                                    .rssiAvg(avgRssiCap)
-                                    .rssiMax(maxRssiCap)
-                                    .rssiMin(minRssiCap)
-                                    .owner(company)
-                                    .build();
-
-                            Amplify.DataStore.save(auditItems,
-                                    result -> {
-                                        Log.i("S360", "Created a new post successfully");
-                                        scanCount++;
-                                    },
-                                    error -> Log.e("S360",  "Error creating post", error)
-                            );
                         }
                     }
                 }
@@ -1130,12 +1132,14 @@ public class ScanConfirmActivity extends BaseActivity {
                         }
                     }
                 }
-                if (devData2Flag){
-                    Map<String, String> tempScanInfo = new HashMap<String, String>();
-                    tempScanInfo.put("devMac", String.valueOf(devData.get(t)));
-                    tempScanInfo.put("rssi", String.valueOf(String.valueOf(rssiSum/counter)));
-                    tempDevData2.add(tempScanInfo);
-                }
+
+                    if (devData2Flag) {
+                        Map<String, String> tempScanInfo = new HashMap<String, String>();
+                        tempScanInfo.put("devMac", String.valueOf(devData.get(t)));
+                        tempScanInfo.put("rssi", String.valueOf(String.valueOf(rssiSum / counter)));
+                        tempDevData2.add(tempScanInfo);
+                    }
+
                 devData2Flag=false;
             }
             devData2.clear();

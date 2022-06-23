@@ -23,7 +23,7 @@ android {
     productFlavors {
         warehouse {
             dimension "Spar"
-            applicationId 'za.smartee.threeSixty.Warehouse'
+            applicationId 'za.smartee.threeSixty.Demo'
             versionCode 21
             versionName "v1.0.0.27"
         }
