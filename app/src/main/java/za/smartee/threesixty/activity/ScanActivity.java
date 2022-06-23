@@ -129,7 +129,7 @@ public class ScanActivity extends BaseActivity {
         doneButton = (Button) findViewById(R.id.DONE);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
         TextView vCode = (TextView) findViewById(R.id.vCode);
-        vCode.setText(BuildConfig.VERSION_NAME);
+        vCode.setText(BuildConfig.VERSION_NAME+"_1");
         loadingSwitch.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
