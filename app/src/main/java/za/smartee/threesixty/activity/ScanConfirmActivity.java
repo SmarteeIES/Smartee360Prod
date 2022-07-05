@@ -718,7 +718,7 @@ public class ScanConfirmActivity extends BaseActivity {
                 case "Reverse Logistics - SR":
                 case "Spar Admin - SR":
                 case "Smartee Admin - SR":
-                    text = "Southrand DC";
+                    text = "South Rand DC";
                     break;
                 case "Assets - NR":
                 case "Reverse Logistics - NR":
@@ -804,7 +804,7 @@ public class ScanConfirmActivity extends BaseActivity {
                                     avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
                                 }
                             }
-                            if (avgRssiCap > -65){
+                       //     if (avgRssiCap > -65){
 
                             if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
                             }
@@ -860,7 +860,7 @@ public class ScanConfirmActivity extends BaseActivity {
                                         },
                                         error -> Log.e("S360", "Error creating post", error)
                                 );
-                            }
+                   //         }
                         }
                     }
                 }
