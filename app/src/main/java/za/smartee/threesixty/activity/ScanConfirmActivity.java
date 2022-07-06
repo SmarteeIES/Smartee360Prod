@@ -731,7 +731,7 @@ public class ScanConfirmActivity extends BaseActivity {
                 case "Reverse Logistics - Gilbeys":
                 case "Spar Admin - Gilbeys":
                 case "Smartee Admin - Gilbeys":
-                    text = "Gilbeys";
+                    text = "Gilbeys Satellite DC";
                     break;
             }
         }

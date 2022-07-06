@@ -169,9 +169,9 @@ public class AuthActivity extends BaseActivity {
                     }
                 });
         switch (text) {
-            case "Spar Admin - SR":
+            case "Spar Admin - Gilbeys":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparAdminCheck))){
-                    iStart.putExtra("appUser","Spar Admin - SR");
+                    iStart.putExtra("appUser","Spar Admin - Gilbeys");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -193,9 +193,9 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Smartee Admin - SR":
+            case "Smartee Admin - Gilbeys":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.smarteeAdminCheck))){
-                    iStart.putExtra("appUser","Smartee Admin - SR");
+                    iStart.putExtra("appUser","Smartee Admin - Gilbeys");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -217,9 +217,9 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Reverse Logistics - SR":
+            case "Reverse Logistics - Gilbeys":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.reverseLogisticsCheck))){
-                    iStart.putExtra("appUser","Reverse Logistics - SR");
+                    iStart.putExtra("appUser","Reverse Logistics - Gilbeys");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -229,9 +229,9 @@ public class AuthActivity extends BaseActivity {
                     });
                 }
                 break;
-            case "Assets - SR":
+            case "Assets - Gilbeys":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.assetsCheck))){
-                    iStart.putExtra("appUser","Assets - SR");
+                    iStart.putExtra("appUser","Assets - Gilbeys");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
