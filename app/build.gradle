@@ -38,8 +38,8 @@ android {
         assetAllocations {
             dimension "Spar"
             applicationId 'za.smartee.threeSixty.AssetAllocations'
-            versionCode 21
-            versionName "v1.0.0.27"
+            versionCode 22
+            versionName "v1.0.0.28"
         }
     }
 

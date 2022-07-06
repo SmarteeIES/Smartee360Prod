@@ -1,10 +1,12 @@
 package za.smartee.threesixty.activity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +29,7 @@ import com.amplifyframework.rx.RxAmplify;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -218,6 +221,7 @@ public class AssetAllocationsActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     void queryDbCreateViews(){
         locationDetailInfo = new ArrayList<Map<String, String>>();
         RxAmplify.DataStore.query(Locations.class)
@@ -226,8 +230,7 @@ public class AssetAllocationsActivity extends AppCompatActivity {
                 .doOnComplete(() -> {
                     Log.i("S360", String.valueOf(locationDetailInfo));
                     queryAssets();
-             
-
+                    locationDetailInfo.sort((o1, o2) -> o1.get("Address").compareTo(o2.get("Address")));
                     createButtonList(locationDetailInfo);
                 })
                 .subscribe(
