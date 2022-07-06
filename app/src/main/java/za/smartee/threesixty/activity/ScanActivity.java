@@ -118,7 +118,7 @@ public class ScanActivity extends BaseActivity {
                 .setDisplay(Display.DIALOG)
                 .setUpdateFrom(UpdateFrom.JSON)
                 .setCancelable(false)
-                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-warehouse.json");
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-warehouseGilbeys.json");
         appUpdater.start();
         Log.i("VCheck","ProdAutoUpdatev6");
 
