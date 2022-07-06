@@ -26,6 +26,9 @@ import com.amplifyframework.datastore.generated.model.AuditLog;
 import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.datastore.generated.model.ScannedAssetsAuditLog;
 import com.amplifyframework.rx.RxAmplify;
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.Display;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,6 +66,15 @@ public class AssetAllocationsActivity extends AppCompatActivity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_asset_allocations);
+
+        //Auto Update Check
+        AppUpdater appUpdater = new AppUpdater(this)
+                .setDisplay(Display.DIALOG)
+                .setUpdateFrom(UpdateFrom.JSON)
+                .setCancelable(false)
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelogAssetAllocations.json");
+        appUpdater.start();
+        Log.i("VCheck","ProdAutoUpdatev6");
 
         //counters to track rows and columns for store selection buttons
         rowCounter = 0;
