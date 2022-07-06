@@ -224,7 +224,10 @@ public class AssetAllocationsActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete(() -> {
+                    Log.i("S360", String.valueOf(locationDetailInfo));
                     queryAssets();
+             
+
                     createButtonList(locationDetailInfo);
                 })
                 .subscribe(
