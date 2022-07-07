@@ -715,11 +715,11 @@ public class ScanConfirmActivity extends BaseActivity {
             Log.i("S360","Loading Checked Username - " + appUser);
             //text = locDD.getSelectedItem().toString();
             switch (appUser) {
-                case "Assets - SR":
-                case "Reverse Logistics - SR":
-                case "Spar Admin - SR":
-                case "Smartee Admin - SR":
-                    text = "Spar Southrand DC";
+                case "Assets - Lowveld DC":
+                case "Reverse Logistics - Lowveld DC":
+                case "Spar Admin - Lowveld DC":
+                case "Smartee Admin - Lowveld DC":
+                    text = "Lowveld DC";
                     break;
                 case "Assets - NR":
                 case "Reverse Logistics - NR":
