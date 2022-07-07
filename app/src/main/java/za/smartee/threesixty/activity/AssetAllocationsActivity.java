@@ -60,6 +60,7 @@ public class AssetAllocationsActivity extends AppCompatActivity {
     ListView allocationList;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
