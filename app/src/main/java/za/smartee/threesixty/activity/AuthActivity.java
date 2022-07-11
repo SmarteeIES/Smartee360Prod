@@ -74,6 +74,7 @@ public class AuthActivity extends BaseActivity {
                     switch (userStateDetails.getUserState()) {
                         case SIGNED_IN:
                             Intent i = new Intent(AuthActivity.this, GuideActivity.class);
+                            i.putExtra("appUser", Amplify.Auth.getCurrentUser().getUsername());
                             startActivity(i);
                             break;
                         case SIGNED_OUT:
@@ -101,12 +102,13 @@ public class AuthActivity extends BaseActivity {
 
                     @Override
                     public void onResult(UserStateDetails userStateDetails) {
-                        Log.i("TAG", userStateDetails.getUserState().toString());
+                        Log.i("TAG", Amplify.Auth.getCurrentUser().getUsername());
 
 
                         switch (userStateDetails.getUserState()) {
                             case SIGNED_IN:
                                 Intent i = new Intent(AuthActivity.this, GuideActivity.class);
+                                i.putExtra("appUser", Amplify.Auth.getCurrentUser().getUsername());
                                 startActivity(i);
                                 break;
                             case SIGNED_OUT:
