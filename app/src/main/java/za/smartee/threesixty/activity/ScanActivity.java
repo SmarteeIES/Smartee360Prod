@@ -49,11 +49,23 @@ import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.datastore.syncengine.PendingMutation;
 import com.amplifyframework.hub.HubChannel;
 import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.AppUpdaterUtils;
+import com.github.javiersantos.appupdater.enums.AppUpdaterError;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.github.javiersantos.appupdater.objects.Update;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,12 +122,38 @@ public class ScanActivity extends BaseActivity {
 
 
         //Auto Update Check
-        AppUpdater appUpdater = new AppUpdater(this)
-                .setDisplay(Display.DIALOG)
+//        AppUpdater appUpdater = new AppUpdater(this)
+//                .setDisplay(Display.DIALOG)
+//                .setUpdateFrom(UpdateFrom.JSON)
+//                .setCancelable(false)
+//                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json");
+//        appUpdater.start();
+
+        AppUpdaterUtils appUpdaterUtils = new AppUpdaterUtils(this)
                 .setUpdateFrom(UpdateFrom.JSON)
-                .setCancelable(false)
-                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json");
-        appUpdater.start();
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json")
+                .withListener(new AppUpdaterUtils.UpdateListener() {
+                    @Override
+                    public void onSuccess(Update update, Boolean isUpdateAvailable) {
+                        Log.d("Latest Version", update.getLatestVersion());
+                        Log.d("Latest Version Code", String.valueOf(update.getLatestVersionCode()));
+                        Log.d("Release notes", update.getReleaseNotes());
+                        Log.d("URL", String.valueOf(update.getUrlToDownload()));
+                        Log.d("Is update available?", Boolean.toString(isUpdateAvailable));
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        String DownloadUrl = "http://myexample.com/android/";
+                        String fileName = "myclock_db.db";
+                        DownloadDatabase(DownloadUrl,fileName);
+                        intent.setDataAndType(Uri.parse("file://" + appFilelocation.toString()), "application/vnd.android.package-archive");
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailed(AppUpdaterError error) {
+                        Log.d("AppUpdater Error", "Something went wrong");
+                    }
+                });
+        appUpdaterUtils.start();
         Log.i("VCheck","ProdAutoUpdatev6");
 
 
@@ -473,4 +511,57 @@ public class ScanActivity extends BaseActivity {
             final boolean unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
     };
-}
+
+
+
+    // and the method is
+
+    public void DownloadDatabase(String DownloadUrl, String fileName) {
+        try {
+            File root = android.os.Environment.getExternalStorageDirectory();
+            File dir = new File(root.getAbsolutePath() + "/myclock/databases");
+            if (dir.exists() == false) {
+                dir.mkdirs();
+            }
+
+            URL url = new URL("http://myexample.com/android/yourfilename.txt");
+            File file = new File(dir, fileName);
+
+            long startTime = System.currentTimeMillis();
+            Log.d("DownloadManager", "download url:" + url);
+            Log.d("DownloadManager", "download file name:" + fileName);
+
+            URLConnection uconn = url.openConnection();
+            uconn.setReadTimeout(TIMEOUT_CONNECTION);
+            uconn.setConnectTimeout(TIMEOUT_SOCKET);
+
+            InputStream is = uconn.getInputStream();
+            BufferedInputStream bufferinstream = new BufferedInputStream(is);
+
+            ByteArrayBuffer baf = new ByteArrayBuffer(5000);
+            int current = 0;
+            while ((current = bufferinstream.read()) != -1) {
+                baf.append((byte) current);
+            }
+
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(baf.toByteArray());
+            fos.flush();
+            fos.close();
+            Log.d("DownloadManager", "download ready in" + ((System.currentTimeMillis() - startTime) / 1000) + "sec");
+            int dotindex = fileName.lastIndexOf('.');
+            if (dotindex >= 0) {
+                fileName = fileName.substring(0, dotindex);
+
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    }
