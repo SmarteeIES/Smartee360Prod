@@ -756,6 +756,7 @@ public class ScanConfirmActivity extends BaseActivity{
         locDdData.clear();
         devData2.clear();
         devDataDetail.clear();
+        missingLocFlag = false;
         TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
         selectedLocation.setText("Select Location");
         calculatedLoc = "";

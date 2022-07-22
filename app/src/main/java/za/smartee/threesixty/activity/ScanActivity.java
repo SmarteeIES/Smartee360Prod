@@ -4,27 +4,40 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.StrictMode;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -74,7 +87,7 @@ import java.util.concurrent.TimeUnit;
 import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
 
-public class ScanActivity extends BaseActivity {
+public class ScanActivity extends BaseActivity{
     Button scanButton;
     Button signOutButton;
     TextView infoText1;
@@ -96,6 +109,14 @@ public class ScanActivity extends BaseActivity {
     Long waitSetTime;
     public Boolean mutationCompleteFlag = false;
     public Boolean processingFlag = false;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    LocationListener networkLocationListener;
+    LocationListener gpsLocationListener;
+    //Setup the device GPS variables
+    final double[] devLat = new double[1];
+    final double[] devLng = new double[1];
+    Boolean locationFoundFlag = false;
 
 
 
@@ -119,6 +140,7 @@ public class ScanActivity extends BaseActivity {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(ConnectivityManager.class);
         connectivityManager.requestNetwork(networkRequest, networkCallback);
+        getLocation();
 
 
         //Auto Update Check
@@ -131,21 +153,19 @@ public class ScanActivity extends BaseActivity {
 
         AppUpdaterUtils appUpdaterUtils = new AppUpdaterUtils(this)
                 .setUpdateFrom(UpdateFrom.JSON)
-                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json")
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json")
                 .withListener(new AppUpdaterUtils.UpdateListener() {
                     @Override
                     public void onSuccess(Update update, Boolean isUpdateAvailable) {
-                        Log.d("Latest Version", update.getLatestVersion());
-                        Log.d("Latest Version Code", String.valueOf(update.getLatestVersionCode()));
-                        Log.d("Release notes", update.getReleaseNotes());
-                        Log.d("URL", String.valueOf(update.getUrlToDownload()));
-                        Log.d("Is update available?", Boolean.toString(isUpdateAvailable));
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        String DownloadUrl = "http://myexample.com/android/";
-                        String fileName = "myclock_db.db";
-                        DownloadDatabase(DownloadUrl,fileName);
-                        intent.setDataAndType(Uri.parse("file://" + appFilelocation.toString()), "application/vnd.android.package-archive");
-                        startActivity(intent);
+//                        Log.d("Latest Version", update.getLatestVersion());
+//                        Log.d("Latest Version Code", String.valueOf(update.getLatestVersionCode()));
+//                        Log.d("Release notes", update.getReleaseNotes());
+//                        Log.d("URL", String.valueOf(update.getUrlToDownload()));
+//                        Log.d("Is update available?", Boolean.toString(isUpdateAvailable));
+                        if (isUpdateAvailable) {
+                            new DownloadFileFromURL().execute(String.valueOf(update.getUrlToDownload()));
+                        }
+
                     }
 
                     @Override
@@ -167,7 +187,7 @@ public class ScanActivity extends BaseActivity {
         doneButton = (Button) findViewById(R.id.DONE);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
         TextView vCode = (TextView) findViewById(R.id.vCode);
-        vCode.setText(BuildConfig.VERSION_NAME+"_1");
+        vCode.setText(BuildConfig.VERSION_NAME+"_2");
         loadingSwitch.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         doneButton.setVisibility(View.INVISIBLE);
@@ -514,54 +534,196 @@ public class ScanActivity extends BaseActivity {
 
 
 
-    // and the method is
+    class DownloadFileFromURL extends AsyncTask<String, String, String> {
+        ProgressDialog pd;
+        String pathFolder = "";
+        String pathFile = "";
 
-    public void DownloadDatabase(String DownloadUrl, String fileName) {
-        try {
-            File root = android.os.Environment.getExternalStorageDirectory();
-            File dir = new File(root.getAbsolutePath() + "/myclock/databases");
-            if (dir.exists() == false) {
-                dir.mkdirs();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(ScanActivity.this);
+            pd.setTitle("Update Downloading...");
+            pd.setMessage("Please wait.");
+            pd.setMax(100);
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setCancelable(true);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... f_url) {
+            int count;
+
+            try {
+//                pathFolder = Environment.getExternalStorageDirectory() + "/YourAppDataFolder";
+                pathFolder = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+                pathFile = pathFolder + "/s360auto.apk";
+                File futureStudioIconFile = new File(pathFolder);
+                if (!futureStudioIconFile.exists()) {
+                    futureStudioIconFile.mkdirs();
+                }
+
+                File apkFileName = new File(pathFile);
+                if (apkFileName.exists()){
+                    File file = new File(pathFolder, "s360auto.apk");
+                    boolean deleted = file.delete();
+                }
+
+                URL url = new URL(f_url[0]);
+                URLConnection connection = url.openConnection();
+                connection.connect();
+
+                // this will be useful so that you can show a tipical 0-100%
+                // progress bar
+                int lengthOfFile = connection.getContentLength();
+
+                // download the file
+                InputStream input = new BufferedInputStream(url.openStream());
+                FileOutputStream output = new FileOutputStream(pathFile);
+
+                byte data[] = new byte[1024]; //anybody know what 1024 means ?
+                long total = 0;
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    // publishing the progress....
+                    // After this onProgressUpdate will be called
+                    publishProgress("" + (int) ((total * 100) / lengthOfFile));
+
+                    // writing data to file
+                    output.write(data, 0, count);
+                }
+
+                // flushing output
+                output.flush();
+
+                // closing streams
+                output.close();
+                input.close();
+
+
+            } catch (Exception e) {
+                Log.e("Error: ", e.getMessage());
             }
 
-            URL url = new URL("http://myexample.com/android/yourfilename.txt");
-            File file = new File(dir, fileName);
+            return pathFile;
+        }
 
-            long startTime = System.currentTimeMillis();
-            Log.d("DownloadManager", "download url:" + url);
-            Log.d("DownloadManager", "download file name:" + fileName);
+        protected void onProgressUpdate(String... progress) {
+            // setting progress percentage
+            pd.setProgress(Integer.parseInt(progress[0]));
+        }
 
-            URLConnection uconn = url.openConnection();
-            uconn.setReadTimeout(TIMEOUT_CONNECTION);
-            uconn.setConnectTimeout(TIMEOUT_SOCKET);
+        @Override
+        protected void onPostExecute(String file_url) {
+            if (pd != null) {
+                pd.dismiss();
+            }
+            File toInstall = new File(file_url);
+            Intent intent;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Uri apkUri = FileProvider.getUriForFile(ScanActivity.this, "za.smartee.threeSixty", toInstall);
+                intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                intent.setData(apkUri);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Log.i("S360","Veriosn N");
+            } else {
+                Uri apkUri = Uri.fromFile(toInstall);
+                intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Log.i("S360","Veriosn < N");
+            }
+            ScanActivity.this.startActivity(intent);
+        }
 
-            InputStream is = uconn.getInputStream();
-            BufferedInputStream bufferinstream = new BufferedInputStream(is);
+        }
 
-            ByteArrayBuffer baf = new ByteArrayBuffer(5000);
-            int current = 0;
-            while ((current = bufferinstream.read()) != -1) {
-                baf.append((byte) current);
+    private void getLocation(){
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Boolean hasGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        Boolean hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        final Location[] locationByGps = new Location[1];
+        final Location[] locationByNetwork = new Location[1];
+
+        gpsLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                locationByGps[0] = location;
             }
 
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(baf.toByteArray());
-            fos.flush();
-            fos.close();
-            Log.d("DownloadManager", "download ready in" + ((System.currentTimeMillis() - startTime) / 1000) + "sec");
-            int dotindex = fileName.lastIndexOf('.');
-            if (dotindex >= 0) {
-                fileName = fileName.substring(0, dotindex);
-
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+                Log.i("location", "provider");
             }
 
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+                Log.i("location", "provider disabled");
+            }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("location", "status changed");
+            }
+        };
+        networkLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                locationByNetwork[0] = location;
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+                Log.i("location", "provider");
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+                Log.i("location", "provider disabled");
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("location", "status changed");
+            }
+        };
+
+
+
+        if (hasGPS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ScanActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0F, gpsLocationListener);
+        }
+        if (hasNetwork) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ScanActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0F, networkLocationListener);
+        }
+        Location lastKnownLocationByGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location lastKnownLocationByNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (lastKnownLocationByGPS != null && lastKnownLocationByNetwork != null){
+            if (lastKnownLocationByGPS.getAccuracy() < lastKnownLocationByNetwork.getAccuracy()){
+                devLat[0] = lastKnownLocationByGPS.getLatitude();
+                devLng[0] = lastKnownLocationByGPS.getLongitude();
+                locationFoundFlag = true;
+            }
+        }
+        else if (lastKnownLocationByNetwork != null) {
+            devLat[0] = lastKnownLocationByNetwork.getLatitude();
+            devLng[0] = lastKnownLocationByNetwork.getLongitude();
+            locationFoundFlag=true;
+
+        }
+        if (!locationFoundFlag) {
+            devLat[0] = 0;
+            devLng[0] = 0;
         }
     }
     }

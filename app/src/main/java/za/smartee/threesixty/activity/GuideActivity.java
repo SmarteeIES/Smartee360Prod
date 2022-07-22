@@ -18,6 +18,7 @@ import za.smartee.threesixty.AppConstants;
 import za.smartee.threesixty.R;
 import za.smartee.threesixty.utils.Utils;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import butterknife.ButterKnife;
 
@@ -25,6 +26,7 @@ import butterknife.ButterKnife;
 
 public class GuideActivity extends BaseActivity {
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class GuideActivity extends BaseActivity {
                 return;
             }
         }
+
         delayGotoMain();
     }
 
