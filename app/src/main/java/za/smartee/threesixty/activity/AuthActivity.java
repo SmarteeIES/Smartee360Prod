@@ -1,18 +1,13 @@
 package za.smartee.threesixty.activity;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -32,7 +27,7 @@ import java.util.ArrayList;
 import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
 
-public class AuthActivity extends BaseActivity {
+public class AuthActivity extends BaseActivity{
     TextView tv1;
     TextView tv2;
     TextView tv3;
@@ -48,7 +43,7 @@ public class AuthActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        Log.i("S360Screen","AuthCreate");
+        //Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
         TextView vCode = (TextView) findViewById(R.id.vCode);
         vCode.setText(BuildConfig.VERSION_NAME+"_1");
@@ -108,7 +103,7 @@ public class AuthActivity extends BaseActivity {
         super.onResume();
         Button loginButton = (Button) findViewById(R.id.signInButton);
         Spinner userDD = (Spinner) findViewById(R.id.userSpinner);
-        Log.i("S360Screen","Auth Resume");
+        //Log.i("S360Screen","Auth Resume");
         Boolean donePressedFlag = getIntent().getBooleanExtra("donePressedFlag",false);
         Boolean scanCheckFlag = getIntent().getBooleanExtra("scanCheckFlag",false);
         if (donePressedFlag) {
@@ -120,6 +115,7 @@ public class AuthActivity extends BaseActivity {
                 }
                 else {
                     i.putExtra("data","s360failure");
+
                 }
                 sendBroadcast(i);
                 Log.i("Msg","Intent Sent");
@@ -129,14 +125,17 @@ public class AuthActivity extends BaseActivity {
             } catch (ActivityNotFoundException e){
                 Log.i("Msg","App Not Found");
             }
-
-
         } else {
             Log.i("S360","VSC Login");
             // ATTENTION: This was auto-generated to handle app links.
             Intent appLinkIntent = getIntent();
             String appLinkAction = appLinkIntent.getAction();
             Uri appLinkData = appLinkIntent.getData();
+            String vscData = appLinkIntent.getDataString();
+            Bundle vscData2 = appLinkIntent.getExtras();
+
+
+
             //Determine if the app was started from VSc or manually
             if (appLinkData == null){
                 tve1.setVisibility(View.VISIBLE);
@@ -147,6 +146,9 @@ public class AuthActivity extends BaseActivity {
                 userDD.setVisibility(View.VISIBLE);
             } else {
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
+                Log.i("S360_VSCDataReceived",appLinkData.toString());
+                Log.i("S360_VSCDataString",vscData);
+                Log.i("S360_VSCDataBundle", String.valueOf(vscData2));
                 iStart.putExtra("appUser",appLinkData.toString());
                 startActivity(iStart);
                 AuthActivity.this.finish();

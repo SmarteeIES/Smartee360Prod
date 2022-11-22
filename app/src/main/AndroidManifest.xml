@@ -131,6 +131,7 @@
 <!--        </provider>-->
 
         <service android:name=".service.DfuService" />
+
     </application>
 
 </manifest>

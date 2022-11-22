@@ -1,6 +1,7 @@
 package za.smartee.threesixty.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -54,4 +55,5 @@ public class BaseActivity extends AppCompatActivity {
     public boolean isLocationPermissionOpen() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
+
 }
