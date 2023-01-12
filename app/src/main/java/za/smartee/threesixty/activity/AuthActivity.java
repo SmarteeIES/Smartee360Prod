@@ -21,8 +21,11 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.SignInUIOptions;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
@@ -131,25 +134,56 @@ public class AuthActivity extends BaseActivity{
             Intent appLinkIntent = getIntent();
             String appLinkAction = appLinkIntent.getAction();
             Uri appLinkData = appLinkIntent.getData();
-            String vscData = appLinkIntent.getDataString();
+
+            //Temporarily replaced to simulate string
+            //String vscData = appLinkIntent.getDataString();
+            String vscData = "integration://s360vsc#{%22user_name%22:%22Driver%20Test%22,%22customers%22:[{%22account_number%22:%2221672%22,%22account_name%22:%22TOPS%205%20STAR%22,%22location%22:%22null,null%22}]}";
             Bundle vscData2 = appLinkIntent.getExtras();
+            String vscDataModified;
 
 
 
             //Determine if the app was started from VSc or manually
-            if (appLinkData == null){
+
+            //Temporarilty changed to not null for simulation
+            //if (appLinkData == null){
+            if (appLinkData != null){
                 tve1.setVisibility(View.VISIBLE);
                 tv1.setVisibility(View.VISIBLE);
                 tv2.setVisibility(View.VISIBLE);
                 tv3.setVisibility(View.VISIBLE);
                 loginButton.setVisibility(View.VISIBLE);
+
                 userDD.setVisibility(View.VISIBLE);
             } else {
                 Intent iStart = new Intent(AuthActivity.this, GuideActivity.class);
-                Log.i("S360_VSCDataReceived",appLinkData.toString());
                 Log.i("S360_VSCDataString",vscData);
-                Log.i("S360_VSCDataBundle", String.valueOf(vscData2));
-                iStart.putExtra("appUser",appLinkData.toString());
+
+                //Remove the formatting errors from integration
+                vscDataModified = vscData.replace("%22","\"");
+                vscDataModified = vscDataModified.replace("%20"," ");
+                //Split the integration source from payload data
+                String [] vscDataSplit = vscDataModified.split("#");
+
+
+
+                ArrayList<String> list = new ArrayList<>(Arrays.asList(vscDataSplit));
+                String payloadString = String.valueOf(vscDataSplit[1]);
+                Log.i("SMInPLString",payloadString);
+                String [] payloadArray = payloadString.split("\"customers\":");
+                String customerData = payloadArray[1].replace("[","");
+                customerData = customerData.replace("]}","");
+
+                //Covert to Has object
+                HashMap<String, String> map = new Gson().fromJson(payloadString, HashMap.class);
+                String userName = map.get("user_name");
+
+                HashMap<String, String> customerMap = new Gson().fromJson(customerData, HashMap.class);
+                String storeName = customerMap.get("account_name");
+
+                Log.i("SMInUser",userName);
+                Log.i("SMInAccount",storeName);
+
                 startActivity(iStart);
                 AuthActivity.this.finish();
             }
