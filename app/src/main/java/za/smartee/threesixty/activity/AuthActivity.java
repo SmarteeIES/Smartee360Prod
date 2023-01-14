@@ -174,16 +174,17 @@ public class AuthActivity extends BaseActivity{
                 String customerData = payloadArray[1].replace("[","");
                 customerData = customerData.replace("]}","");
 
-                //Covert to Has object
+                //Covert to Hash object
                 HashMap<String, String> map = new Gson().fromJson(payloadString, HashMap.class);
                 String userName = map.get("user_name");
 
                 HashMap<String, String> customerMap = new Gson().fromJson(customerData, HashMap.class);
                 String storeName = customerMap.get("account_name");
+                String storeCode = customerMap.get("account_name");
 
-                Log.i("SMInUser",userName);
-                Log.i("SMInAccount",storeName);
-
+                iStart.putExtra("appUser",userName);
+                iStart.putExtra("appStore",storeName);
+                iStart.putExtra("appStoreCode",storeCode);
                 startActivity(iStart);
                 AuthActivity.this.finish();
             }

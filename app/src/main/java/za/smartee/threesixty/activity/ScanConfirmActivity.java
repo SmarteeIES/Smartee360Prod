@@ -233,6 +233,9 @@ public class ScanConfirmActivity extends BaseActivity{
         devDataDetail = new ArrayList<Map<String, String>>();
         Intent intent = getIntent();
         String appUser = intent.getStringExtra("appUser");
+        String appStore = intent.getStringExtra("appStore");
+        String appStoreCode = intent.getStringExtra("appStoreCode");
+
 
         //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -652,53 +655,63 @@ public class ScanConfirmActivity extends BaseActivity{
                                     locationDetailInfoSize = 0;
                                 }
                                 
+//Removed and replaced with location from VSC
+//                                for (int r = 0; r < locationDetailInfoSize; r++) {
+//                                    locationInfoFlag = true;
+//                                    String tempLoc;
+//                                    tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+//                                    if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
+//                                        double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
+//                                        if (distResult < 501) {
+//                                            calculatedLoc = locationDetailInfo.get(r).get("Address");
+//                                        }
+//                                    }
+//                                }
+//                                TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+//
+//                                if (finalLoadingChecked) {
+//                                    selectedLocation.setVisibility(View.VISIBLE);
+//                                    selectedLocation.setText("Select Vehicle");
+//                                    locDD.setVisibility(View.VISIBLE);
+//                                    ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
+//                                    LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                                    LocationDDAdapter.notifyDataSetChanged();
+//                                    locDD.setAdapter(LocationDDAdapter);
+//                                    calculatedLoc = "Loading Checked";
+//                                } else {
+//                                    missingLocation.setVisibility(View.VISIBLE);
+//                                    if (missingLocFlag == false) {
+//                                        selectedLocation.setVisibility(View.VISIBLE);
+//                                        if (calculatedLoc == null || calculatedLoc.equals("")) {
+//                                            calculatedLoc = "No Location Available";
+//                                        }
+//                                        selectedLocation.setText("Current Location - " + calculatedLoc);
+//                                    }
+//                                }
 
-                                for (int r = 0; r < locationDetailInfoSize; r++) {
-                                    locationInfoFlag = true;
-                                    String tempLoc;
-                                    tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                    if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
-                                        double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
-                                        if (distResult < 501) {
-                                            calculatedLoc = locationDetailInfo.get(r).get("Address");
-                                        }
-                                    }
-                                }
+                                //VSC Location
+                                calculatedLoc = appStore;
                                 TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+                                selectedLocation.setText("Current Location - " + calculatedLoc);
 
-                                if (finalLoadingChecked) {
-                                    selectedLocation.setVisibility(View.VISIBLE);
-                                    selectedLocation.setText("Select Vehicle");
-                                    locDD.setVisibility(View.VISIBLE);
-                                    ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
-                                    LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    LocationDDAdapter.notifyDataSetChanged();
-                                    locDD.setAdapter(LocationDDAdapter);
-                                    calculatedLoc = "Loading Checked";
-                                } else {
-                                    missingLocation.setVisibility(View.VISIBLE);
-                                    if (missingLocFlag == false) {
-                                        selectedLocation.setVisibility(View.VISIBLE);
-                                        if (calculatedLoc == null || calculatedLoc.equals("")) {
-                                            calculatedLoc = "No Location Available";
-                                        }
-                                        selectedLocation.setText("Current Location - " + calculatedLoc);
-                                    }
-                                }
 
-                                if (!locationInfoFlag) {
-                                    selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
-                                }
+//Removed due to VSC location integration
+//                                if (!locationInfoFlag) {
+//                                    selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
+//                                }
+//
+//                                locationInfoFlag = false;
 
-                                locationInfoFlag = false;
+//                                if (calculatedLoc.equals("No Location Available")) {
+//                                    if (missingLocFlag != false) {
+//                                        btnConfirm.setVisibility(View.VISIBLE);
+//                                    }
+//                                } else {
+//                                    btnConfirm.setVisibility(View.VISIBLE);
+//                                }
 
-                                if (calculatedLoc.equals("No Location Available")) {
-                                    if (missingLocFlag != false) {
-                                        btnConfirm.setVisibility(View.VISIBLE);
-                                    }
-                                } else {
-                                    btnConfirm.setVisibility(View.VISIBLE);
-                                }
+
+                                btnConfirm.setVisibility(View.VISIBLE);
                                 btnScanCancel.setVisibility(View.VISIBLE);
 
                             }

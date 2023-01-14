@@ -50,6 +50,25 @@ type Locations @model
   category1: String
   category2: String
   category3: String
+  accounts: [Accounts] @connection(keyName: "locationIDIndex", fields: ["id"])
+}
+
+
+type Accounts @model
+@key (name: "locationIDIndex", fields: ["locationID"])
+{
+  id: ID!
+  baseAccountType: String!
+  accountID: String!
+  accountName: String!
+  locationID: ID!
+  latitude: Float
+  longitude: Float
+  category1: String
+  category2: String
+  category3: String
+  activeStatus: String
+
 }
 
 type AuditLog @model

@@ -129,6 +129,8 @@ public class ScanActivity extends BaseActivity{
         Log.i("S360Screen","ScanCreate");
         //Get the app user who initiatied the start of teh app
         String appUser = getIntent().getStringExtra("appUser");
+        String appStore = getIntent().getStringExtra("appStore");
+        String appStoreCode = getIntent().getStringExtra("appStoreCode");
 
         //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -234,6 +236,8 @@ public class ScanActivity extends BaseActivity{
                     processingFlag = false;
                     Intent i = new Intent(ScanActivity.this, ScanConfirmActivity.class);
                     i.putExtra("appUser",appUser);
+                    i.putExtra("appStore",appStore);
+                    i.putExtra("appStoreCode",appStoreCode);
                     i.putExtra("loadingFlag", loadingChecked);
                     startActivity(i);
             }

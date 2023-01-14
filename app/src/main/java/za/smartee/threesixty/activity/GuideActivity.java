@@ -106,6 +106,8 @@ public class GuideActivity extends BaseActivity {
                     public void run() {
                         Intent scanStart = new Intent(GuideActivity.this, ScanActivity.class);
                         scanStart.putExtra("appUser",getIntent().getStringExtra("appUser"));
+                        scanStart.putExtra("appStore",getIntent().getStringExtra("appStore"));
+                        scanStart.putExtra("appStoreCode",getIntent().getStringExtra("appStoreCode"));
                         startActivity(scanStart);
                         //GuideActivity.this.finish();
                     }
