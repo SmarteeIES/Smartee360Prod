@@ -52,6 +52,7 @@ import com.amplifyframework.api.graphql.model.ModelQuery;
 import com.amplifyframework.auth.AuthUser;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.datastore.DataStoreChannelEventName;
+import com.amplifyframework.datastore.generated.model.Accounts;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.AuditLog;
 import com.amplifyframework.datastore.generated.model.Locations;
@@ -142,6 +143,8 @@ public class ScanConfirmActivity extends BaseActivity{
     private boolean mScanning = false;
     private boolean GPSPermission = false;
     private boolean dsErrorFlag = false;
+    private boolean accFound = false;
+
     private Button btnScan = null;
     private Button btnConfirm = null;
     private Button btnScanCancel = null;
@@ -178,6 +181,7 @@ public class ScanConfirmActivity extends BaseActivity{
 
     //Declare array map to store the details of the locations
     List<Map<String, String>> locationDetailInfo;
+    List<Map<String, String>> accDetailInfo;
     List<Map<String, String>> devData2;
 
 
@@ -367,27 +371,47 @@ public class ScanConfirmActivity extends BaseActivity{
                         devData.remove(devData.lastIndexOf(s));
                     }
                 }
-                if (missingLocFlag){
-                    text = locDD.getSelectedItem().toString();
-                } else {
-                    text = calculatedLoc;
-                }
-
-                if (loadingChecked){
-                    text = locDD.getSelectedItem().toString();
-                }
-
-
-                for (int i = 0; i < locationDetailInfo.size(); i++) {
-                    if (locationDetailInfo.get(i).get("Address").equals(text)) {
-                        selectedLocID = locationDetailInfo.get(i).get("LocationID");
-                        selectedLongitude = locationDetailInfo.get(i).get("Longitude");
-                        selectedLatitude = locationDetailInfo.get(i).get("Latitude");
+                //REMOVED FOR VSC INTEGRATION
+//                if (missingLocFlag){
+//                    text = locDD.getSelectedItem().toString();
+//                } else {
+//                    text = calculatedLoc;
+//                }
+//
+//                if (loadingChecked){
+//                    text = locDD.getSelectedItem().toString();
+//                }
+                for (int i = 0; i < accDetailInfo.size(); i++) {
+                    Log.i("SMInLocSC",appStoreCode);
+                    if (accDetailInfo.get(i).get("AccNumber").equals(appStoreCode)) {
+                        selectedLocID = accDetailInfo.get(i).get("locationID");
+                        selectedLongitude = accDetailInfo.get(i).get("Longitude");
+                        selectedLatitude = accDetailInfo.get(i).get("Latitude");
+                        accFound = true;
                     }
                 }
+                Log.i("SMInLocAccQuery", String.valueOf(accDetailInfo));
+
+                //If the account number could not be matched, then just use the acc number
+                if (!accFound){
+                    Log.i("SMInLocPosCheck", "Not Found");
+                    selectedLocID = appStoreCode;
+                    selectedLongitude = "0";
+                    selectedLatitude = "0";
+                }
+                accFound = false;
+
+
+//                for (int i = 0; i < locationDetailInfo.size(); i++) {
+//                    if (locationDetailInfo.get(i).get("LocationID").equals(text)) {
+//                        selectedLocID = locationDetailInfo.get(i).get("LocationID");
+//                        selectedLongitude = locationDetailInfo.get(i).get("Longitude");
+//                        selectedLatitude = locationDetailInfo.get(i).get("Latitude");
+//                    }
+//                }
 
                 //Get the number of existing Assets
-
+                Log.i("SMInLocID",selectedLocID);
                 Integer numberExistingAssets = 0;
                 for (int m = 0; m < assetDetailInfo.size(); m++) {
                     if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
@@ -443,7 +467,7 @@ public class ScanConfirmActivity extends BaseActivity{
                                                 avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
                                             }
                                         }
-
+                                        Log.i("SMInLocAccSave",selectedLocID);
                                         if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
                                         } else {
                                             numberNewAssets++;
@@ -504,7 +528,7 @@ public class ScanConfirmActivity extends BaseActivity{
                     final Integer existAssets = numberExistingAssets;
                     final Integer newAssets = numberNewAssets;
                     Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                    i.putExtra("selectedLocation",text);
+                    i.putExtra("selectedLocation",appStore);
                     i.putExtra("scanTime",scanTime.toString());
                     i.putExtra("assetsInStore",numberExistingAssets.toString());
                     i.putExtra("scannedAssets",numberNewAssets.toString());
@@ -595,6 +619,33 @@ public class ScanConfirmActivity extends BaseActivity{
                                             },
                                             error -> Log.e("S360",  "Error retrieving posts", error)
                                     );
+
+                                    Amplify.DataStore.query(Accounts.class,
+                                            accResponse -> {
+                                                if (accResponse.hasNext()) {
+                                                    // Log.i("S360", "Successful query, found posts.");
+                                                    accDetailInfo = new ArrayList<Map<String, String>>();
+                                                    while (accResponse.hasNext()) {
+                                                        Accounts accDetail = accResponse.next();
+                                                        if (accDetail.getAccountName() != null) {
+                                                            Map<String, String> accDetailInfo1 = new HashMap<String, String>();
+                                                            accDetailInfo1.put("AccName", accDetail.getAccountName());
+                                                            accDetailInfo1.put("AccNumber", accDetail.getAccountId());
+                                                            accDetailInfo1.put("Longitude", accDetail.getLongitude().toString());
+                                                            accDetailInfo1.put("Latitude", accDetail.getLatitude().toString());
+                                                            accDetailInfo1.put("baseAccountType", accDetail.getBaseAccountType());
+                                                            accDetailInfo1.put("locationID", accDetail.getLocationId());
+                                                            accDetailInfo.add(accDetailInfo1);
+                                                        }
+                                                    }
+                                                } else {
+                                                    Log.i("S360", "Successful query, but no posts.");
+                                                }
+                                            },
+                                            error -> Log.e("S360",  "Error retrieving posts", error)
+                                    );
+
+
 
 
                         Amplify.DataStore.query(Assets.class,

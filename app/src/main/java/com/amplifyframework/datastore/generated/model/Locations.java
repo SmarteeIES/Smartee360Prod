@@ -44,6 +44,7 @@ public final class Locations implements Model {
   private final @ModelField(targetType="String") String category1;
   private final @ModelField(targetType="String") String category2;
   private final @ModelField(targetType="String") String category3;
+  private final @ModelField(targetType="Accounts") @HasMany(associatedWith = "locationID", type = Accounts.class) List<Accounts> accounts = null;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
@@ -92,6 +93,10 @@ public final class Locations implements Model {
   
   public String getCategory3() {
       return category3;
+  }
+  
+  public List<Accounts> getAccounts() {
+      return accounts;
   }
   
   public Temporal.DateTime getCreatedAt() {

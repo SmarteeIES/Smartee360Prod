@@ -206,6 +206,10 @@ query SyncLocations(
       category1
       category2
       category3
+      accounts {
+        nextToken
+        startedAt
+      }
       _version
       _deleted
       _lastChangedAt
@@ -258,6 +262,28 @@ query GetLocations($id: ID!) {
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
     _version
     _deleted
     _lastChangedAt
@@ -287,6 +313,92 @@ query ListLocationss(
       category1
       category2
       category3
+      accounts {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncAccounts(
+  $filter: ModelAccountsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAccounts(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAccountType
+      accountID
+      accountName
+      locationID
+      latitude
+      longitude
+      category1
+      category2
+      category3
+      activeStatus
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetAccounts($id: ID!) {
+  getAccounts(id: $id) {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListAccountss(
+  $filter: ModelAccountsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listAccountss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      baseAccountType
+      accountID
+      accountName
+      locationID
+      latitude
+      longitude
+      category1
+      category2
+      category3
+      activeStatus
       _version
       _deleted
       _lastChangedAt
@@ -510,6 +622,77 @@ query ListScannedAssetsAuditLogs(
       rssi3
       classification
       owner
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncAssetAllocationStores(
+  $filter: ModelAssetAllocationStoresFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncAssetAllocationStores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      baseAllocationType
+      storeCode
+      storeName
+      dc
+      status
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetAssetAllocationStores($id: ID!) {
+  getAssetAllocationStores(id: $id) {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListAssetAllocationStoress(
+  $filter: ModelAssetAllocationStoresFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listAssetAllocationStoress(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      baseAllocationType
+      storeCode
+      storeName
+      dc
+      status
       _version
       _deleted
       _lastChangedAt

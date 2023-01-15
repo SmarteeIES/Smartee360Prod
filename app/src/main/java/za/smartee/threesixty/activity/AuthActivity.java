@@ -180,7 +180,7 @@ public class AuthActivity extends BaseActivity{
 
                 HashMap<String, String> customerMap = new Gson().fromJson(customerData, HashMap.class);
                 String storeName = customerMap.get("account_name");
-                String storeCode = customerMap.get("account_name");
+                String storeCode = customerMap.get("account_number");
 
                 iStart.putExtra("appUser",userName);
                 iStart.putExtra("appStore",storeName);

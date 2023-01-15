@@ -197,6 +197,28 @@ mutation CreateLocations(
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
     _version
     _deleted
     _lastChangedAt
@@ -249,6 +271,28 @@ mutation UpdateLocations(
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
     _version
     _deleted
     _lastChangedAt
@@ -301,6 +345,97 @@ mutation DeleteLocations(
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateAccounts(
+  $input: CreateAccountsInput!
+  $condition: ModelAccountsConditionInput
+) {
+  createAccounts(input: $input, condition: $condition) {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateAccounts(
+  $input: UpdateAccountsInput!
+  $condition: ModelAccountsConditionInput
+) {
+  updateAccounts(input: $input, condition: $condition) {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteAccounts(
+  $input: DeleteAccountsInput!
+  $condition: ModelAccountsConditionInput
+) {
+  deleteAccounts(input: $input, condition: $condition) {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
     _version
     _deleted
     _lastChangedAt
@@ -538,6 +673,60 @@ mutation DeleteScannedAssetsAuditLog(
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateAssetAllocationStores(
+  $input: CreateAssetAllocationStoresInput!
+  $condition: ModelAssetAllocationStoresConditionInput
+) {
+  createAssetAllocationStores(input: $input, condition: $condition) {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateAssetAllocationStores(
+  $input: UpdateAssetAllocationStoresInput!
+  $condition: ModelAssetAllocationStoresConditionInput
+) {
+  updateAssetAllocationStores(input: $input, condition: $condition) {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteAssetAllocationStores(
+  $input: DeleteAssetAllocationStoresInput!
+  $condition: ModelAssetAllocationStoresConditionInput
+) {
+  deleteAssetAllocationStores(input: $input, condition: $condition) {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
     _version
     _deleted
     _lastChangedAt

@@ -176,6 +176,28 @@ subscription OnCreateLocations {
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
     _version
     _deleted
     _lastChangedAt
@@ -225,6 +247,28 @@ subscription OnUpdateLocations {
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
     _version
     _deleted
     _lastChangedAt
@@ -274,6 +318,88 @@ subscription OnDeleteLocations {
     category1
     category2
     category3
+    accounts {
+      items {
+        id
+        baseAccountType
+        accountID
+        accountName
+        locationID
+        latitude
+        longitude
+        category1
+        category2
+        category3
+        activeStatus
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateAccounts {
+  onCreateAccounts {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateAccounts {
+  onUpdateAccounts {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteAccounts {
+  onDeleteAccounts {
+    id
+    baseAccountType
+    accountID
+    accountName
+    locationID
+    latitude
+    longitude
+    category1
+    category2
+    category3
+    activeStatus
     _version
     _deleted
     _lastChangedAt
@@ -493,6 +619,51 @@ subscription OnDeleteScannedAssetsAuditLog {
     rssi3
     classification
     owner
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateAssetAllocationStores {
+  onCreateAssetAllocationStores {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateAssetAllocationStores {
+  onUpdateAssetAllocationStores {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteAssetAllocationStores {
+  onDeleteAssetAllocationStores {
+    id
+    baseAllocationType
+    storeCode
+    storeName
+    dc
+    status
     _version
     _deleted
     _lastChangedAt
