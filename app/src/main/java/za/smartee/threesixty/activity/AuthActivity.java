@@ -136,8 +136,8 @@ public class AuthActivity extends BaseActivity{
             Uri appLinkData = appLinkIntent.getData();
 
             //Temporarily replaced to simulate string
-            //String vscData = appLinkIntent.getDataString();
-            String vscData = "integration://s360vsc#{%22user_name%22:%22Driver%20Test%22,%22customers%22:[{%22account_number%22:%2221672%22,%22account_name%22:%22TOPS%205%20STAR%22,%22location%22:%22null,null%22}]}";
+            String vscData = appLinkIntent.getDataString();
+//            String vscData = "integration://s360vsc#{%22user_name%22:%22Driver%20Test%22,%22customers%22:[{%22account_number%22:%2221672%22,%22account_name%22:%22TOPS%205%20STAR%22,%22location%22:%22null,null%22}]}";
             Bundle vscData2 = appLinkIntent.getExtras();
             String vscDataModified;
 
@@ -146,8 +146,8 @@ public class AuthActivity extends BaseActivity{
             //Determine if the app was started from VSc or manually
 
             //Temporarilty changed to not null for simulation
-            //if (appLinkData == null){
-            if (appLinkData != null){
+            if (appLinkData == null){
+//            if (appLinkData != null){
                 tve1.setVisibility(View.VISIBLE);
                 tv1.setVisibility(View.VISIBLE);
                 tv2.setVisibility(View.VISIBLE);
