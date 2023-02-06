@@ -568,7 +568,7 @@ public class ScanConfirmActivity extends BaseActivity{
             @Override
             public void onScanDevice(DeviceInfo device) {
 //                Log.i("Test Mac",device.mac);
-//                Log.i("Test Mac", String.valueOf(device.rssi));
+//                Log.i("Test Mac", String.valueOf(device.));
                 Map<String, String> scanInfo = new HashMap<String, String>();
                 scanInfo.put("devMac", String.valueOf(device.mac));
                 scanInfo.put("rssi", String.valueOf(device.rssi));
