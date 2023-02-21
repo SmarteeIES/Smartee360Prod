@@ -621,6 +621,7 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
 
                     selectedLocID = text;
+
                 }
 
                 for (int i = 0; i < accDetailInfo.size(); i++) {
