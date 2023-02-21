@@ -185,6 +185,7 @@ public class AuthActivity extends BaseActivity{
                 iStart.putExtra("appUser",userName);
                 iStart.putExtra("appStore",storeName);
                 iStart.putExtra("appStoreCode",storeCode);
+                iStart.putExtra("loginType","VSCLogin");
                 startActivity(iStart);
                 AuthActivity.this.finish();
             }
@@ -210,6 +211,7 @@ public class AuthActivity extends BaseActivity{
             case "Spar Admin":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparAdminCheck))){
                     iStart.putExtra("appUser","Spar Admin");
+                    iStart.putExtra("loginType","LocalLogin");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -222,6 +224,7 @@ public class AuthActivity extends BaseActivity{
             case "Spar Driver":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.sparDriverCheck))){
                     iStart.putExtra("appUser","Spar Driver");
+                    iStart.putExtra("loginType","LocalLogin");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -234,6 +237,7 @@ public class AuthActivity extends BaseActivity{
             case "Smartee Admin":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.smarteeAdminCheck))){
                     iStart.putExtra("appUser","Smartee Admin");
+                    iStart.putExtra("loginType","LocalLogin");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -246,6 +250,7 @@ public class AuthActivity extends BaseActivity{
             case "Other":
                 if (textCheck.getText().toString().equals(getResources().getString(R.string.otherCheck))){
                     iStart.putExtra("appUser","Other");
+                    iStart.putExtra("loginType","LocalLogin");
                     startActivity(iStart);
                 } else {
                     runOnUiThread(new Runnable() {

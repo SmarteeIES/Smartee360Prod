@@ -131,6 +131,7 @@ public class ScanActivity extends BaseActivity{
         String appUser = getIntent().getStringExtra("appUser");
         String appStore = getIntent().getStringExtra("appStore");
         String appStoreCode = getIntent().getStringExtra("appStoreCode");
+        String loginType = getIntent().getStringExtra("loginType");
 
         //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -239,6 +240,7 @@ public class ScanActivity extends BaseActivity{
                     i.putExtra("appStore",appStore);
                     i.putExtra("appStoreCode",appStoreCode);
                     i.putExtra("loadingFlag", loadingChecked);
+                    i.putExtra("loginType", loginType);
                     startActivity(i);
             }
         });

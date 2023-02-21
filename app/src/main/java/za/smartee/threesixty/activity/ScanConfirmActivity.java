@@ -217,13 +217,15 @@ public class ScanConfirmActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_confirm);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        Log.i("S360Screen","ScanConfirmCreate");
+
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+
+        //Initialise buttons, dropdowns and flags
         scanCount = 0;
         saveCount = 0;
         locationFoundFlag = false;
@@ -235,11 +237,14 @@ public class ScanConfirmActivity extends BaseActivity{
         Spinner locDD = (Spinner) findViewById(R.id.locationsSpinner);
         devData2 = new ArrayList<Map<String, String>>();
         devDataDetail = new ArrayList<Map<String, String>>();
+
+        //Get login credentials from previous activities
         Intent intent = getIntent();
         String appUser = intent.getStringExtra("appUser");
         String appStore = intent.getStringExtra("appStore");
         String appStoreCode = intent.getStringExtra("appStoreCode");
-
+        String loginType = intent.getStringExtra("loginType");
+        Log.i("S360",loginType);
 
         //Setup a subscription which checks for changes in network connection
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -269,8 +274,242 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
                 });
 
+        //Feature marked as false as not used
         Boolean loadingChecked = getIntent().getBooleanExtra("loadingFlag",false);
 
+        //Setup location parameters
+        getLocation();
+
+        //Get the current time
+        scanTime = Calendar.getInstance().getTime();
+
+        //Initialize the text boxes
+        TextView answer1 = (TextView) findViewById(R.id.scanInfo);
+        answer1.setVisibility(View.INVISIBLE);
+        TextView answer2 = (TextView) findViewById(R.id.scanInfo2);
+        answer2.setVisibility(View.INVISIBLE);
+        TextView answer3 = (TextView) findViewById(R.id.scanInfo3);
+        answer3.setVisibility(View.INVISIBLE);
+        TextView answer4 = (TextView) findViewById(R.id.TextViewSelectedStore);
+        answer4.setVisibility(View.INVISIBLE);
+        TextView infoHeader = (TextView) findViewById(R.id.infoHeader);
+        infoHeader.setVisibility(View.INVISIBLE);
+        TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+
+        //Ble scanner service with callback to get the data
+        MokoBleScanner mokoBleScanner = new MokoBleScanner(this);
+        mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
+            @Override
+            public void onStartScan() {
+            }
+
+            @Override
+            public void onScanDevice(DeviceInfo device) {
+                Map<String, String> scanInfo = new HashMap<String, String>();
+                scanInfo.put("devMac", String.valueOf(device.mac));
+                scanInfo.put("rssi", String.valueOf(device.rssi));
+                devData2.add(scanInfo);
+                devData.add(device.mac);
+            }
+
+            @Override
+            public void onStopScan() {
+            }
+        });
+
+
+
+        Boolean finalLoadingChecked1 = loadingChecked;
+
+        //Query the datastore for the Locations, Accounts and Assets
+                        company="Spar";
+                        Amplify.DataStore.query(Locations.class,
+                                locResponse -> {
+                                    if (locResponse.hasNext()) {
+                                        // Log.i("S360", "Successful query, found posts.");
+                                        locationDetailInfo = new ArrayList<Map<String, String>>();
+                                        while (locResponse.hasNext()) {
+                                            Locations locationDetail = locResponse.next();
+                                            if (locationDetail.getAddress() != null) {
+                                                Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
+                                                locationDetailInfo1.put("Address", locationDetail.getAddress());
+                                                locationDetailInfo1.put("LocationID", locationDetail.getId());
+                                                locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
+                                                locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
+                                                locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
+                                                locationDetailInfo.add(locationDetailInfo1);
+                                            }
+                                        }
+                                        for (int r = 0; r < locationDetailInfo.size(); r++) {
+                                            String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                                            if (finalLoadingChecked1) {
+                                                if (tempLoc.equals("Transit")) {
+                                                    locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                                }
+                                            } else {
+                                                locDdData.add(locationDetailInfo.get(r).get("Address"));
+                                            }
+                                        }
+                                        Collections.sort(locDdData);
+                                    } else {
+                                        Log.i("S360", "Successful query, but no posts.");
+                                    }
+                                },
+                                error -> Log.e("S360",  "Error retrieving posts", error)
+                        );
+
+                        Amplify.DataStore.query(Accounts.class,
+                                accResponse -> {
+                                    if (accResponse.hasNext()) {
+                                        // Log.i("S360", "Successful query, found posts.");
+                                        accDetailInfo = new ArrayList<Map<String, String>>();
+                                        while (accResponse.hasNext()) {
+                                            Accounts accDetail = accResponse.next();
+                                            if (accDetail.getAccountName() != null) {
+                                                Map<String, String> accDetailInfo1 = new HashMap<String, String>();
+                                                accDetailInfo1.put("AccName", accDetail.getAccountName());
+                                                accDetailInfo1.put("AccNumber", accDetail.getAccountId());
+                                                accDetailInfo1.put("Longitude", accDetail.getLongitude().toString());
+                                                accDetailInfo1.put("Latitude", accDetail.getLatitude().toString());
+                                                accDetailInfo1.put("baseAccountType", accDetail.getBaseAccountType());
+                                                accDetailInfo1.put("locationID", accDetail.getLocationId());
+                                                accDetailInfo.add(accDetailInfo1);
+                                            }
+                                        }
+                                    } else {
+                                        Log.i("S360", "Successful query, but no posts.");
+                                    }
+                                },
+                                error -> Log.e("S360",  "Error retrieving posts", error)
+                        );
+
+                        Amplify.DataStore.query(Assets.class,
+                                assetResponse -> {
+                                    if (assetResponse.hasNext()) {
+                                        assetDetailInfo = new ArrayList<Map<String, String>>();
+                                        while (assetResponse.hasNext()) {
+                                            Assets assetDetail = assetResponse.next();
+                                            if (assetDetail.getAssetId() != null) {
+                                                assetItems.add(assetDetail.getAssetId().toString());
+                                                Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
+                                                assetDetailInfo1.put("systemID", assetDetail.getId());
+                                                assetDetailInfo1.put("assetID", assetDetail.getAssetId());
+                                                assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
+                                                assetDetailInfo1.put("assetName", assetDetail.getAssetName());
+                                                assetDetailInfo1.put("locationID", assetDetail.getLocationId());
+                                                assetDetailInfo.add(assetDetailInfo1);
+                                            }
+                                        }
+                                    } else {
+                                        Log.i("S360", "Successful query, but no posts.");
+                                    }
+                                },
+                                error -> Log.e("S360",  "Error retrieving posts", error)
+                        );
+
+        //Start the Scanning process for 25 seconds
+        Boolean finalLoadingChecked = loadingChecked;
+        scannerSetTime = (new Double(25000)).longValue();
+        new CountDownTimer(scannerSetTime, 1000) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            public void onTick(long millisUntilFinished) {
+                btnScan.setVisibility(View.INVISIBLE);
+                TextView infoView = (TextView) findViewById(R.id.infoView);
+                TextView timeText = (TextView) findViewById(R.id.timerText);
+
+                infoView.setText("Scanning In Progress");
+                //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            public void onFinish() {
+                mokoBleScanner.stopScanDevice();
+                spinner = (ProgressBar) findViewById(R.id.progressBar);
+                spinner.setVisibility(View.GONE);
+                TextView answer = (TextView) findViewById(R.id.scanInfo);
+                selectedLocation.setVisibility(View.VISIBLE);
+
+//                            if (locationDetailInfo.equals(null)) {
+//                                dlgAlert.show();
+//                            }
+
+                if (locationDetailInfo == null) {
+                    dlgAlert.create().show();
+                } else {
+                    Integer locationDetailInfoSize = locationDetailInfo.size();
+                    if (locationDetailInfoSize == null) {
+                        locationDetailInfoSize = 0;
+                    }
+                    if (loginType.equals("LocalLogin")) {
+                        for (int r = 0; r < locationDetailInfoSize; r++) {
+                            locationInfoFlag = true;
+                            String tempLoc;
+                            tempLoc = locationDetailInfo.get(r).get("baseLocationType");
+                            if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
+                                double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
+                                if (distResult < 501) {
+                                    calculatedLoc = locationDetailInfo.get(r).get("Address");
+                                }
+                            }
+                        }
+                        TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+
+                        if (finalLoadingChecked) {
+                            selectedLocation.setVisibility(View.VISIBLE);
+                            selectedLocation.setText("Select Vehicle");
+                            locDD.setVisibility(View.VISIBLE);
+                            ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
+                            LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            LocationDDAdapter.notifyDataSetChanged();
+                            locDD.setAdapter(LocationDDAdapter);
+                            calculatedLoc = "Loading Checked";
+                        } else {
+                            missingLocation.setVisibility(View.VISIBLE);
+                            if (missingLocFlag == false) {
+                                selectedLocation.setVisibility(View.VISIBLE);
+                                if (calculatedLoc == null || calculatedLoc.equals("")) {
+                                    calculatedLoc = "No Location Available";
+                                }
+                                selectedLocation.setText("Current Location - " + calculatedLoc);
+                            }
+                        }
+                    }
+                    //VSC Location
+                    if (loginType.equals("VSCLogin")) {
+                        calculatedLoc = appStore;
+                        TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
+                        selectedLocation.setText("Current Location - " + calculatedLoc);
+                    }
+                    else {
+                        if (!locationInfoFlag) {
+                            selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
+                        }
+
+                        locationInfoFlag = false;
+
+                        if (calculatedLoc.equals("No Location Available")) {
+                            if (missingLocFlag != false) {
+                                btnConfirm.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            btnConfirm.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    btnConfirm.setVisibility(View.VISIBLE);
+                    btnScanCancel.setVisibility(View.VISIBLE);
+
+                }
+
+                TextView infoView = (TextView) findViewById(R.id.infoView);
+                TextView timeText = (TextView) findViewById(R.id.timerText);
+                timeText.setText("");
+                infoView.setText("");
+                ArrayList<String> devData = new ArrayList<String>();
+            }
+        }.start();
+
+        //Handle the button listeners
 
         //Check if Location is missing or incorrect click
         missingLocation.setOnClickListener(new View.OnClickListener() {
@@ -287,7 +526,6 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
             }
         });
-
 
         btnScanCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -371,47 +609,54 @@ public class ScanConfirmActivity extends BaseActivity{
                         devData.remove(devData.lastIndexOf(s));
                     }
                 }
-                //REMOVED FOR VSC INTEGRATION
-//                if (missingLocFlag){
-//                    text = locDD.getSelectedItem().toString();
-//                } else {
-//                    text = calculatedLoc;
-//                }
-//
-//                if (loadingChecked){
-//                    text = locDD.getSelectedItem().toString();
-//                }
+
+                if (loginType.equals("LocalLogin")) {
+                    if (missingLocFlag){
+                        text = locDD.getSelectedItem().toString();
+                    } else {
+                        text = calculatedLoc;
+                    }
+                    if (loadingChecked){
+                        text = locDD.getSelectedItem().toString();
+                    }
+
+                    selectedLocID = text;
+                }
+
                 for (int i = 0; i < accDetailInfo.size(); i++) {
-                    Log.i("SMInLocSC",appStoreCode);
-                    if (accDetailInfo.get(i).get("AccNumber").equals(appStoreCode)) {
-                        selectedLocID = accDetailInfo.get(i).get("locationID");
-                        selectedLongitude = accDetailInfo.get(i).get("Longitude");
-                        selectedLatitude = accDetailInfo.get(i).get("Latitude");
-                        accFound = true;
+                    if (loginType.equals("VSCLogin")){
+                        if (accDetailInfo.get(i).get("AccNumber").equals(appStoreCode)) {
+                            selectedLocID = accDetailInfo.get(i).get("locationID");
+                            selectedLongitude = accDetailInfo.get(i).get("Longitude");
+                            selectedLatitude = accDetailInfo.get(i).get("Latitude");
+                            accFound = true;
+                        }
                     }
                 }
-                Log.i("SMInLocAccQuery", String.valueOf(accDetailInfo));
 
                 //If the account number could not be matched, then just use the acc number
-                if (!accFound){
-                    Log.i("SMInLocPosCheck", "Not Found");
-                    selectedLocID = appStoreCode;
-                    selectedLongitude = "0";
-                    selectedLatitude = "0";
+                if (loginType.equals("VSCLogin")) {
+                    if (!accFound) {
+                        selectedLocID = appStoreCode;
+                        selectedLongitude = "0";
+                        selectedLatitude = "0";
+                    }
+                    accFound = false;
                 }
-                accFound = false;
 
-
-//                for (int i = 0; i < locationDetailInfo.size(); i++) {
-//                    if (locationDetailInfo.get(i).get("LocationID").equals(text)) {
-//                        selectedLocID = locationDetailInfo.get(i).get("LocationID");
-//                        selectedLongitude = locationDetailInfo.get(i).get("Longitude");
-//                        selectedLatitude = locationDetailInfo.get(i).get("Latitude");
-//                    }
-//                }
+                if (loginType.equals("LocalLogin")){
+                    for (int i = 0; i < locationDetailInfo.size(); i++) {
+                        if (locationDetailInfo.get(i).get("LocationID").equals(text)) {
+                            selectedLocID = locationDetailInfo.get(i).get("LocationID");
+                            selectedLongitude = locationDetailInfo.get(i).get("Longitude");
+                            selectedLatitude = locationDetailInfo.get(i).get("Latitude");
+                        }
+                    }
+                }
+                Log.i("S360",loginType);
 
                 //Get the number of existing Assets
-                Log.i("SMInLocID",selectedLocID);
+
                 Integer numberExistingAssets = 0;
                 for (int m = 0; m < assetDetailInfo.size(); m++) {
                     if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
@@ -453,328 +698,94 @@ public class ScanConfirmActivity extends BaseActivity{
                 }
 
                 //Compare the scanned devices to the database and if found update
-               // networkConnectStatus = isNetworkAvailable();
+                // networkConnectStatus = isNetworkAvailable();
 
-                    for (int y = 0; y < assetItems.size(); y++) {
-                        for (int z = 0; z < devData.size(); z++) {
-                            if (devData.get(z).equals(assetItems.get(y))) {
-                                for (int m = 0; m < assetDetailInfo.size(); m++) {
-                                    if (devData.get(z).equals(assetDetailInfo.get(m).get("assetID"))) {
-                                        for (int u = 0; u < devDataDetail.size(); u++){
-                                            if (devDataDetail.get(u).get("devMac").equals(devData.get(z))){
-                                                maxRssiCap = Double.parseDouble(devDataDetail.get(u).get("maxRssi"));
-                                                minRssiCap = Double.parseDouble(devDataDetail.get(u).get("minRssi"));
-                                                avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
-                                            }
+                for (int y = 0; y < assetItems.size(); y++) {
+                    for (int z = 0; z < devData.size(); z++) {
+                        if (devData.get(z).equals(assetItems.get(y))) {
+                            for (int m = 0; m < assetDetailInfo.size(); m++) {
+                                if (devData.get(z).equals(assetDetailInfo.get(m).get("assetID"))) {
+                                    for (int u = 0; u < devDataDetail.size(); u++){
+                                        if (devDataDetail.get(u).get("devMac").equals(devData.get(z))){
+                                            maxRssiCap = Double.parseDouble(devDataDetail.get(u).get("maxRssi"));
+                                            minRssiCap = Double.parseDouble(devDataDetail.get(u).get("minRssi"));
+                                            avgRssiCap = Double.parseDouble(devDataDetail.get(u).get("avgRssi"));
                                         }
-                                        Log.i("SMInLocAccSave",selectedLocID);
-                                        if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
-                                        } else {
-                                            numberNewAssets++;
-                                            Assets AssetItem = Assets.builder()
-                                                    .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
-                                                    .assetName(assetDetailInfo.get(m).get("assetName"))
-                                                    .assetId(devData.get(z))
-                                                    .macAddress(devData.get(z))
-                                                    .locationId(selectedLocID)
-                                                    .latitude(Double.parseDouble(selectedLatitude))
-                                                    .longitude(Double.parseDouble(selectedLongitude))
-                                                    .owner(company)
-                                                    .id(assetDetailInfo.get(m).get("systemID"))
-                                                    .rssiAvg(avgRssiCap)
-                                                    .rssiMax(maxRssiCap)
-                                                    .rssiMin(minRssiCap)
-                                                    .locationName(text)
-                                                    .serviceId(String.valueOf(scanTime))
-                                                    .build();
-
-                                            Amplify.DataStore.save(AssetItem,
-                                                    result -> {
-                                                        Log.i("S360", "Created a new post successfully");
-                                                        scanCount++;
-                                                    },
-                                                    error -> Log.e("S360Assets",  "Error creating post", error)
-                                            );
-                                            //Mutation Update end
-                                        }
-                                        AuditLog auditItems = AuditLog.builder()
-                                                .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
-                                                .confirmTime(String.valueOf(confirmTime))
-                                                .device(devData.get(z))
-                                                .deviceLatitude(devLat[0])
-                                                .deviceLongitude(devLng[0])
-                                                .scanTime(String.valueOf(scanTime))
-                                                .storeName(calculatedLoc)
-                                                .user(appUser)
-                                                .selectedStoreName(selectedLocID)
+                                    }
+                                    Log.i("SMInLocAccSave",selectedLocID);
+                                    if (selectedLocID.equals(assetDetailInfo.get(m).get("locationID"))) {
+                                    } else {
+                                        numberNewAssets++;
+                                        Assets AssetItem = Assets.builder()
+                                                .baseAssetType(assetDetailInfo.get(m).get("baseAssetType"))
+                                                .assetName(assetDetailInfo.get(m).get("assetName"))
+                                                .assetId(devData.get(z))
+                                                .macAddress(devData.get(z))
+                                                .locationId(selectedLocID)
+                                                .latitude(Double.parseDouble(selectedLatitude))
+                                                .longitude(Double.parseDouble(selectedLongitude))
+                                                .owner(company)
+                                                .id(assetDetailInfo.get(m).get("systemID"))
                                                 .rssiAvg(avgRssiCap)
                                                 .rssiMax(maxRssiCap)
                                                 .rssiMin(minRssiCap)
-                                                .owner(company)
+                                                .locationName(text)
+                                                .serviceId(String.valueOf(scanTime))
                                                 .build();
 
-                                        Amplify.DataStore.save(auditItems,
+                                        Amplify.DataStore.save(AssetItem,
                                                 result -> {
                                                     Log.i("S360", "Created a new post successfully");
                                                     scanCount++;
                                                 },
-                                                error -> Log.e("S360",  "Error creating post", error)
+                                                error -> Log.e("S360Assets",  "Error creating post", error)
                                         );
+                                        //Mutation Update end
                                     }
+                                    AuditLog auditItems = AuditLog.builder()
+                                            .baseActionType(assetDetailInfo.get(m).get("baseAssetType"))
+                                            .confirmTime(String.valueOf(confirmTime))
+                                            .device(devData.get(z))
+                                            .deviceLatitude(devLat[0])
+                                            .deviceLongitude(devLng[0])
+                                            .scanTime(String.valueOf(scanTime))
+                                            .storeName(calculatedLoc)
+                                            .user(appUser)
+                                            .selectedStoreName(selectedLocID)
+                                            .rssiAvg(avgRssiCap)
+                                            .rssiMax(maxRssiCap)
+                                            .rssiMin(minRssiCap)
+                                            .owner(company)
+                                            .build();
+
+                                    Amplify.DataStore.save(auditItems,
+                                            result -> {
+                                                Log.i("S360", "Created a new post successfully");
+                                                scanCount++;
+                                            },
+                                            error -> Log.e("S360",  "Error creating post", error)
+                                    );
                                 }
                             }
                         }
                     }
-                    final Integer existAssets = numberExistingAssets;
-                    final Integer newAssets = numberNewAssets;
-                    Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                    i.putExtra("selectedLocation",appStore);
-                    i.putExtra("scanTime",scanTime.toString());
-                    i.putExtra("assetsInStore",numberExistingAssets.toString());
-                    i.putExtra("scannedAssets",numberNewAssets.toString());
-                    i.putExtra("scanHistFlag",true);
-                    i.putExtra("scanCount",scanCount);
-                    i.putExtra("appUser",appUser);
-                    clearData();
-                    startActivity(i);
-                    ScanConfirmActivity.this.finish();
-            }
-        });
-
-        //Setup location parameters
-        getLocation();
-
-        scanTime = Calendar.getInstance().getTime();
-
-        TextView answer1 = (TextView) findViewById(R.id.scanInfo);
-        answer1.setVisibility(View.INVISIBLE);
-        TextView answer2 = (TextView) findViewById(R.id.scanInfo2);
-        answer2.setVisibility(View.INVISIBLE);
-        TextView answer3 = (TextView) findViewById(R.id.scanInfo3);
-        answer3.setVisibility(View.INVISIBLE);
-        TextView answer4 = (TextView) findViewById(R.id.TextViewSelectedStore);
-        answer4.setVisibility(View.INVISIBLE);
-        TextView infoHeader = (TextView) findViewById(R.id.infoHeader);
-        infoHeader.setVisibility(View.INVISIBLE);
-        TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
-
-
-        MokoBleScanner mokoBleScanner = new MokoBleScanner(this);
-        mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
-            @Override
-            public void onStartScan() {
-            }
-
-            @Override
-            public void onScanDevice(DeviceInfo device) {
-//                Log.i("Test Mac",device.mac);
-//                Log.i("Test Mac", String.valueOf(device.));
-                Map<String, String> scanInfo = new HashMap<String, String>();
-                scanInfo.put("devMac", String.valueOf(device.mac));
-                scanInfo.put("rssi", String.valueOf(device.rssi));
-                devData2.add(scanInfo);
-                devData.add(device.mac);
-            }
-
-            @Override
-            public void onStopScan() {
-            }
-        });
-
-
-
-        Boolean finalLoadingChecked1 = loadingChecked;
-                                    company="Spar";
-                                    Amplify.DataStore.query(Locations.class,
-                                            locResponse -> {
-                                                if (locResponse.hasNext()) {
-                                                   // Log.i("S360", "Successful query, found posts.");
-                                                    locationDetailInfo = new ArrayList<Map<String, String>>();
-                                                    while (locResponse.hasNext()) {
-                                                        Locations locationDetail = locResponse.next();
-                                                        if (locationDetail.getAddress() != null) {
-                                                            Map<String, String> locationDetailInfo1 = new HashMap<String, String>();
-                                                            locationDetailInfo1.put("Address", locationDetail.getAddress());
-                                                            locationDetailInfo1.put("LocationID", locationDetail.getId());
-                                                            locationDetailInfo1.put("Longitude", locationDetail.getLongitude().toString());
-                                                            locationDetailInfo1.put("Latitude", locationDetail.getLatitude().toString());
-                                                            locationDetailInfo1.put("baseLocationType", locationDetail.getBaseLocationType());
-                                                            locationDetailInfo.add(locationDetailInfo1);
-                                                        }
-                                                    }
-                                                    for (int r = 0; r < locationDetailInfo.size(); r++) {
-                                                        String tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-                                                        if (finalLoadingChecked1) {
-                                                            if (tempLoc.equals("Transit")) {
-                                                                locDdData.add(locationDetailInfo.get(r).get("Address"));
-                                                            }
-                                                        } else {
-                                                            locDdData.add(locationDetailInfo.get(r).get("Address"));
-                                                        }
-                                                    }
-                                                    Collections.sort(locDdData);
-                                                } else {
-                                                    Log.i("S360", "Successful query, but no posts.");
-                                                }
-                                            },
-                                            error -> Log.e("S360",  "Error retrieving posts", error)
-                                    );
-
-                                    Amplify.DataStore.query(Accounts.class,
-                                            accResponse -> {
-                                                if (accResponse.hasNext()) {
-                                                    // Log.i("S360", "Successful query, found posts.");
-                                                    accDetailInfo = new ArrayList<Map<String, String>>();
-                                                    while (accResponse.hasNext()) {
-                                                        Accounts accDetail = accResponse.next();
-                                                        if (accDetail.getAccountName() != null) {
-                                                            Map<String, String> accDetailInfo1 = new HashMap<String, String>();
-                                                            accDetailInfo1.put("AccName", accDetail.getAccountName());
-                                                            accDetailInfo1.put("AccNumber", accDetail.getAccountId());
-                                                            accDetailInfo1.put("Longitude", accDetail.getLongitude().toString());
-                                                            accDetailInfo1.put("Latitude", accDetail.getLatitude().toString());
-                                                            accDetailInfo1.put("baseAccountType", accDetail.getBaseAccountType());
-                                                            accDetailInfo1.put("locationID", accDetail.getLocationId());
-                                                            accDetailInfo.add(accDetailInfo1);
-                                                        }
-                                                    }
-                                                } else {
-                                                    Log.i("S360", "Successful query, but no posts.");
-                                                }
-                                            },
-                                            error -> Log.e("S360",  "Error retrieving posts", error)
-                                    );
-
-
-
-
-                        Amplify.DataStore.query(Assets.class,
-                                assetResponse -> {
-                                    if (assetResponse.hasNext()) {
-                                        assetDetailInfo = new ArrayList<Map<String, String>>();
-                                        while (assetResponse.hasNext()) {
-                                            Assets assetDetail = assetResponse.next();
-                                            if (assetDetail.getAssetId() != null) {
-                                                assetItems.add(assetDetail.getAssetId().toString());
-                                                Map<String, String> assetDetailInfo1 = new HashMap<String, String>();
-                                                assetDetailInfo1.put("systemID", assetDetail.getId());
-                                                assetDetailInfo1.put("assetID", assetDetail.getAssetId());
-                                                assetDetailInfo1.put("baseAssetType", assetDetail.getBaseAssetType());
-                                                assetDetailInfo1.put("assetName", assetDetail.getAssetName());
-                                                assetDetailInfo1.put("locationID", assetDetail.getLocationId());
-                                                assetDetailInfo.add(assetDetailInfo1);
-                                            }
-                                        }
-                                    } else {
-                                        Log.i("S360", "Successful query, but no posts.");
-                                    }
-                                },
-                                error -> Log.e("S360",  "Error retrieving posts", error)
-                        );
-
-                    Boolean finalLoadingChecked = loadingChecked;
-                    scannerSetTime = (new Double(25000)).longValue();
-
-                    new CountDownTimer(scannerSetTime, 1000) {
-                        @RequiresApi(api = Build.VERSION_CODES.N)
-                        public void onTick(long millisUntilFinished) {
-                            btnScan.setVisibility(View.INVISIBLE);
-                            TextView infoView = (TextView) findViewById(R.id.infoView);
-                            TextView timeText = (TextView) findViewById(R.id.timerText);
-
-                            infoView.setText("Scanning In Progress");
-                            //Log.i("Smartee360Msg-Timer", String.valueOf((millisUntilFinished / 1000)));
-                        }
-
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        public void onFinish() {
-                            mokoBleScanner.stopScanDevice();
-                            spinner = (ProgressBar) findViewById(R.id.progressBar);
-                            spinner.setVisibility(View.GONE);
-                            TextView answer = (TextView) findViewById(R.id.scanInfo);
-                            selectedLocation.setVisibility(View.VISIBLE);
-
-//                            if (locationDetailInfo.equals(null)) {
-//                                dlgAlert.show();
-//                            }
-
-                            if (locationDetailInfo == null) {
-                                dlgAlert.create().show();
-                            } else {
-                                Integer locationDetailInfoSize = locationDetailInfo.size();
-                                if (locationDetailInfoSize == null) {
-                                    locationDetailInfoSize = 0;
-                                }
-                                
-//Removed and replaced with location from VSC
-//                                for (int r = 0; r < locationDetailInfoSize; r++) {
-//                                    locationInfoFlag = true;
-//                                    String tempLoc;
-//                                    tempLoc = locationDetailInfo.get(r).get("baseLocationType");
-//                                    if (tempLoc.equals("DC") || tempLoc.equals("Store")) {
-//                                        double distResult = distance(Double.parseDouble(locationDetailInfo.get(r).get("Latitude")), Double.parseDouble(locationDetailInfo.get(r).get("Longitude")), devLat[0], devLng[0], 0, 0);
-//                                        if (distResult < 501) {
-//                                            calculatedLoc = locationDetailInfo.get(r).get("Address");
-//                                        }
-//                                    }
-//                                }
-//                                TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
-//
-//                                if (finalLoadingChecked) {
-//                                    selectedLocation.setVisibility(View.VISIBLE);
-//                                    selectedLocation.setText("Select Vehicle");
-//                                    locDD.setVisibility(View.VISIBLE);
-//                                    ArrayAdapter<String> LocationDDAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, locDdData);
-//                                    LocationDDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                                    LocationDDAdapter.notifyDataSetChanged();
-//                                    locDD.setAdapter(LocationDDAdapter);
-//                                    calculatedLoc = "Loading Checked";
-//                                } else {
-//                                    missingLocation.setVisibility(View.VISIBLE);
-//                                    if (missingLocFlag == false) {
-//                                        selectedLocation.setVisibility(View.VISIBLE);
-//                                        if (calculatedLoc == null || calculatedLoc.equals("")) {
-//                                            calculatedLoc = "No Location Available";
-//                                        }
-//                                        selectedLocation.setText("Current Location - " + calculatedLoc);
-//                                    }
-//                                }
-
-                                //VSC Location
-                                calculatedLoc = appStore;
-                                TextView selectedLocation = (TextView) findViewById(R.id.textViewSelectLocation);
-                                selectedLocation.setText("Current Location - " + calculatedLoc);
-
-
-//Removed due to VSC location integration
-//                                if (!locationInfoFlag) {
-//                                    selectedLocation.setText("ERROR - User Data Not Available. Cancel and Rescan or contact your administrator!");
-//                                }
-//
-//                                locationInfoFlag = false;
-
-//                                if (calculatedLoc.equals("No Location Available")) {
-//                                    if (missingLocFlag != false) {
-//                                        btnConfirm.setVisibility(View.VISIBLE);
-//                                    }
-//                                } else {
-//                                    btnConfirm.setVisibility(View.VISIBLE);
-//                                }
-
-
-                                btnConfirm.setVisibility(View.VISIBLE);
-                                btnScanCancel.setVisibility(View.VISIBLE);
-
-                            }
-
-                            TextView infoView = (TextView) findViewById(R.id.infoView);
-                            TextView timeText = (TextView) findViewById(R.id.timerText);
-                            timeText.setText("");
-                            infoView.setText("");
-                            ArrayList<String> devData = new ArrayList<String>();
-                        }
-                    }.start();
                 }
+                final Integer existAssets = numberExistingAssets;
+                final Integer newAssets = numberNewAssets;
+                Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
+                i.putExtra("selectedLocation",appStore);
+                i.putExtra("scanTime",scanTime.toString());
+                i.putExtra("assetsInStore",numberExistingAssets.toString());
+                i.putExtra("scannedAssets",numberNewAssets.toString());
+                i.putExtra("scanHistFlag",true);
+                i.putExtra("scanCount",scanCount);
+                i.putExtra("appUser",appUser);
+                clearData();
+                startActivity(i);
+                ScanConfirmActivity.this.finish();
+            }
+        });
+    }
 
 
     //Check Permissions
