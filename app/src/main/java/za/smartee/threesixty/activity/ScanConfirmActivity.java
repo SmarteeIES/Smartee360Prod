@@ -496,8 +496,24 @@ public class ScanConfirmActivity extends BaseActivity{
                         }
                     }
 
-                    btnConfirm.setVisibility(View.VISIBLE);
-                    btnScanCancel.setVisibility(View.VISIBLE);
+                    if (loginType.equals("VSCLogin")) {
+                        btnConfirm.performClick();
+                        btnConfirm.setPressed(true);
+                        btnConfirm.invalidate();
+                        // delay completion till animation completes
+                        btnConfirm.postDelayed(new Runnable() {  //delay button
+                            public void run() {
+                                btnConfirm.setPressed(false);
+                                btnConfirm.invalidate();
+                                //any other associated action
+                            }
+                        }, 800);  // .8secs delay time
+                    } else{
+                        btnConfirm.setVisibility(View.VISIBLE);
+                        btnScanCancel.setVisibility(View.VISIBLE);
+                    }
+
+
 
                 }
 
@@ -621,6 +637,14 @@ public class ScanConfirmActivity extends BaseActivity{
                     }
 
                     selectedLocID = text;
+
+                    for (int i = 0; i < locationDetailInfo.size(); i++) {
+                        if (locationDetailInfo.get(i).get("Address").equals(text)) {
+                            selectedLocID = locationDetailInfo.get(i).get("LocationID");
+                            selectedLongitude = locationDetailInfo.get(i).get("Longitude");
+                            selectedLatitude = locationDetailInfo.get(i).get("Latitude");
+                        }
+                    }
 
                 }
 
@@ -774,13 +798,22 @@ public class ScanConfirmActivity extends BaseActivity{
                 final Integer existAssets = numberExistingAssets;
                 final Integer newAssets = numberNewAssets;
                 Intent i = new Intent(ScanConfirmActivity.this, ScanActivity.class);
-                i.putExtra("selectedLocation",appStore);
                 i.putExtra("scanTime",scanTime.toString());
                 i.putExtra("assetsInStore",numberExistingAssets.toString());
                 i.putExtra("scannedAssets",numberNewAssets.toString());
                 i.putExtra("scanHistFlag",true);
                 i.putExtra("scanCount",scanCount);
-                i.putExtra("appUser",appUser);
+                i.putExtra("appUser",appUser);;
+                i.putExtra("loginType",loginType);
+                if (loginType.equals("VSCLogin")) {
+                    i.putExtra("selectedLocation",appStore);
+                    i.putExtra("appStore",appStore);
+                    i.putExtra("appStoreCode",appStoreCode);
+                }
+                if (loginType.equals("LocalLogin")){
+                    i.putExtra("selectedLocation",text);
+                }
+
                 clearData();
                 startActivity(i);
                 ScanConfirmActivity.this.finish();
