@@ -39,14 +39,11 @@ import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.datastore.syncengine.PendingMutation;
 import com.amplifyframework.hub.HubChannel;
-import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.AppUpdaterUtils;
 import com.github.javiersantos.appupdater.enums.AppUpdaterError;
-import com.github.javiersantos.appupdater.enums.Display;
-import com.github.javiersantos.appupdater.enums.Duration;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.Update;
-import com.google.android.material.snackbar.Snackbar;
+
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -134,29 +131,7 @@ public class ScanActivity extends BaseActivity{
                         Log.d("AppUpdater Error", "Something went wrong");
                     }
                 });
-     //   appUpdaterUtils.start();
-
-
-//        Auto Update Check
-//        AppUpdater appUpdater = new AppUpdater(this)
-//                .setDisplay(Display.SNACKBAR)
-//                .setDuration(Duration.INDEFINITE)
-//                .setUpdateFrom(UpdateFrom.JSON)
-//                .setCancelable(false)
-//                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json")
-//                .setButtonUpdateClickListener(new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                });
-//        appUpdater.start();
-
-
-
-
-        Log.i("VCheck","ProdAutoUpdatev6");
-
+        appUpdaterUtils.start();
 
         scanButton = (Button) findViewById(R.id.btnScan);
         signOutButton = (Button) findViewById(R.id.btnSignOut);
@@ -168,7 +143,7 @@ public class ScanActivity extends BaseActivity{
         doneButton = (Button) findViewById(R.id.DONE);
         Switch loadingSwitch = (Switch) findViewById(R.id.switchLoading);
         TextView vCode = (TextView) findViewById(R.id.vCode);
-        vCode.setText(BuildConfig.VERSION_NAME+"_2");
+        vCode.setText(BuildConfig.VERSION_NAME);
         loadingSwitch.setVisibility(View.INVISIBLE);
         scanButton.setVisibility(View.INVISIBLE);
         doneButton.setVisibility(View.INVISIBLE);

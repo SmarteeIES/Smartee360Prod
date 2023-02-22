@@ -49,7 +49,7 @@ public class AuthActivity extends BaseActivity{
         //Log.i("S360Screen","AuthCreate");
         Intent intent = getIntent();
         TextView vCode = (TextView) findViewById(R.id.vCode);
-        vCode.setText(BuildConfig.VERSION_NAME+"_1");
+        vCode.setText(BuildConfig.VERSION_NAME);
 //        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 //        wifiManager.setWifiEnabled(true);
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
