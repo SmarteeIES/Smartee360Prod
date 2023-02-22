@@ -648,14 +648,14 @@ public class ScanConfirmActivity extends BaseActivity{
 
                 }
 
-                for (int i = 0; i < accDetailInfo.size(); i++) {
-                    if (loginType.equals("VSCLogin")){
-                        if (accDetailInfo.get(i).get("AccNumber").equals(appStoreCode)) {
-                            selectedLocID = accDetailInfo.get(i).get("locationID");
-                            selectedLongitude = accDetailInfo.get(i).get("Longitude");
-                            selectedLatitude = accDetailInfo.get(i).get("Latitude");
-                            accFound = true;
-                        }
+                if (loginType.equals("VSCLogin")){
+                    for (int i = 0; i < accDetailInfo.size(); i++) {
+                            if (accDetailInfo.get(i).get("AccNumber").equals(appStoreCode)) {
+                                selectedLocID = accDetailInfo.get(i).get("locationID");
+                                selectedLongitude = accDetailInfo.get(i).get("Longitude");
+                                selectedLatitude = accDetailInfo.get(i).get("Latitude");
+                                accFound = true;
+                            }
                     }
                 }
 

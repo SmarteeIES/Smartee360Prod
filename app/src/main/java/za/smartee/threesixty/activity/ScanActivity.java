@@ -1,26 +1,15 @@
 package za.smartee.threesixty.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Application;
-import android.app.DownloadManager;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -36,8 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
-import android.os.StrictMode;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,18 +32,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.amazonaws.mobile.client.AWSMobileClient;
-import com.amazonaws.mobile.client.Callback;
-import com.amazonaws.mobile.client.SignOutOptions;
 import com.amplifyframework.core.Amplify;
-import com.amplifyframework.datastore.AWSDataStorePlugin;
 import com.amplifyframework.datastore.DataStoreChannelEventName;
-import com.amplifyframework.datastore.DataStoreConfiguration;
-import com.amplifyframework.datastore.DataStoreConflictHandler;
-import com.amplifyframework.datastore.DataStoreException;
-import com.amplifyframework.datastore.events.NetworkStatusEvent;
 import com.amplifyframework.datastore.generated.model.Assets;
 import com.amplifyframework.datastore.generated.model.Locations;
 import com.amplifyframework.datastore.syncengine.PendingMutation;
@@ -65,24 +43,20 @@ import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.AppUpdaterUtils;
 import com.github.javiersantos.appupdater.enums.AppUpdaterError;
 import com.github.javiersantos.appupdater.enums.Display;
+import com.github.javiersantos.appupdater.enums.Duration;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.Update;
-
-import org.jetbrains.annotations.NotNull;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import za.smartee.threesixty.BuildConfig;
 import za.smartee.threesixty.R;
@@ -145,38 +119,42 @@ public class ScanActivity extends BaseActivity{
         connectivityManager.requestNetwork(networkRequest, networkCallback);
         getLocation();
 
-
-        //Auto Update Check
-//        AppUpdater appUpdater = new AppUpdater(this)
-//                .setDisplay(Display.DIALOG)
-//                .setUpdateFrom(UpdateFrom.JSON)
-//                .setCancelable(false)
-//                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json");
-//        appUpdater.start();
-
         AppUpdaterUtils appUpdaterUtils = new AppUpdaterUtils(this)
                 .setUpdateFrom(UpdateFrom.JSON)
-                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog.json")
+                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json")
                 .withListener(new AppUpdaterUtils.UpdateListener() {
                     @Override
                     public void onSuccess(Update update, Boolean isUpdateAvailable) {
-//                        Log.d("Latest Version", update.getLatestVersion());
-//                        Log.d("Latest Version Code", String.valueOf(update.getLatestVersionCode()));
-//                        Log.d("Release notes", update.getReleaseNotes());
-//                        Log.d("URL", String.valueOf(update.getUrlToDownload()));
-//                        Log.d("Is update available?", Boolean.toString(isUpdateAvailable));
                         if (isUpdateAvailable) {
                             new DownloadFileFromURL().execute(String.valueOf(update.getUrlToDownload()));
                         }
-
                     }
-
                     @Override
                     public void onFailed(AppUpdaterError error) {
                         Log.d("AppUpdater Error", "Something went wrong");
                     }
                 });
-        appUpdaterUtils.start();
+     //   appUpdaterUtils.start();
+
+
+//        Auto Update Check
+//        AppUpdater appUpdater = new AppUpdater(this)
+//                .setDisplay(Display.SNACKBAR)
+//                .setDuration(Duration.INDEFINITE)
+//                .setUpdateFrom(UpdateFrom.JSON)
+//                .setCancelable(false)
+//                .setUpdateJSON("https://s360rellog.s3.amazonaws.com/update-changelog-temp.json")
+//                .setButtonUpdateClickListener(new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                });
+//        appUpdater.start();
+
+
+
+
         Log.i("VCheck","ProdAutoUpdatev6");
 
 
