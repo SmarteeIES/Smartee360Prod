@@ -94,4 +94,8 @@ dependencies {
 
     //Autoupdate using AppUpdater
     implementation 'com.github.javiersantos:AppUpdater:2.7'
+
+    //Searcheable spinner
+    implementation 'com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1'
+
 }
