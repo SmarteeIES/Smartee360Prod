@@ -122,10 +122,17 @@ public class ScanActivity extends BaseActivity{
                 .withListener(new AppUpdaterUtils.UpdateListener() {
                     @Override
                     public void onSuccess(Update update, Boolean isUpdateAvailable) {
+//                        Log.d("Latest Version", update.getLatestVersion());
+//                        Log.d("Latest Version Code", String.valueOf(update.getLatestVersionCode()));
+//                        Log.d("Release notes", update.getReleaseNotes());
+//                        Log.d("URL", String.valueOf(update.getUrlToDownload()));
+//                        Log.d("Is update available?", Boolean.toString(isUpdateAvailable));
                         if (isUpdateAvailable) {
                             new DownloadFileFromURL().execute(String.valueOf(update.getUrlToDownload()));
                         }
+
                     }
+
                     @Override
                     public void onFailed(AppUpdaterError error) {
                         Log.d("AppUpdater Error", "Something went wrong");

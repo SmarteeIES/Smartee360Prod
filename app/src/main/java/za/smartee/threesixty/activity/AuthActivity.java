@@ -141,11 +141,9 @@ public class AuthActivity extends BaseActivity{
             Bundle vscData2 = appLinkIntent.getExtras();
             String vscDataModified;
 
-
-
             //Determine if the app was started from VSc or manually
 
-            //Temporarilty changed to not null for simulation
+            //Temporarily changed to not null for simulation
             if (appLinkData == null){
 //            if (appLinkData != null){
                 tve1.setVisibility(View.VISIBLE);
@@ -164,8 +162,6 @@ public class AuthActivity extends BaseActivity{
                 vscDataModified = vscDataModified.replace("%20"," ");
                 //Split the integration source from payload data
                 String [] vscDataSplit = vscDataModified.split("#");
-
-
 
                 ArrayList<String> list = new ArrayList<>(Arrays.asList(vscDataSplit));
                 String payloadString = String.valueOf(vscDataSplit[1]);
